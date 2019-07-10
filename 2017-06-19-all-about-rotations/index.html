@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
+<meta name="keywords" content="Android,Frameworks,WMS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android屏幕旋转源码探索及应用实践">
+<meta property="og:url" content="http://yoursite.com/2017-06-19-all-about-rotations/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_landscape.png?imageView2/2/w/200/q/95">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/RotationFlow.png">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/configurationChange_flow.png">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/landscape_start_flow.png">
+<meta property="og:updated_time" content="2019-07-04T15:22:20.647Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android屏幕旋转源码探索及应用实践">
+<meta name="twitter:description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
+<meta name="twitter:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2017-06-19-all-about-rotations/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Android屏幕旋转源码探索及应用实践 | 奔哲明的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017-06-19-all-about-rotations/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Android屏幕旋转源码探索及应用实践
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-06-19 00:00:00" itemprop="dateCreated datePublished" datetime="2017-06-19T00:00:00+08:00">2017-06-19</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-04 23:22:20" itemprop="dateModified" datetime="2019-07-04T23:22:20+08:00">2019-07-04</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              
+                <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+              
+                <a href="/tags/WMS/" rel="tag"><i class="fa fa-tag"></i> WMS</a>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1 引言"></a>1 引言</h2><p>在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。   </p>
+<p>本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长的源码分析无感的同学可以直接看后面章节。  </p>
+<p>(基于Android7.1.1源码，推荐源码阅读网站：<a href="http://androidxref.com/" target="_blank" rel="noopener">http://androidxref.com/</a>)  </p>
+<h2 id="2-Rotation-与-Orientation区别"><a href="#2-Rotation-与-Orientation区别" class="headerlink" title="2 Rotation 与 Orientation区别"></a>2 Rotation 与 Orientation区别</h2><p>rotation 与 orientation 是相关但不同的概念。<br>orientation标识此时界面以什么方向显示，而且从词源上讲，这个方向可以是三维的；<br>而rotation是指平面内旋转的方向。      </p>
+<table>
+<thead>
+<tr>
+<th align="center">竖屏</th>
+<th align="center">横屏</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" alt="竖屏"></td>
+<td align="center"><img src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_landscape.png?imageView2/2/w/200/q/95" alt="横屏"></td>
+</tr>
+<tr>
+<td align="center">WMS.mRotation == 0</td>
+<td align="center">WMS.mRotation == 1</td>
+</tr>
+<tr>
+<td align="center">screenOrientation == 1</td>
+<td align="center">screenOrientation == 0</td>
+</tr>
+<tr>
+<td align="center">Configuration.orientation == 1</td>
+<td align="center">Configuration.orientation == 2</td>
+</tr>
+</tbody></table>
+<h3 id="2-1-rotation"><a href="#2-1-rotation" class="headerlink" title="2.1 rotation"></a>2.1 rotation</h3><p>rotation旋转方向是指界面(不是手机)相对于默认情况顺时针旋转的角度，平板一般默认横屏，而小屏幕设备默认竖屏。<br>其值，定义在Surface.java中：  </p>
+<pre><code>ROTATION_0 = 0, ROTATION_90 = 1, ROTATION_180 = 2, ROTATION_270 = 3  </code></pre><h3 id="2-2-orientation"><a href="#2-2-orientation" class="headerlink" title="2.2 orientation"></a>2.2 orientation</h3><p>orientation 分为两种，一个是在ActivityInfo.java中，另一个在Configuration.java。<br>前者具体来说是ActivityInfo.screenOrientation，这个值用于记录App强制设定的方向或旋转模式。具体代码如下：  </p>
+<pre><code class="Java"><span class="comment">/**  </span>
+<span class="comment"> * The preferred screen orientation this activity would like to run in.  </span>
+<span class="comment"> * From the {<span class="doctag">@link</span> android.R.attr#screenOrientation} attribute, one of  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_UNSPECIFIED},  -1  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_LANDSCAPE},     0  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_PORTRAIT},      1  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_USER},          2  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_BEHIND},        3  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_SENSOR},          </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_NOSENSOR},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_SENSOR_LANDSCAPE},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_SENSOR_PORTRAIT},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_REVERSE_LANDSCAPE},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_REVERSE_PORTRAIT},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_FULL_SENSOR},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_USER_LANDSCAPE},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_USER_PORTRAIT},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_FULL_USER},  </span>
+<span class="comment"> * {<span class="doctag">@link</span> #SCREEN_ORIENTATION_LOCKED},        14  </span>
+<span class="comment"> */</span>  
+<span class="meta">@ScreenOrientation</span>  
+<span class="keyword">public</span> <span class="keyword">int</span> screenOrientation = SCREEN_ORIENTATION_UNSPECIFIED;  </code></pre>
+<p>而Configuration.java中的orientation值可以认为只有两个，横屏或竖屏：  </p>
+<pre><code class="Java"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ORIENTATION_UNDEFINED = <span class="number">0</span>;  
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ORIENTATION_PORTRAIT = <span class="number">1</span>;  
+<span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ORIENTATION_LANDSCAPE = <span class="number">2</span>;  
+<span class="meta">@Deprecated</span> <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> ORIENTATION_SQUARE = <span class="number">3</span>;  </code></pre>
+<p>当app具体渲染时候，不必在意具体旋转方向，区分横屏竖屏即可。  </p>
+<h2 id="3-自动旋转开关"><a href="#3-自动旋转开关" class="headerlink" title="3 自动旋转开关"></a>3 自动旋转开关</h2><p>系统全局是否响应sensor的旋转做转屏是通过Settings中的“自动旋转”开关控制的：<br>开与关分别调用wms#thawRotation()和wms#freezeRotation。<br>这两个动作，主要是为了改PhoneWindowManager中两个值，mUserRotationMode和mUserRotation，前者控制是否自由旋屏，后者是旋转锁死时候的系统旋转方向。  </p>
+<p>mUserRotationMode会有两种值，声明在WindowManagerPolicy中：  </p>
+<pre><code class="Java"><span class="comment">/** When not otherwise specified by the activity's screenOrientation, rotation should be  </span>
+<span class="comment"> * determined by the system (that is, using sensors). */</span>  
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> USER_ROTATION_FREE = <span class="number">0</span>;  
+<span class="comment">/** When not otherwise specified by the activity's screenOrientation, rotation is set by  </span>
+<span class="comment"> * the user. */</span>  
+<span class="keyword">public</span> <span class="keyword">final</span> <span class="keyword">int</span> USER_ROTATION_LOCKED = <span class="number">1</span>;  </code></pre>
+<p>在thawRotation开启自动旋转时，设置<code>mUserRotationMode</code>值为0。  </p>
+<p>在freezeRotation时，除了设置<code>mUserRotationMode</code>为1，还会为<code>mUserRotation</code>赋值，一般是0，即竖屏方向，这样如果应用没有自行设置orientation，那么方向判断时就会使用这里的<code>mUserRotation</code>，从而尽可能保持竖屏。  </p>
+<p>设置这两个值的具体过程还涉及到Setting、PhoneWindowManager.SettingObserver，有兴趣的可以看此处blog的详细代码和流程分析：<a href="http://blog.csdn.net/kc58236582/article/details/53671134" target="_blank" rel="noopener">WMS注册传感器回调</a>  </p>
+<p><code>mUserRotationMode</code>和<code>mUserRotation</code>将在判断orientation的时候起到关键作用，在后续具体流程还会讲到。  </p>
+<h2 id="4-旋转，从Sensor到onConfigurationChanged"><a href="#4-旋转，从Sensor到onConfigurationChanged" class="headerlink" title="4 旋转，从Sensor到onConfigurationChanged"></a>4 旋转，从Sensor到onConfigurationChanged</h2><p><img src="http://or5nesfx1.bkt.clouddn.com/RotationFlow.png" alt="旋转流程"><br>上图是一般情况下在应用内屏幕从竖屏旋转到竖屏时的调用流程图，这里我们分为三部分讲，包括WMS一侧rotation更新逻辑，AMS一侧的configuration控制逻辑，以及AMS将configuration分发到app和WMS的逻辑。  </p>
+<h3 id="4-1-Sensor-gt-PWM-gt-WMS"><a href="#4-1-Sensor-gt-PWM-gt-WMS" class="headerlink" title="4.1 Sensor -&gt; PWM  -&gt; WMS"></a>4.1 Sensor -&gt; PWM  -&gt; WMS</h3><p>特别值得看的有两个地方：<br>一个是<code>WMS#updateRotationUnchecked()</code>，还有一个是<code>WMS#rotationForOrientationLw()</code>。  </p>
+<p>updateRotationUnchecked方法可以看作是更新旋转的枢纽，它联系了PWM、AMS和WMS，代码如下：<br><strong>updateRotationUnchecked()</strong>  </p>
+<pre><code class="Java"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateRotationUnchecked</span><span class="params">(<span class="keyword">boolean</span> alwaysSendConfiguration, <span class="keyword">boolean</span> forceRelayout)</span> </span>{  
+        ......  
+        <span class="keyword">boolean</span> changed;  
+        <span class="keyword">synchronized</span>(mWindowMap) {  
+            changed = updateRotationUncheckedLocked(<span class="keyword">false</span>);  
+            <span class="keyword">if</span> (!changed || forceRelayout) {  
+                getDefaultDisplayContentLocked().layoutNeeded = <span class="keyword">true</span>;  
+                mWindowPlacerLocked.performSurfacePlacement();  
+            }  
+        }  
+
+        <span class="keyword">if</span> (changed || alwaysSendConfiguration) {  
+            sendNewConfiguration();  
+        }  
+
+        Binder.restoreCallingIdentity(origId);  
+    }  </code></pre>
+<p>首先调用updateRotationUncheckedLocked()进行rotation的更新，而如果rotation有更新，则sendNewConfiguration()通知AMS更新configuration。  </p>
+<p>而在updateRotationUncheckedLocked()中，也就是流程图中的5处，会通过下面这句计算得到新的rotation：  </p>
+<pre><code>int rotation = mPolicy.rotationForOrientationLw(mLastOrientation, mRotation);  </code></pre><p>mLastOrientation和mRotation全局记录在WMS中，其中前者是应用显示方向，后者是生效的旋转方向。<br>这个方法是重点，因为我们需要知道对于不同应用不同环境，为什么有时候会旋转有时候不旋转，而这个方法的结果直接决定了系统是否发生旋转。方法具体如下：  </p>
+<pre><code class="Java"><span class="meta">@Override</span>  
+    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">rotationForOrientationLw</span><span class="params">(<span class="keyword">int</span> orientation, <span class="keyword">int</span> lastRotation)</span> </span>{  
+        <span class="keyword">if</span> (<span class="keyword">false</span>) {  
+            Slog.v(TAG, <span class="string">"rotationForOrientationLw(orient="</span>  
+                        + orientation + <span class="string">", last="</span> + lastRotation  
+                        + <span class="string">"); user="</span> + mUserRotation + <span class="string">" "</span>  
+                        + ((mUserRotationMode == WindowManagerPolicy.USER_ROTATION_LOCKED)  
+                            ? <span class="string">"USER_ROTATION_LOCKED"</span> : <span class="string">""</span>)  
+                        );  
+        }  
+
+        <span class="keyword">if</span> (mForceDefaultOrientation) {  
+            <span class="keyword">return</span> Surface.ROTATION_0;  
+        }  
+
+        <span class="keyword">synchronized</span> (mLock) {  
+            <span class="keyword">int</span> sensorRotation = mOrientationListener.getProposedRotation(); <span class="comment">// may be -1  </span>
+            <span class="keyword">if</span> (sensorRotation &lt; <span class="number">0</span>) {  
+                sensorRotation = lastRotation;  
+            }  
+
+            <span class="keyword">final</span> <span class="keyword">int</span> preferredRotation;  
+            <span class="keyword">if</span> (mLidState == LID_OPEN &amp;&amp; mLidOpenRotation &gt;= <span class="number">0</span>) {  
+                <span class="comment">// Ignore sensor when lid switch is open and rotation is forced.  </span>
+                preferredRotation = mLidOpenRotation;  
+            }   
+              ......  
+
+              <span class="keyword">else</span> <span class="keyword">if</span> (mDemoRotationLock) {  
+                <span class="comment">// Ignore sensor when demo rotation lock is enabled.  </span>
+                <span class="comment">// Note that the dock orientation and HDMI rotation lock override this.  </span>
+                preferredRotation = mDemoRotation;  
+            } <span class="keyword">else</span> <span class="keyword">if</span> (orientation == ActivityInfo.SCREEN_ORIENTATION_LOCKED) {  
+                <span class="comment">// Application just wants to remain locked in the last rotation.  </span>
+                preferredRotation = lastRotation;  
+            } <span class="keyword">else</span> <span class="keyword">if</span> (!mSupportAutoRotation) {  
+                <span class="comment">// If we don't support auto-rotation then bail out here and ignore  </span>
+                <span class="comment">// the sensor and any rotation lock settings.  </span>
+                preferredRotation = -<span class="number">1</span>;  
+            } <span class="keyword">else</span> <span class="keyword">if</span> ((mUserRotationMode == WindowManagerPolicy.USER_ROTATION_FREE  
+                            &amp;&amp; (orientation == ActivityInfo.SCREEN_ORIENTATION_USER  
+                                    || orientation == ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED  
+                                    || orientation == ActivityInfo.SCREEN_ORIENTATION_USER_LANDSCAPE  
+                                    || orientation == ActivityInfo.SCREEN_ORIENTATION_USER_PORTRAIT  
+                                    || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_USER))  
+                    || orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR  
+                    || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR  
+                    || orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE  
+                    || orientation == ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT) {  
+                <span class="comment">// Otherwise, use sensor only if requested by the application or enabled  </span>
+                <span class="comment">// by default for USER or UNSPECIFIED modes.  Does not apply to NOSENSOR.  </span>
+                <span class="keyword">if</span> (mAllowAllRotations &lt; <span class="number">0</span>) {  
+                    <span class="comment">// Can't read this during init() because the context doesn't  </span>
+                    <span class="comment">// have display metrics at that time so we cannot determine  </span>
+                    <span class="comment">// tablet vs. phone then.  </span>
+                    mAllowAllRotations = mContext.getResources().getBoolean(  
+                            com.android.internal.R.bool.config_allowAllRotations) ? <span class="number">1</span> : <span class="number">0</span>;  
+                }  
+                <span class="keyword">if</span> (sensorRotation != Surface.ROTATION_180  
+                        || mAllowAllRotations == <span class="number">1</span>  
+                        || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_SENSOR  
+                        || orientation == ActivityInfo.SCREEN_ORIENTATION_FULL_USER) {  
+                    preferredRotation = sensorRotation;  
+                } <span class="keyword">else</span> {  
+                    preferredRotation = lastRotation;  
+                }  
+            } <span class="keyword">else</span> <span class="keyword">if</span> (mUserRotationMode == WindowManagerPolicy.USER_ROTATION_LOCKED  
+                    &amp;&amp; orientation != ActivityInfo.SCREEN_ORIENTATION_NOSENSOR) {  
+                <span class="comment">// Apply rotation lock.  Does not apply to NOSENSOR.  </span>
+                <span class="comment">// The idea is that the user rotation expresses a weak preference for the direction  </span>
+                <span class="comment">// of gravity and as NOSENSOR is never affected by gravity, then neither should  </span>
+                <span class="comment">// NOSENSOR be affected by rotation lock (although it will be affected by docks).  </span>
+                preferredRotation = mUserRotation;  
+            } <span class="keyword">else</span> {  
+                <span class="comment">// No overriding preference.  </span>
+                <span class="comment">// We will do exactly what the application asked us to do.  </span>
+                preferredRotation = -<span class="number">1</span>;  
+            }  
+
+            <span class="keyword">switch</span> (orientation) {  
+                <span class="keyword">case</span> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:  
+                    <span class="comment">// Return portrait unless overridden.  </span>
+                    <span class="keyword">if</span> (isAnyPortrait(preferredRotation)) {  
+                        <span class="keyword">return</span> preferredRotation;  
+                    }  
+                    <span class="keyword">return</span> mPortraitRotation;  
+
+                <span class="keyword">case</span> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:  
+                    <span class="comment">// Return landscape unless overridden.  </span>
+                    <span class="keyword">if</span> (isLandscapeOrSeascape(preferredRotation)) {  
+                        <span class="keyword">return</span> preferredRotation;  
+                    }  
+                    <span class="keyword">return</span> mLandscapeRotation;  
+
+                ......  
+
+                <span class="keyword">default</span>:  
+                    <span class="comment">// For USER, UNSPECIFIED, NOSENSOR, SENSOR and FULL_SENSOR,  </span>
+                    <span class="comment">// just return the preferred orientation we already calculated.  </span>
+                    <span class="keyword">if</span> (preferredRotation &gt;= <span class="number">0</span>) {  
+                        <span class="keyword">return</span> preferredRotation;  
+                    }  
+                    <span class="keyword">return</span> Surface.ROTATION_0;  
+            }  
+        }  
+    }  </code></pre>
+<p>这个函数前面的if-else主要是结合当前系统显示模式、旋转模式以及sensor监测到的旋转方向给出一个preferredRotation，后面的switch-case则是根据当前的orientation决定是否可以使用preferredRotation。<br>下面我们从两个具体情况看这段代码做了什么，<a href="#SCREEN_ORIENTATION_UNSPECIFIED">应用不设置横竖屏的情况</a>以及<a href="#SCREEN_ORIENTATION_PORTRAIT">应用设置强制竖屏的情况</a>  </p>
+<h4 id="4-1-1-应用不设置横竖屏的情况"><a href="#4-1-1-应用不设置横竖屏的情况" class="headerlink" title="4.1.1 应用不设置横竖屏的情况"></a><span id="4_1_1">4.1.1</span> <span id="SCREEN_ORIENTATION_UNSPECIFIED">应用不设置横竖屏的情况</span></h4><p>对于一个没有设置screenOrientation的应用来说，一次竖屏旋转到横屏，wms是如何判定orientation的?  </p>
+<pre><code>int rotation = mPolicy.rotationForOrientationLw(mLastOrientation, mRotation);  </code></pre><p>在上面一行代码中，<code>mLastOrientation</code>此时为应用的screenOrientation值  -1（UNSPECIFIED）,<code>mRotatiton</code>是上次竖屏的值0。<br>然后进入orientationForRotation()    </p>
+<pre><code>int sensorRotation = mOrientationListener.getProposedRotation(); // may be -1  </code></pre><p>要转到竖屏，所以此时sensorRotation为1。在后续判断中，首先根据各种系统此时的显示模式以及应用的orientationMode计算preferredRotation。在当前情况下，会走到90行  </p>
+<pre><code>preferredRotation = sensorRotation;  </code></pre><p>并且由于当前orientation是SCREEN_ORIENTATION_UNSPECIFIED（应用未设置）的，最后会在130行将preferredRotation(==1)作为结果返回。<br>随后WMS将<code>mRotation</code>值更新为1，并继续根据该值更新displayInfo等信息，<br>具体更新displayInfo等相关内容的流程这里不再详解，大致意思就是一层层重新计算display的长宽，最终给到设备底层，具体代码流程分析可以看<a href="http://blog.csdn.net/kc58236582/article/details/53689526" target="_blank" rel="noopener">此处</a>。  </p>
+<p>除了dissplayInfo的更新，这里还创建了旋转动画，与动画相关的具体在下文第7节讲解。<br>这些WMS系统显示层相关东西搞定后，回到<code>WMS#updateRotationUnchecked</code>，此时changed为true，即configuration有变化，调用<strong>AMS#updateConfiguration</strong>更新configuration。  </p>
+<p>下面看看应用如果设置了强制竖屏时，rotationForOrientationLw返回的结果如何。  </p>
+<h4 id="4-1-2-应用设置强制竖屏的情况"><a href="#4-1-2-应用设置强制竖屏的情况" class="headerlink" title="4.1.2 应用设置强制竖屏的情况"></a>4.1.2 <span id="SCREEN_ORIENTATION_PORTRAIT">应用设置强制竖屏的情况</span></h4><p>应用强制设置竖屏的方式将在第5节中具体讲，<br>可以确定的一点是，在成功设置好竖屏后，且没关闭系统自动旋转开关的情况下，几个关键的变量如下：<br>WMS.mLastOrientation == 1, WMS.mRotation == 0,<br>PWM.mUserRotationMode == 0 (ROTATION_FREE), PWM.mUserRotation == 0。  </p>
+<p>然后我们将手机从竖屏旋转到横屏，在<code>rotationForOrientationLw()</code>中进行判断时，虽然<code>UserRotationMode</code>是FREE的，但<code>mLastOrientation</code>却并不属于67~76行的条件中的一个，preferredRotation不能使用sensorRotation，且在后面switch(orientation)是，对于ORIENTATION_PORTRAIT的情况，实际上preferredRotation也是不会生效的，无论如何都会返回0，也就是说应用设定的orientation优先级总是最高的。  </p>
+<p>WMS拿到0的结果后，由于与已有的<code>mRotation</code>值相同，会中断后续逻辑，对旋转不做任何反应，由于没有向AMS更新configuration，所以也不会有onConfigurationChanged过程，其它app也不会知道发生了旋转。  </p>
+<h3 id="4-2-AMS"><a href="#4-2-AMS" class="headerlink" title="4.2 AMS"></a>4.2 AMS</h3><p>回到WMS#updateRotationUnchecked()，在确定rotation更新后changed==true，执行方法sendNewConfiguration() -&gt; AMS#updateConfiguration 通知AMS更新configuration。  </p>
+<p><strong>AMS#updateConfiguration()</strong>  </p>
+<pre><code>public void updateConfiguration(Configuration values) {  
+    enforceCallingPermission(android.Manifest.permission.CHANGE_CONFIGURATION,  
+            &quot;updateConfiguration()&quot;);  
+
+    synchronized(this) {  
+        if (values == null &amp;&amp; mWindowManager != null) {  
+            // sentinel: fetch the current configuration from the window manager  
+            values = mWindowManager.computeNewConfiguration();  
+        }  
+
+        if (mWindowManager != null) {  
+            mProcessList.applyDisplaySize(mWindowManager);  
+        }  
+
+        final long origId = Binder.clearCallingIdentity();  
+        if (values != null) {  
+            Settings.System.clearConfiguration(values);  
+        }  
+        updateConfigurationLocked(values, null, false);  
+        Binder.restoreCallingIdentity(origId);  
+    }  
+}  </code></pre><p>入参values这时候为空，首先从WMS重新获取一遍，生成一个新的Configuration，然后进入方法updateConfigurationLocked()<br><span id="ams_updateconfiglocked"><strong>ActivityManagerService#updateConfigurationLocked</strong></span>  </p>
+<pre><code class="Java"><span class="comment">/**  </span>
+<span class="comment"> * Do either or both things: (1) change the current configuration, and (2)  </span>
+<span class="comment"> * make sure the given activity is running with the (now) current  </span>
+<span class="comment"> * configuration.  Returns true if the activity has been left running, or  </span>
+<span class="comment"> * false if &lt;var&gt;starting&lt;/var&gt; is being destroyed to match the new  </span>
+<span class="comment"> * configuration.  </span>
+<span class="comment"> *  </span>
+<span class="comment"> * <span class="doctag">@param</span> userId is only used when persistent parameter is set to true to persist configuration  </span>
+<span class="comment"> *               for that particular user  </span>
+<span class="comment"> */</span>  
+<span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">updateConfigurationLocked</span><span class="params">(Configuration values, ActivityRecord starting,  </span></span>
+<span class="function"><span class="params">        <span class="keyword">boolean</span> initLocale, <span class="keyword">boolean</span> persistent, <span class="keyword">int</span> userId, <span class="keyword">boolean</span> deferResume)</span> </span>{  
+    <span class="keyword">int</span> changes = <span class="number">0</span>;  
+
+    <span class="keyword">if</span> (mWindowManager != <span class="keyword">null</span>) {  
+        mWindowManager.deferSurfaceLayout();  
+    }  
+    <span class="keyword">if</span> (values != <span class="keyword">null</span>) {  
+        Configuration newConfig = <span class="keyword">new</span> Configuration(mConfiguration);  
+        changes = newConfig.updateFrom(values); <span class="comment">//copy更新，同时以flags的方式记录区别  </span>
+        <span class="keyword">if</span> (changes != <span class="number">0</span>) {  
+            ......  
+            mConfigurationSeq++;  
+            <span class="keyword">if</span> (mConfigurationSeq &lt;= <span class="number">0</span>) {  
+                mConfigurationSeq = <span class="number">1</span>;  
+            }  
+            newConfig.seq = mConfigurationSeq; <span class="comment">//序列号，可用来略过旧的config  </span>
+            mConfiguration = newConfig; <span class="comment">//保存新configuration  </span>
+            ......  
+            <span class="keyword">final</span> Configuration configCopy = <span class="keyword">new</span> Configuration(mConfiguration);  
+            ......  
+
+            <span class="keyword">for</span> (<span class="keyword">int</span> i=mLruProcesses.size()-<span class="number">1</span>; i&gt;=<span class="number">0</span>; i--) {  
+                ProcessRecord app = mLruProcesses.get(i);  
+                <span class="keyword">try</span> {  
+                    <span class="keyword">if</span> (app.thread != <span class="keyword">null</span>) {  
+                        <span class="keyword">if</span> (DEBUG_CONFIGURATION) Slog.v(TAG_CONFIGURATION, <span class="string">"Sending to proc "</span>  
+                                + app.processName + <span class="string">" new config "</span> + mConfiguration);  
+                        app.thread.scheduleConfigurationChanged(configCopy);  
+                    }  
+                } <span class="keyword">catch</span> (Exception e) {  
+                }  
+            }  
+            Intent intent = <span class="keyword">new</span> Intent(Intent.ACTION_CONFIGURATION_CHANGED);  
+            intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY  
+                    | Intent.FLAG_RECEIVER_REPLACE_PENDING  
+                    | Intent.FLAG_RECEIVER_FOREGROUND);  
+            broadcastIntentLocked(<span class="keyword">null</span>, <span class="keyword">null</span>, intent, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>, <span class="keyword">null</span>, <span class="keyword">null</span>,  
+                    <span class="keyword">null</span>, AppOpsManager.OP_NONE, <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">false</span>,  
+                    MY_PID, Process.SYSTEM_UID, UserHandle.USER_ALL);  
+            <span class="keyword">if</span> ((changes&amp;ActivityInfo.CONFIG_LOCALE) != <span class="number">0</span>) {  
+                intent = <span class="keyword">new</span> Intent(Intent.ACTION_LOCALE_CHANGED);  
+                intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);  
+                <span class="keyword">if</span> (initLocale || !mProcessesReady) {  
+                    intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY);  
+                }  
+                broadcastIntentLocked(<span class="keyword">null</span>, <span class="keyword">null</span>, intent,  
+                        <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="number">0</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, AppOpsManager.OP_NONE,  
+                        <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, MY_PID, Process.SYSTEM_UID, UserHandle.USER_ALL);  
+            }  
+            ......  
+        }  
+        <span class="comment">// Update the configuration with WM first and check if any of the stacks need to be  </span>
+        <span class="comment">// resized due to the configuration change. If so, resize the stacks now and do any  </span>
+        <span class="comment">// relaunches if necessary. This way we don't need to relaunch again below in  </span>
+        <span class="comment">// ensureActivityConfigurationLocked().  </span>
+        <span class="keyword">if</span> (mWindowManager != <span class="keyword">null</span>) {  
+            <span class="keyword">final</span> <span class="keyword">int</span>[] resizedStacks = mWindowManager.setNewConfiguration(mConfiguration);  
+            <span class="keyword">if</span> (resizedStacks != <span class="keyword">null</span>) {  
+                <span class="keyword">for</span> (<span class="keyword">int</span> stackId : resizedStacks) {  
+                    <span class="keyword">final</span> Rect newBounds = mWindowManager.getBoundsForNewConfiguration(stackId);  
+                    mStackSupervisor.resizeStackLocked(  
+                            stackId, newBounds, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">false</span>, <span class="keyword">false</span>, deferResume);  
+                }  
+            }  
+        }  
+    }  
+
+    <span class="keyword">boolean</span> kept = <span class="keyword">true</span>;  
+    <span class="keyword">final</span> ActivityStack mainStack = mStackSupervisor.getFocusedStack();  
+    <span class="comment">// mainStack is null during startup.  </span>
+    <span class="keyword">if</span> (mainStack != <span class="keyword">null</span>) {  
+        <span class="keyword">if</span> (changes != <span class="number">0</span> &amp;&amp; starting == <span class="keyword">null</span>) {  
+            <span class="comment">// If the configuration changed, and the caller is not already  </span>
+            <span class="comment">// in the process of starting an activity, then find the top  </span>
+            <span class="comment">// activity to check if its configuration needs to change.  </span>
+            starting = mainStack.topRunningActivityLocked();  
+        }  
+
+        <span class="keyword">if</span> (starting != <span class="keyword">null</span>) {  
+            kept = mainStack.ensureActivityConfigurationLocked(starting, changes, <span class="keyword">false</span>);  
+            <span class="comment">// And we need to make sure at this point that all other activities  </span>
+            <span class="comment">// are made visible with the correct configuration.  </span>
+            mStackSupervisor.ensureActivitiesVisibleLocked(starting, changes,  
+                    !PRESERVE_WINDOWS);  
+        }  
+    }  
+    <span class="keyword">if</span> (mWindowManager != <span class="keyword">null</span>) {  
+        mWindowManager.continueSurfaceLayout();  
+    }  
+    <span class="keyword">return</span> kept;  
+}  
+</code></pre>
+<p>代码略长，上面已经略去很多这里不会讲的内容。<br>整个方法先前后通过<code>mWindowManager.deferSurfaceLayout()</code>和<code>mWindowManager.continueSurfaceLayout()</code>包起来，毕竟config变动布局等影响很大，许多状态变化会触发到surfacelayout，通过这种方式避免重复刷新。<br>首先将新config保存到mConfiguration中，然后是关键的33<del>43行:<br>遍历mLruProcesses，调用appThread.scheduleConfigurationChanged，对应的ActivityThread随后进入onConfigurationChanged相关流程，app侧的处理下面会再细讲。<a href="#4_3_schedulConfig">跳转</a><br>除此之外，44</del>66行，updateConfigurationChanged()还会发出ACTION_CONFIGURATION_CHANGED的广播，似乎是留给其它service接收该广播做其他事情的。<br>再之后，图中流程15，调用WMS#setNewConfiguration回到WMS:  </p>
+<pre><code>@Override  
+    public int[] setNewConfiguration(Configuration config) {  
+        if (!checkCallingPermission(android.Manifest.permission.MANAGE_APP_TOKENS,  
+                &quot;setNewConfiguration()&quot;)) {  
+            throw new SecurityException(&quot;Requires MANAGE_APP_TOKENS permission&quot;);  
+        }  
+
+        synchronized(mWindowMap) {  
+            if (mWaitingForConfig) {  
+                mWaitingForConfig = false;  
+                mLastFinishedFreezeSource = &quot;new-config&quot;;  
+            }  
+            boolean configChanged = mCurConfiguration.diff(config) != 0;  
+            if (!configChanged) {  
+                return null;  
+            }  
+            prepareFreezingAllTaskBounds();  
+            mCurConfiguration = new Configuration(config);  
+            return onConfigurationChanged();  
+        }  
+    }  </code></pre><p>这个方法主要是向WMS更新mCurConfiguration。是的，WMS此时才更新到新的Configuration，之前WMS的逻辑主要是在display和phone层面上的动作，最关键的修改是mRotation，而这里则扩展到了Configuration领域的动作，主题、字体、bounds的改变都是configuration的改变，AMS在逻辑层面更有话语权，而此时WMS响应新的配置项，并调用WMS#onConfigurationChanged()。<br>不过在更早的<a href="http://androidxref.com/6.0.0_r5/xref/frameworks/base/services/core/java/com/android/server/wm/WindowManagerService.java#4037" target="_blank" rel="noopener">android版本</a>上，这里并没有这么多的操作，会直接就进行surfaceLayout(现在延迟到continueSurfaceLayout了)，这里增加的内容主要为了提前响应非全屏应用的bounds的改变，尤其有不少为分屏stack量身定制的逻辑，这里就不再细讲了。  </p>
+<p>在刷新界面之前，还有很重要的一部分逻辑，91行：  </p>
+<pre><code>kept = mainStack.ensureActivityConfigurationLocked(starting, changes, false);  
+// And we need to make sure at this point that all other activities  
+// are made visible with the correct configuration.  
+mStackSupervisor.ensureActivitiesVisibleLocked(starting, changes, !PRESERVE_WINDOWS);  </code></pre><p>然后进入<strong>ActivityStack#ensureActivityConfigurationLocked</strong>  </p>
+<pre><code>/**  
+ * Make sure the given activity matches the current configuration. Returns false if the activity  
+ * had to be destroyed.  Returns true if the configuration is the same, or the activity will  
+ * remain running as-is for whatever reason. Ensures the HistoryRecord is updated with the  
+ * correct configuration and all other bookkeeping is handled.  
+ */  
+boolean ensureActivityConfigurationLocked(  
+        ActivityRecord r, int globalChanges, boolean preserveWindow) {  
+    ......  
+
+    if ((changes&amp;(~r.info.getRealConfigChanged())) != 0 || r.forceNewConfig) {  
+        // Aha, the activity isn&apos;t handling the change, so DIE DIE DIE.  
+        r.configChangeFlags |= changes;  
+        r.startFreezingScreenLocked(r.app, globalChanges);  
+        r.forceNewConfig = false;  
+        preserveWindow &amp;= isResizeOnlyChange(changes);  
+        if (r.app == null || r.app.thread == null) {  
+            ......  
+        } else if (r.state == ActivityState.RESUMED) {  
+            // Try to optimize this case: the configuration is changing and we need to restart  
+            // the top, resumed activity. Instead of doing the normal handshaking, just say  
+            // &quot;restart!&quot;.  
+            relaunchActivityLocked(r, r.configChangeFlags, true, preserveWindow);  
+        } else {  
+            if (DEBUG_SWITCH || DEBUG_CONFIGURATION) Slog.v(TAG_CONFIGURATION,  
+                    &quot;Config is relaunching non-resumed &quot; + r);  
+            relaunchActivityLocked(r, r.configChangeFlags, false, preserveWindow);  
+        }  
+
+        // All done...  tell the caller we weren&apos;t able to keep this activity around.  
+        return false;  
+    }  
+
+    // Default case: the activity can handle this new configuration, so hand it over.  
+    // NOTE: We only forward the task override configuration as the system level configuration  
+    // changes is always sent to all processes when they happen so it can just use whatever  
+    // system level configuration it last got.  
+    r.scheduleConfigurationChanged(taskConfig, true);  
+    r.stopFreezingScreenLocked(false);  
+
+    return true;  
+}  </code></pre><p>注释已经将此方法解释得很好：确保activity的Configuration更新，如果应用没有针对该类改变做特殊处理，那么不得不重启应用，走relaunch流程；相反，如果应用能够在handle当前的变化，那么走scheduleConfigurationChanged-&gt;onConfigurationChanged流程。这里的两个分支判断细节在后面会用具体例子讲解，这里先继续讲relauch流程部分。  </p>
+<p>relaunch流程很长，简单的说就是把应用重启了一遍，我们跳过各种binder调用，直接到app一侧并择取其中关键易懂的：<br><strong>android.app.ActivityThread#handleRelaunchActivity()</strong>  </p>
+<pre><code>private void handleRelaunchActivity(ActivityClientRecord tmp) {  
+    ......  
+    // Need to ensure state is saved.  
+    if (!r.paused) {  
+        performPauseActivity(r.token, false, r.isPreHoneycomb(), &quot;handleRelaunchActivity&quot;);  
+    }  
+    if (r.state == null &amp;&amp; !r.stopped &amp;&amp; !r.isPreHoneycomb()) {  
+        callCallActivityOnSaveInstanceState(r);  
+    }  
+
+    handleDestroyActivity(r.token, false, configChanges, true);  
+    ......  
+    handleLaunchActivity(r, currentIntent, &quot;handleRelaunchActivity&quot;);  
+    ......  
+}  </code></pre><p>可以看到，代码里顺次进行了pause、destroy、launch，前面两个就是一般意义上的onPause、onDestroy生命周期。<br>而launch流程，它则是与一般的start流程<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>一样的，relaunch就是我们常说的旋转屏幕时Activity会销毁重建的原因。<br>然后我们还看到第8行调用了onSaveInstanceState，所以应对屏幕旋转时的重新实例化的改变，通常需要在onSaveInstanceState()中保留必要的现场数据，应对屏幕旋转的其它技术细节见第6节。  </p>
+<p>回到AMS，除了对top应用的处理，还有对其它activities的处理。ensureActivitiesVisibleLocked将会遍历task，确定其它的activity的visible和configuration状态都正常，如果还有需要显示的activity（例如前台是透明应用的情况），也要走一遍<code>ensureActivityConfigurationLocked</code>流程。  </p>
+<h3 id="4-3-AMS-gt-AppThread-onConfigurationChanged"><a href="#4-3-AMS-gt-AppThread-onConfigurationChanged" class="headerlink" title="4.3 AMS -&gt; AppThread.onConfigurationChanged"></a><span id="4_3_schedulConfig">4.3 AMS -&gt; AppThread.onConfigurationChanged</span></h3><p>首先给出结论，只要系统AMS里的configuration确认发生了变化，所有app都会接收到新的configuration，并根据其配置可能执行onConfigurationChanged方法。  </p>
+<p>在上一节<a href="#ams_updateconfiglocked">AMS#updateConfigurationLocked</a>方法中，我们讲到其会遍历mLruProcesses，对每个appThread调用scheduleConfigurationChanged接口，这里我们讲一讲app在config变化后都做了什么以及如何继续步入onConfigurationChanged方法，流程图如下<br><img src="http://or5nesfx1.bkt.clouddn.com/configurationChange_flow.png" alt="onConfigurationChanged流程图"><br>首先在2.updatePendingConfiguration里把新值保存在mPendingConfiguration里，丢出msg，AMS继续遍历，app侧在handleConfigurationChanged继续处理。<br>紧接着，执行4.applyConfigurationToResourcesLocked，顾名思义，讲config应用到resource上，可以想见，这里将会遍历resource，按照config的变化刷新资源，具体是交给ResourcesImpl.updateConfiguration处理，值得细看，但我对resource不太熟悉，就不细讲了。<br>接下来collectComponentCallbacks()，收集应用的组件，再遍历组件执行performConfigurationChanged(cb)，这也是我们比较关心的地方。<br>这个方法里主要是判断一下当前config的改变是否应该触发onConfigurationChanged，后面也有例子细讲。<br>再接下来正式进入各个组件的onConfigurationChanged方法，在service、contentprovider中都是空方法，activity有些不同：  </p>
+<pre><code>public void onConfigurationChanged(Configuration newConfig) {  
+    if (DEBUG_LIFECYCLE) Slog.v(TAG, &quot;onConfigurationChanged &quot; + this + &quot;: &quot; + newConfig);  
+    mCalled = true;  
+
+    mFragments.dispatchConfigurationChanged(newConfig);  
+
+    if (mWindow != null) {  
+        // Pass the configuration changed event to the window  
+        mWindow.onConfigurationChanged(newConfig);  
+    }  
+
+    if (mActionBar != null) {  
+        // Do this last; the action bar will need to access  
+        // view changes from above.  
+        mActionBar.onConfigurationChanged(newConfig);  
+    }  
+}  </code></pre><p><strong>最后再总结下Activity在发生旋转时重要的生命周期：</strong>  </p>
+<ul>
+<li>如果acitivityInfo.getRealConfigChanged() 不能cover住当前config发生的改变：<br>转屏 -&gt; onPause -&gt; onSaveInstanceState -&gt; onStop -&gt; onDestroy -&gt; onCreate -&gt; onStart -&gt; onRestoreInstanceState -&gt; onResume  </li>
+<li>相反，如果config的变化应用自行可以处理：<br>转屏 -&gt; 只会执行onConfigurationChanged  </li>
+</ul>
+<p>在网上有类说法如下：  </p>
+<blockquote>
+<p>不设置Activity的android:configChanges时，切屏会重新调用各个生命周期，切横屏时会执行一次，切竖屏时会执行两次<br>设置Activity的android:configChanges=”orientation|keyboardHidden”时，切屏不会重新调用各个生命周期，只会执行onConfigurationChanged方法  </p>
+</blockquote>
+<p>请注意，这种说法<strong>完全不对</strong>，再怎么说，生命周期怎么可能重复执行两次呢，那是要有多么的浪费资源，框架不可能设计得那么差，这个时候就得想想是不是自己的代码写错了。<br>另外orientation 也与 keyboardHidden是两类不同的标签，二者没有关系，在API13以后orientation需要与screenSize配合使用，这是因为横竖屏切换不仅变方向同时也有屏幕大小的变化。详情见<a href="https://developer.android.com/guide/topics/resources/runtime-changes.html?hl=zh-cn#HandlingTheChange" target="_blank" rel="noopener">官方文档</a>。  </p>
+<h2 id="5-应用强制横屏竖屏"><a href="#5-应用强制横屏竖屏" class="headerlink" title="5 应用强制横屏竖屏"></a>5 应用强制横屏竖屏</h2><p>应用强制设置屏幕方向，就我所知有两种方式，一种是在manifest里设定，一种是在代码里通过setOrientation设定，接下来分别讲解具体方法以及原理。  </p>
+<h3 id="5-1-静态-screenOrientation属性"><a href="#5-1-静态-screenOrientation属性" class="headerlink" title="5.1 静态 screenOrientation属性"></a>5.1 静态 screenOrientation属性</h3><p>假设需要强制竖屏，修改ActivityManifest.xml对应的activity元素里的内容如下即可：  </p>
+<pre><code class="xml"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".MainActivity"</span>  </span>
+<span class="tag">            <span class="attr">android:screenOrientation</span>=<span class="string">"portrait"</span>&gt;</span>  </code></pre>
+<p>还有更多属性值用法见<a href="https://developer.android.com/guide/topics/manifest/activity-element.html?hl=zh-cn#screen" target="_blank" rel="noopener">官方文档</a>。  </p>
+<p>这里网上有说法认为使用了screenOrientation也应该同时使用configChanges，这样可以避免 应用在后台时由于其它应用的旋转切换回本应用时会onCreate<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>。  </p>
+<p>这种问题意味着多走了relaunch流程，我实测了下未出现此种问题。<br>在resume一个应用时，确实会再次做ensureActivityConfig，ActivityStack#resumeTopActivityInnerLocked()中有如下一段代码：  </p>
+<pre><code>// Have the window manager re-evaluate the orientation of  
+// the screen based on the new activity order.  
+boolean notUpdated = true;  
+if (mStackSupervisor.isFocusedStack(this)) {  
+    Configuration config = mWindowManager.updateOrientationFromAppTokens(  
+            mService.mConfiguration,  
+            next.mayFreezeScreenLocked(next.app) ? next.appToken : null);  
+    if (config != null) {  
+        next.frozenBeforeDestroy = true;  
+    }  
+    notUpdated = !mService.updateConfigurationLocked(config, next, false);  
+}  </code></pre><p>第11行updateConfigurationLocked是之前讲到的AMS更新config的方法，方法内会执行ensureActivityConfig()<br>但我们可以看到，在updateConfigurationLocked之前，第5行重新从wms计算了一遍config，而这个config在下面ensureAtyConfig判断时，会发现前后Aty已有的config与此值一样，所以正常不应该再走relaunch流程。<br>不过有鉴于异常情况总会意想不到地出现，这里还是<strong>推荐增加相应configChanges属性值</strong>。  </p>
+<h3 id="5-2-动态-setRequestedOrientation"><a href="#5-2-动态-setRequestedOrientation" class="headerlink" title="5.2 动态 setRequestedOrientation"></a>5.2 动态 setRequestedOrientation</h3><p>上一小节我们讲了静态修改的方法，接下来是用代码动态生效的方法。  </p>
+<p>代码动态修改orientation为横屏，例子如下：  </p>
+<pre><code>setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)  </code></pre><p>直接在activity中执行该方法即可，它会调用到AMS#setRequestedOrientation()，并最终执行WMS#setAppOrientation来修改AppToken.requestOrientation的值，用于保存应用设定的屏幕方向。<br>其实，前面静态设置屏幕方向的screenOrientation值，最终也是传递到了AppToken.requestOrientation<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>才生效，二者殊途同归。  </p>
+<p>那么这个值究竟又是如何影响屏幕旋转方向的呢？  </p>
+<h3 id="5-3-应用强制屏幕方向生效原理"><a href="#5-3-应用强制屏幕方向生效原理" class="headerlink" title="5.3 应用强制屏幕方向生效原理"></a>5.3 应用强制屏幕方向生效原理</h3><p>前面 4.1.1 和 4.1.2 具体讲解了WMS如何判断决定屏幕方向，主要通过PWM.rotationForOrientationLw方法，而这个方法里，screenOrientation几乎是起决定性作用的，这个参数的值则是WMS.mLastOrientation。全局搜索这个WMS.mLastOrientation的引用，发现只有一个写操作的地方：WMS#updateOrientationFromAppTokensLocked(boolean)。  </p>
+<p><strong>WindowManagerService#updateOrientationFromAppTokensLocked(boolean)</strong>  </p>
+<pre><code class="Java"><span class="comment">/*  </span>
+<span class="comment"> * Determine the new desired orientation of the display, returning  </span>
+<span class="comment"> * a non-null new Configuration if it has changed from the current  </span>
+<span class="comment"> * orientation.  IF TRUE IS RETURNED SOMEONE MUST CALL  </span>
+<span class="comment"> * setNewConfiguration() TO TELL THE WINDOW MANAGER IT CAN UNFREEZE THE  </span>
+<span class="comment"> * SCREEN.  This will typically be done for you if you call  </span>
+<span class="comment"> * sendNewConfiguration().  </span>
+<span class="comment"> *  </span>
+<span class="comment"> * The orientation is computed from non-application windows first. If none of  </span>
+<span class="comment"> * the non-application windows specify orientation, the orientation is computed from  </span>
+<span class="comment"> * application tokens.  </span>
+<span class="comment"> * @see android.view.IWindowManager#updateOrientationFromAppTokens(  </span>
+<span class="comment"> * android.os.IBinder)  </span>
+<span class="comment"> */</span>  
+<span class="function"><span class="keyword">boolean</span> <span class="title">updateOrientationFromAppTokensLocked</span><span class="params">(<span class="keyword">boolean</span> inTransaction)</span> </span>{  
+    <span class="keyword">long</span> ident = Binder.clearCallingIdentity();  
+    <span class="keyword">try</span> {  
+        <span class="keyword">int</span> req = getOrientationLocked();  
+        <span class="keyword">if</span> (req != mLastOrientation) {  
+            mLastOrientation = req;  
+            <span class="comment">//send a message to Policy indicating orientation change to take  </span>
+            <span class="comment">//action like disabling/enabling sensors etc.,  </span>
+            mPolicy.setCurrentOrientationLw(req);  
+            <span class="keyword">if</span> (updateRotationUncheckedLocked(inTransaction)) {  
+                <span class="comment">// changed  </span>
+                <span class="keyword">return</span> <span class="keyword">true</span>;  
+            }  
+        }  
+
+        <span class="keyword">return</span> <span class="keyword">false</span>;  
+    } <span class="keyword">finally</span> {  
+        Binder.restoreCallingIdentity(ident);  
+    }  
+}  </code></pre>
+<p>在此方法中，通过getOrientationLocked()计算并更新mLastOrientation的值。具体计算过程大致就是注释里第9行开始说的，先根据系统状态看是否有确定的orientation（比如锁屏时一般就只能是portrait），如果没有，则取前台应用appToken里的requestedOrientation拿来用。<br>WMS#updateOrientationFromAppTokensLocked通常在应用resume时被调用，它的调用流程见下一节流程图。  </p>
+<p>所以我们可以总结出应用强制设置orientation的数据流图大概如下：<br><img src="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" alt="数据流">  </p>
+<h3 id="5-4-横屏应用载入流程"><a href="#5-4-横屏应用载入流程" class="headerlink" title="5.4 横屏应用载入流程"></a>5.4 横屏应用载入流程</h3><p>这个就直接窃用网上<a href="http://blog.csdn.net/guoqifa29/article/details/40504189" target="_blank" rel="noopener">博客</a>图了，各个方法前面基本也都有讲到，这里就略过了。<br><img src="http://or5nesfx1.bkt.clouddn.com/landscape_start_flow.png" alt="landscape_start_flow">  </p>
+<h2 id="6-更好的应对旋转布局变化以及持久化"><a href="#6-更好的应对旋转布局变化以及持久化" class="headerlink" title="6 更好的应对旋转布局变化以及持久化"></a>6 更好的应对旋转布局变化以及持久化</h2><h3 id="6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化"><a href="#6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化" class="headerlink" title="6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化"></a>6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化</h3><p>自行处理配置变更，官方文档<a href="https://developer.android.com/guide/topics/resources/runtime-changes.html?hl=zh-cn#HandlingTheChange" target="_blank" rel="noopener">在此</a>，简单来说需要做两件事情：  </p>
+<ol>
+<li>在manifest的<activity>标签里增加configChanges属性，例如，如果你准备在onConfigurationChanged处理旋转屏幕的情况，要这样写：  </activity></li>
+</ol>
+<pre><code>&lt;activity android:name=&quot;.MyActivity&quot;  
+          android:configChanges=&quot;orientation|screenSize&quot;  
+          android:label=&quot;@string/app_name&quot;&gt;  </code></pre><ol start="2">
+<li>重写各个组件的onConfigurationChanged方法  </li>
+</ol>
+<p>接下来从代码流程上讲下这种处理方式的原理：<br>在上面AMS#ensureActivityConfigurationLocked里我们提到，应用要么走relaunch重新实例化的流程，要么scheduleConfigurationChanged走onConfigurationChanged流程。而这里我们希望是后者。<br><strong>ActivityStack#ensureActivityConfigurationLocked</strong>  </p>
+<pre><code>boolean ensureActivityConfigurationLocked(  
+        ActivityRecord r, int globalChanges, boolean preserveWindow) {  
+    ......  
+
+    if ((changes&amp;(~r.info.getRealConfigChanged())) != 0 || r.forceNewConfig) {  
+        // Aha, the activity isn&apos;t handling the change, so DIE DIE DIE.  
+        r.configChangeFlags |= changes;  
+        r.startFreezingScreenLocked(r.app, globalChanges);  
+        r.forceNewConfig = false;  
+        preserveWindow &amp;= isResizeOnlyChange(changes);  
+        if (r.app == null || r.app.thread == null) {  
+            ......  
+        } else if (r.state == ActivityState.RESUMED) {  
+            // Try to optimize this case: the configuration is changing and we need to restart  
+            // the top, resumed activity. Instead of doing the normal handshaking, just say  
+            // &quot;restart!&quot;.  
+            relaunchActivityLocked(r, r.configChangeFlags, true, preserveWindow);  
+        } else {  
+            if (DEBUG_SWITCH || DEBUG_CONFIGURATION) Slog.v(TAG_CONFIGURATION,  
+                    &quot;Config is relaunching non-resumed &quot; + r);  
+            relaunchActivityLocked(r, r.configChangeFlags, false, preserveWindow);  
+        }  
+
+        // All done...  tell the caller we weren&apos;t able to keep this activity around.  
+        return false;  
+    }  
+
+    // Default case: the activity can handle this new configuration, so hand it over.  
+    // NOTE: We only forward the task override configuration as the system level configuration  
+    // changes is always sent to all processes when they happen so it can just use whatever  
+    // system level configuration it last got.  
+    r.scheduleConfigurationChanged(taskConfig, true);  
+    r.stopFreezingScreenLocked(false);  
+
+    return true;  
+}  </code></pre><p>上面代码第5行是这个方法重要的分支点。<br>首先我们假设此时的activity设置了configChanges=”orientation|screenSize”。<br>如果此时config只发生了旋屏变化，此时<code>changes&amp;(~r.info.getRealConfigChanged())</code>为0，整个判断条件为false(标记位的细节就不解释了)，所以会跳过该代码块，走下面28行开始的schedule流程，也就是onConfigurationChanged流程；<br>相对的，如果此时的config发生了其它变化，或者不只是旋屏变化，此时判断条件会为真，意味着app无法在onCOnfigurationChanged自行处理config的所有变化，需要重走实例化流程，走relaunch流程并返回。<br>这段代码基本解释了为什么有的时候应用不得不重新实例化，有的时候则是走onConfigurationChanged。  </p>
+<p>还有一点要提一下，<strong>relaunch和onConfigurationChanged流程是不会并存的</strong>。<br>虽然ensureActivityConfig之前都会发出scheduleConfigurationChanged流程，但在app一侧，也会进行上面类似的判断，对与activityinfo.getRealConfigChanged()掩码不能handle当前config变化的情况，会跳过onConfigurationChanged，果断等待后面的relaunch。<br><strong>android.app.ActivityThread#performConfigurationChanged</strong>  </p>
+<pre><code>private void performConfigurationChanged(ComponentCallbacks2 cb,  
+                                             IBinder activityToken,  
+                                             Configuration newConfig,  
+                                             Configuration amOverrideConfig,  
+                                             boolean reportToActivity) {  
+        ......  
+        boolean shouldChangeConfig = false;  
+        if ((activity == null) || (activity.mCurrentConfig == null)) {  
+            shouldChangeConfig = true;  
+        } else {  
+            // If the new config is the same as the config this Activity is already  
+            // running with and the override config also didn&apos;t change, then don&apos;t  
+            // bother calling onConfigurationChanged.  
+            int diff = activity.mCurrentConfig.diff(newConfig);  
+            if (diff != 0 || !mResourcesManager.isSameResourcesOverrideConfig(activityToken,  
+                    amOverrideConfig)) {  
+                // Always send the task-level config changes. For system-level configuration, if  
+                // this activity doesn&apos;t handle any of the config changes, then don&apos;t bother  
+                // calling onConfigurationChanged as we&apos;re going to destroy it.  
+                if (!mUpdatingSystemConfig  
+                        || (~activity.mActivityInfo.getRealConfigChanged() &amp; diff) == 0  
+                        || !reportToActivity) {  
+                    shouldChangeConfig = true;  
+                }  
+            }  
+        }  
+
+        if (shouldChangeConfig) {  
+            ...  
+            if (reportToActivity) {  
+                cb.onConfigurationChanged(configToReport);  
+            }  
+            ...  
+        }  </code></pre><p>如上，在21行会同样把ActivityInfo.getRealConfigChanged与diff做判断，如果shouldChangeConfig不为真，后面并不会调用onConfigurationChanged。  </p>
+<p>也就是说，我们任何写在onConfiguraionChanged中的一套东西，不能忘了在实例化时也得有一套（如果在旋转屏幕的同时还发生了其它的配置变化，并不会先在onConfigChange里处理屏幕旋转）。  </p>
+<h3 id="6-2-需要实例化的情况，做好现场的保存与恢复"><a href="#6-2-需要实例化的情况，做好现场的保存与恢复" class="headerlink" title="6.2 需要实例化的情况，做好现场的保存与恢复"></a>6.2 需要实例化的情况，做好现场的保存与恢复</h3><p>由于应用侧代码写得较少，我自己这里也总结不出什么好的具体实践的建议，这里暂时就贴下我看到的比较好的总结以及官方文档，以后有机会再更新。<br><a href="https://developer.android.com/guide/topics/resources/runtime-changes.html?hl=zh-cn#RetainingAnObject" target="_blank" rel="noopener">在配置变更期间保留对象</a><br><a href="http://code.hootsuite.com/orientation-changes-on-android/" target="_blank" rel="noopener">Handling Orientation Changes on Android</a><br><a href="http://www.jianshu.com/p/0b5403c42fdb" target="_blank" rel="noopener">保存与恢复</a>  </p>
+<h2 id="7-DividerBar-分屏分割条如何在旋转时附加特殊动画"><a href="#7-DividerBar-分屏分割条如何在旋转时附加特殊动画" class="headerlink" title="7 DividerBar 分屏分割条如何在旋转时附加特殊动画"></a>7 DividerBar 分屏分割条如何在旋转时附加特殊动画</h2><p>  (未完待续)</p>
+<hr>
+<p><strong>注</strong>:</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()<br>
+
+<p><a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">8</a>: <a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png</a><a href="#fnref:1" rev="footnote"> ↩</a></p></span></li></ol></div></div><p></p>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          
+            <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+          
+            <a href="/tags/WMS/" rel="tag"><i class="fa fa-tag"></i> WMS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017-06-16-tasks-differences-between-ams-and-recnets/" rel="next" title="Recents和AMS中历史任务的区别">
+                <i class="fa fa-chevron-left"></i> Recents和AMS中历史任务的区别
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017-11-27-推荐系统指北/" rel="prev" title="推荐系统指北">
+                推荐系统指北 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-引言"><span class="nav-text">1 引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Rotation-与-Orientation区别"><span class="nav-text">2 Rotation 与 Orientation区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-rotation"><span class="nav-text">2.1 rotation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-orientation"><span class="nav-text">2.2 orientation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-自动旋转开关"><span class="nav-text">3 自动旋转开关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-旋转，从Sensor到onConfigurationChanged"><span class="nav-text">4 旋转，从Sensor到onConfigurationChanged</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Sensor-gt-PWM-gt-WMS"><span class="nav-text">4.1 Sensor -&gt; PWM  -&gt; WMS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-应用不设置横竖屏的情况"><span class="nav-text">4.1.1 应用不设置横竖屏的情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-应用设置强制竖屏的情况"><span class="nav-text">4.1.2 应用设置强制竖屏的情况</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-AMS"><span class="nav-text">4.2 AMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-AMS-gt-AppThread-onConfigurationChanged"><span class="nav-text">4.3 AMS -&gt; AppThread.onConfigurationChanged</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-应用强制横屏竖屏"><span class="nav-text">5 应用强制横屏竖屏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-静态-screenOrientation属性"><span class="nav-text">5.1 静态 screenOrientation属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-动态-setRequestedOrientation"><span class="nav-text">5.2 动态 setRequestedOrientation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-应用强制屏幕方向生效原理"><span class="nav-text">5.3 应用强制屏幕方向生效原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-横屏应用载入流程"><span class="nav-text">5.4 横屏应用载入流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-更好的应对旋转布局变化以及持久化"><span class="nav-text">6 更好的应对旋转布局变化以及持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化"><span class="nav-text">6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-需要实例化的情况，做好现场的保存与恢复"><span class="nav-text">6.2 需要实例化的情况，做好现场的保存与恢复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-DividerBar-分屏分割条如何在旋转时附加特殊动画"><span class="nav-text">7 DividerBar 分屏分割条如何在旋转时附加特殊动画</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

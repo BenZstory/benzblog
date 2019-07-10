@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="原由：深度学习技术不仅落地难，找到合适需求点甚至更难。在一次头脑风暴中，同事提到或许可以尝试用深度学习手段解决手机ROM里主题图标包的问题，一下子就觉得这是个无论技术可行性、使用价值、技术壁垒都很有亮点的需求。">
+<meta name="keywords" content="GAN,深度学习,StyleTransfer,图像生成,预研">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IconTransfer 图标生成技术预研">
+<meta property="og:url" content="http://yoursite.com/2019-07-04-IconTransfer 图标生成技术预研/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="原由：深度学习技术不仅落地难，找到合适需求点甚至更难。在一次头脑风暴中，同事提到或许可以尝试用深度学习手段解决手机ROM里主题图标包的问题，一下子就觉得这是个无论技术可行性、使用价值、技术壁垒都很有亮点的需求。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_job_des.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_on_retro.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_teaser_v3.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_kitty_graph_discriminator_train.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_kitty_graph_generator_train.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_dataset_a.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_dataset_b.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_pix2pix_train_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/horse2zebra.gif">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_figure_2_unpair_dataset.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_structure_A.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_structure_B.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_paper_training_details_l2_loss.jpg?x-oss-process=style/resize_400">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_cycle_loss.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_icon_colorization_task_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_A_to_B_task_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_horse2zebra_result_epoch_187.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_cartoonize_portraits_result_epoch_14.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2yxz_result_epoch12.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2yxz_result_epoch_199.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2jjxf_result_epoch_34.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CartoonGAN_pdf_figure_example_1.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/TwinGAN_Diagram.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/TwinGAN_icon_transfer_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/StarGAN_diagram.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/StarGAN_teaser.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pure_icons_preprocess.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/candy_icons_preprocess.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/IconTransfer_result_1.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/IconTransfer_result_2.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/gram_matrix_defination.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/Style_Transfer_diagram.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_style_loss_on_diff_tv_w.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_on_diff_tv_w.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_tv_loss_on_diff_tv_w.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_and_style_loss_on_diff_style_w.png?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_and_style_loss_on_diff_style_w_stylenet_5.png?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_50_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_100_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_300_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_1000_result.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style24.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_24.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style25.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_25.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style26.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_26.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style28.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_28.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style29.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_29.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style30.png?x-oss-process=style/resize_w200h100_center_crop">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_30.jpg?x-oss-process=style/resize_800">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_on_icon_bocmbci_of_style_24_to_31.jpg?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_on_icon_mihoyobh3_of_style_24_to_31.jpg?x-oss-process=style/resize_600">
+<meta property="og:updated_time" content="2019-07-08T15:58:11.521Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IconTransfer 图标生成技术预研">
+<meta name="twitter:description" content="原由：深度学习技术不仅落地难，找到合适需求点甚至更难。在一次头脑风暴中，同事提到或许可以尝试用深度学习手段解决手机ROM里主题图标包的问题，一下子就觉得这是个无论技术可行性、使用价值、技术壁垒都很有亮点的需求。">
+<meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_job_des.png?x-oss-process=style/resize_600">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2019-07-04-IconTransfer 图标生成技术预研/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>IconTransfer 图标生成技术预研 | 奔哲明的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019-07-04-IconTransfer 图标生成技术预研/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">IconTransfer 图标生成技术预研
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-04 00:00:00" itemprop="dateCreated datePublished" datetime="2019-07-04T00:00:00+08:00">2019-07-04</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-08 23:58:11" itemprop="dateModified" datetime="2019-07-08T23:58:11+08:00">2019-07-08</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/GAN/" rel="tag"><i class="fa fa-tag"></i> GAN</a>
+              
+                <a href="/tags/深度学习/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+              
+                <a href="/tags/StyleTransfer/" rel="tag"><i class="fa fa-tag"></i> StyleTransfer</a>
+              
+                <a href="/tags/图像生成/" rel="tag"><i class="fa fa-tag"></i> 图像生成</a>
+              
+                <a href="/tags/预研/" rel="tag"><i class="fa fa-tag"></i> 预研</a>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h3 id="原由："><a href="#原由：" class="headerlink" title="原由："></a><strong>原由</strong>：</h3><p>深度学习技术不仅落地难，找到合适需求点甚至更难。在一次头脑风暴中，同事提到或许可以尝试用深度学习手段解决手机ROM里主题图标包的问题，一下子就觉得这是个无论技术可行性、使用价值、技术壁垒都很有亮点的需求。</p>
+<a id="more"></a>
+<p>现有手机主题图标有以下痛点：</p>
+<ol>
+<li>针对每个新的主题风格，需要设计人员重新设计所有图标，工作量大。</li>
+<li>每次增加主题，需要ROM开发人员增加对应图标资源甚至蒙版逻辑等，或者向主题市场中打包发布。</li>
+<li>主题包图标数量有限，难以覆盖到小众应用。</li>
+</ol>
+<p>而如果能够借助深度学习技术，自动化或半自动化地生成一批风格相近、符合主题的图标，那将会大大节省人力，加快新主题迭代速度，而且自动覆盖到各个见过或没见过的应用，真正做到主题统一。</p>
+<p>网上对不同风格图像间转换有多种叫法，图像风格转换、图像翻译、Domain Transfer等等，我这里将该具体任务叫做图标迁移(IconTransfer)。 经过一段时间的探索尝试，大概可分为两个实现思路，一种是基于<code>GAN</code>方法，另一种是基于<code>风格迁移</code>的方法。</p>
+<hr>
+<h3 id="GAN-Approaches"><a href="#GAN-Approaches" class="headerlink" title="GAN Approaches"></a><strong>GAN Approaches</strong></h3><p>本文默认读者已经了解GAN网络的基本知识，如不太熟悉，可大概看下各方案的实现效果和迭代思路即可，或者看以下链接恶补一下：<br><a href="https://www.tensorflow.org/beta/tutorials/generative/dcgan" target="_blank" rel="noopener">Tensorflow GAN 教程</a></p>
+<p>GAN网络一般会从以下角度阐明：输入输出、生成网络 <code>Generator</code>的结构、鉴别网络 <code>Discriminator</code>的结构、Loss组成、训练驱动方式。</p>
+<p>问题定义：<br>将图标从一个风格转到另一风格，数据集包括现有图标和目标风格图标，实现 DomainA -&gt; DomainB。</p>
+<h4 id="IconColorization"><a href="#IconColorization" class="headerlink" title="IconColorization:"></a><strong>IconColorization</strong>:</h4><p>尝试使用GAN网络来实现图标迁移，最一开始是由这篇文章启发的：<a href="https://becominghuman.ai/towards-automatic-icon-design-using-machine-learning-423cbe6710fe" target="_blank" rel="noopener">Towards Automatic Icon Design Using Machine Learning</a></p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_job_des.png?x-oss-process=style/resize_600" alt="icon_colorization_job_des"></p>
+<p>作者也是为了辅助图标设计，不过他的目标相对要简单很多，如上图所示，从一个轮廓图转换成右边涂好颜色的图标，右边图标集具有某种风格规律。<br>据作者所说，一开始他是使用SRGAN<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="SRGAN超分辨率图像复原 Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network https://arxiv.org/pdf/1609.04802.pdf">[1]</span></a></sup>的，但效果很差，然后选用了U-Net<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="U-Net: Convolutional Networks for Biomedical Image Segmentation https://arxiv.org/abs/1505.04597">[2]</span></a></sup>结构来做图像生成，情况才有转变。作者另有一篇文章<sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Towards Automatic Icon Design using Machine Learning https://pdfs.semanticscholar.org/ed3b/bcba8202d24280e4364432e2b5cacbcf941e.pdf">[3]</span></a></sup>详细讲了网络架构、loss、效果等等，从结论上来看，数据量、数据扩展相当重要，对于稍复杂点的目标图标集效果没有预期那么好，如下图：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_on_retro.png?x-oss-process=style/resize_600" alt="icon_colorization_on_retro"></p>
+<p>而作者使用的网络实际上<sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="论文里的意思似乎是Discriminator的输入不用把生成图和原图concat一起，但在代码里是concat的，也就跟pix2pix一样了">[4]</span></a></sup>就是 pix2pix<sup id="fnref:5"><a href="#fn:5" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="pix2pix project: https://phillipi.github.io/pix2pix/">[5]</span></a></sup>。</p>
+<hr>
+<h4 id="pix2pix"><a href="#pix2pix" class="headerlink" title="pix2pix:"></a><strong>pix2pix</strong>:</h4><p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_teaser_v3.png?x-oss-process=style/resize_600" alt="pix2pix_teaser_v3"><br>上面展示了pix2pix一个比较知名的图，可以看到pix2pix有着很广泛的应用范围。另外一点就是 pix2pix 的输入和输出目标都必须是一一对应的，这点与下文将讲到的CycleGan有着很明显区别。</p>
+<p>我认为 pix2pix 跟原始的 DCGAN 还是很相近的，是由于输入输出的改变才继而引起结构的变化:<br>DCGAN 的生成是从无到有，而 pix2pix 是从集合A到集合B；<br>DCGAN 的鉴别器的功能是把原图和假图区分开，而 pix2pix 的鉴别器在区分时还参考了集合A的原图，从而鉴别A-&gt;B的过程。</p>
+<p>如下图是 pix2pix 训练示意图：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Discriminator</th>
+<th align="center">Generator</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_kitty_graph_discriminator_train.png?x-oss-process=style/resize_600" alt="pix2pix_kitty_graph_discriminator_train"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pix2pix_kitty_graph_generator_train.png?x-oss-process=style/resize_600" alt="pix2pix_kitty_graph_generator_train"></td>
+</tr>
+</tbody></table>
+<p>其中，Generator 的模型结构为 U-net ，U-net 是在 Encoder-Decoder 结构上增加大量 skip-connection，主要用于图像分割。</p>
+<p>Discriminator 是一般的分类网络，输入是原图和生成图的Concat，在论文中指出，集合A的分布此时是作为 Gan 网络的 condition，这样也就可以归类到cGAN中去。还有挺重要一点是 PatchGAN 技术的应用，能提高效果降低运算量，但这里就不细讲了。</p>
+<p>Tensorflow 不久前居然还提供了 <a href="https://www.tensorflow.org/beta/tutorials/generative/pix2pix" target="_blank" rel="noopener">pix2pix 的教程</a>，整个网页就是个 ipython 形式的，对各个关键地方的解释也很简练，有时间的话建议跑一下试试。<br>截取其中 loss 部分代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">LAMBDA = 100</span><br><span class="line">loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True)</span><br><span class="line"></span><br><span class="line">def discriminator_loss(disc_real_output, disc_generated_output):</span><br><span class="line">  real_loss = loss_object(tf.ones_like(disc_real_output), disc_real_output)</span><br><span class="line">  generated_loss = loss_object(tf.zeros_like(disc_generated_output), disc_generated_output)</span><br><span class="line"></span><br><span class="line">  total_disc_loss = real_loss + generated_loss</span><br><span class="line">  return total_disc_loss</span><br><span class="line"></span><br><span class="line">def generator_loss(disc_generated_output, gen_output, target):</span><br><span class="line">  gan_loss = loss_object(tf.ones_like(disc_generated_output), disc_generated_output)</span><br><span class="line"></span><br><span class="line">  # mean absolute error</span><br><span class="line">  l1_loss = tf.reduce_mean(tf.abs(target - gen_output))</span><br><span class="line"></span><br><span class="line">  total_gen_loss = gan_loss + (LAMBDA * l1_loss)</span><br><span class="line">  return total_gen_loss</span><br></pre></td></tr></table></figure>
+
+<p>跟 DCGAN 相似，将 discriminator_loss 和 generator_loss 分别用于驱动 Discriminator 和 Generator， 训练时的每次循环，两个网络各做一次梯度下降。</p>
+<p>首先进行难度较低的尝试，使用 pix2pix 训练上面提到的 IconColorization 任务。如下是部分训练数据，训练从 domain A 转换到 domain B 的过程。</p>
+<table>
+<thead>
+<tr>
+<th align="center">domain A</th>
+<th align="center">domain B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_dataset_a.png?x-oss-process=style/resize_600" alt="icon_colorization_dataset_a"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_dataset_b.png?x-oss-process=style/resize_600" alt="icon_colorization_dataset_b"></td>
+</tr>
+</tbody></table>
+<p><strong>训练结果如下</strong>（实际上是训练过程中 summary 的图）：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/icon_colorization_pix2pix_train_result.png?x-oss-process=style/resize_600" alt="icon_colorization_pix2pix_train_result"><br>其中由上至下三行分别是：输入的图，输出的图，目标图。<br>输出的结果不太理想，左侧有离散的像素点，颜色也有偏差，以下还有些训练时的笔记，缘由以及是否正确已不可查。</p>
+<blockquote>
+<p>训练慢，配对数据集准备相当困难，且需要数据量大<br>一侧（左边）的线条不明显，有离散的像素点，难以学习到scale大的分布，如形变<br>颜色深浅不贴切 (l1 loss 颜色维度做 segment-relu  maxout)<br>训练速度特别慢，中间loss有大的波动（可能要做 梯度截断）<br>训练中期图片栅格化，颜色涂色不均匀</p>
+</blockquote>
+<p>pix2pix 需要一一对应的图片，准备数据集非常困难，数据量少的话那又肯定非常容易过拟合。CycleGAN很好地解决了这个问题。</p>
+<hr>
+<h4 id="CycleGAN"><a href="#CycleGAN" class="headerlink" title="CycleGAN"></a>CycleGAN</h4><p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/horse2zebra.gif" alt="horse2zebra"></p>
+<p>上图是 CycleGAN 的一个演示，效果很惊人。<br>CycleGAN 的输入是不需要一一对应的，如下图右半边，X集合都是照片，Y集合均为油画，两者非成对的，数目也可以不一样，而pix2pix的训练数据则如左侧所示需要 x,y 成对匹配。<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_figure_2_unpair_dataset.png?x-oss-process=style/resize_600" alt="CycleGAN_figure_2_unpair_dataset"></p>
+<p>CycleGAN网络具有两套生成网络和鉴别网络，一定程度上首尾相扣组成了环形，所以叫做 CycleGAN。</p>
+<p>A-&gt;B-&gt;A 流程如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_structure_A.jpg?x-oss-process=style/resize_600" alt="CycleGAN_structure_A"><br>B-&gt;A-&gt;B 流程如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_structure_B.jpg?x-oss-process=style/resize_600" alt="CycleGAN_structure_B"></p>
+<p>Tensorflow 在 tf2.0Beta 页面 也放出了 CycleGAN 的<a href="https://www.tensorflow.org/beta/tutorials/generative/cyclegan" target="_blank" rel="noopener">代码教程</a>，因此这里的loss讲解也以该代码为主：<br>Discriminator Loss 和 Generator Loss: </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">LAMBDA = 10</span><br><span class="line">loss_obj = tf.keras.losses.BinaryCrossentropy(from_logits=True)</span><br><span class="line"></span><br><span class="line">def discriminator_loss(real, generated):</span><br><span class="line">  real_loss = loss_obj(tf.ones_like(real), real)</span><br><span class="line">  generated_loss = loss_obj(tf.zeros_like(generated), generated)</span><br><span class="line"></span><br><span class="line">  total_disc_loss = real_loss + generated_loss</span><br><span class="line">  return total_disc_loss * 0.5</span><br><span class="line">  </span><br><span class="line">def generator_loss(generated):</span><br><span class="line">  return loss_obj(tf.ones_like(generated), generated)</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意，这里 loss 虽然都是用了 cross entropy，但原论文里在 “Training details” 有提到替换为 l2 loss 来使训练更稳定。<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_paper_training_details_l2_loss.jpg?x-oss-process=style/resize_400" alt="CycleGAN_paper_training_details_l2_loss"> </p>
+</blockquote>
+<p>CyclGAN结构里还有一个很重要的 <code>cycle loss</code>:<br>如下图，假设$G$是 X-&gt;Y 的生成网络， $F$是 Y-&gt;X 的生成网络，则左侧的图，指代训练中 从训练集X数据的流转过程，<br>$x$ 通过 网络$G$得到 $\hat{Y}$ , 再通过 网络$F$得到 $\hat{x}$ 。<br>那么如果$G$和$F$网络性能够好的话，最后生成的 $\hat{x}$ 应与原来的 $x$ 很相似。</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_cycle_loss.png?x-oss-process=style/resize_600" alt="CycleGAN_cycle_loss"></p>
+<p>我们以 l1 loss 来衡量 $x$ 和 $\hat{x}$ 的差距，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">def calc_cycle_loss(real_image, cycled_image):</span><br><span class="line">  loss1 = tf.reduce_mean(tf.abs(real_image - cycled_image))</span><br><span class="line">  </span><br><span class="line">  return LAMBDA * loss1</span><br></pre></td></tr></table></figure>
+
+<p>在 tf 教程代码上还用到了 <code>identity loss</code>，这个是说如果把Y直接输入用于 从X生成Y的 G网络， 那输出应与输入很相似才对，如此又我们加了一个衡量网络稳定性的手段，同样使用 l1 loss。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def identity_loss(real_image, same_image):</span><br><span class="line">  loss = tf.reduce_mean(tf.abs(real_image - same_image))</span><br><span class="line">  return LAMBDA * 0.5 * loss</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>增加 identity loss 会明显增加 GAN 网络计算，而且论文也只提到在 油画转照片 任务的效果中很好，因此这个loss不是必须的，要看具体情况。</p>
+</blockquote>
+<p>具体训练时，构建好四个网络，生成网络$G$、$F$，鉴别网络 $D_x$、$D_y$，<br>$x$ -&gt; $\hat{Y}$ -&gt; $\hat{x}$ 跑一遍， $y$ -&gt;  $\hat{X}$ -&gt; $\hat{y}$ 跑一遍，<br>然后统计各loss， generator_loss + cycle_loss 驱动生成网络，discriminator_loss 驱动鉴别网络，<br>注意网络其实不是勾连在一起的，所以 $G$ 和 $F$ 网络等要分别应用各自的 loss 来做梯度下降，loss 千万小心别写错了。<br>具体代码还是参考 tensorflow 的教程吧。</p>
+<p><strong>接下来看看在不同数据集上实际训练的结果：</strong></p>
+<p>在 IconColorization 任务上的结果：<br>所示结果每排算一个训练样本，每排6个图片，依序分别为 $x$、$y$、$\hat{Y}$ 、$\hat{X}$、$\hat{x}$、$\hat{y}$。<br>对于 IconColorization 任务，第一第二列都是输入，我们最为关心 x-&gt;y 染色的过程，也就是第三列是目标结果，是最重要的指标，而最后两列都是经过两次 GAN 网络的结果，一般不太在意（可以评估网络是否稳定）。<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_icon_colorization_task_result.png?x-oss-process=style/resize_600" alt="CycleGAN_icon_colorization_task_result"></p>
+<blockquote>
+<p>这个训练结果应该是没有训练太久的，看起来染色有些乱，但网络已经掌握了不少规律，变换也比较大胆，因此感觉 CycleGAN 有戏，很快开始尝试其他数据集。</p>
+</blockquote>
+<p>图标集Oblatum 和 图标集MBEStyle<sup id="fnref:6"><a href="#fn:6" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="图标集应该是开源的，我是从酷安搜索图标包下载后再解压整理得到的图标文件，感谢原开发者们。 https://www.coolapk.com/apk/com.oblatum.iconpack">[6]</span></a></sup> 相互转换的结果:</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_A_to_B_task_result.png?x-oss-process=style/resize_600" alt="CycleGAN_A_to_B_task_result"></p>
+<blockquote>
+<p>原笔记：对于X-&gt;Y（即生成第3列）的task，学习到了  黑色线条边框，左边白右边阴影 以及颜色倾向，效果还可以，对于 Y-&gt;X， 颜色抹得还不够平。</p>
+</blockquote>
+<p>对于 horse2zebra：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_horse2zebra_result_epoch_187.jpg?x-oss-process=style/resize_600" alt="CycleGAN_horse2zebra_result_epoch_187"></p>
+<blockquote>
+<p>并不如演示效果那么好，可能是因为数据集难度略大，细节地方掌握不是很好。</p>
+</blockquote>
+<p>【前方高能】<br>还尝试了 celeba 和 anime_faces 之间的转换，用来把人像生成动漫头像：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_cartoonize_portraits_result_epoch_14.jpg?x-oss-process=style/resize_600" alt="CycleGAN_cartoonize_portraits_result_epoch_14"></p>
+<blockquote>
+<p>效果有些惊悚，也可能有训练时间较短的原因。原训练时的笔记： 对于 cartoonizePortraits， 几乎完全不行，训练有些慢，中间已经放弃。漫画头像可能需要避免 random crop 的处理，否则被裁太多。另外根据 twin-gan 的 blog， 最后的效果应该也不会多么好，数据集也是个问题。 可以考虑像 AnimeGAN 一样加 condition，Ceb portraits 数据集是由不少 structured-feature 的， 使用更好的 动漫头像 数据集。</p>
+</blockquote>
+<p>尝试 BlackShark 的图标集 夜行者:<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2yxz_result_epoch12.png?x-oss-process=style/resize_600" alt="CycleGAN_oblatum2yxz_result_epoch12"><br>以上是 epoch 12 的结果，由于 ROM 的图标集都只适配了少数应用，不到30个图片，很容易出现过拟合问题，继续训练下去，在 epoch199 的时候结果如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2yxz_result_epoch_199.png?x-oss-process=style/resize_600" alt="CycleGAN_oblatum2yxz_result_epoch_199"></p>
+<blockquote>
+<p>方图标都变为手柄图标了，原图标变更成了相机，原图标特征被隐藏在我们看不到的地方，居然还能转回去。这种情况叫做模式坍塌，缺少数据难以稳定学习下去，目标集合艺术特征抽象得太多，更加提高了难度。</p>
+</blockquote>
+<p>尝试 BlackShark 的图标集 机甲旋风：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CycleGAN_oblatum2jjxf_result_epoch_34.png?x-oss-process=style/resize_600" alt="CycleGAN_oblatum2jjxf_result_epoch_34"></p>
+<blockquote>
+<p>可以看到勉强学习到了边缘“机甲”边框的配色特征 （的皮毛），配色修改比较大胆，中间复杂特征能保持一部分。但是观感效果不行，仍会丧失绝大部分原图标的含义。<br>Epoch_20 之前保留了更多的原图特征，但色块过渡不好。到训练后期，同样出现了模式坍塌的问题。</p>
+</blockquote>
+<p>尝试到此，已经能大致知道 CycleGAN 的性能边界，针对我们的目标，当然最大的问题还是目标风格的图标数量太少，不过预研阶段也实在没办法找UI同学让他们一次帮我画几十上百个图标啊，而且以百为基数的数据集，估计仍然不够。因此数据集的问题先搁着，先把可优化的点再理顺下：</p>
+<p>1、目标图标集通常有着明确的外轮廓特征，比如都是圆的方的，或者笔触相似，因此我们要使网络将目标图标集的外轮廓特征更多de保留下来，另一方面，对图标中间的部分，通常个体信息量更多，还有不少直接就是文字的，因此要保留原图的特征。<br>2、图标对线条清晰度要求较高，希望结果能有更平滑清晰的边缘特征。整个清晰度提高会更好。<br>3、提高训练速度，找到更合适的训练结束时间避免过拟合。</p>
+<p>伴随着这些问题，继续在各种 GAN 网络海洋中寻找更合适的技术方案。</p>
+<hr>
+<p>接下来阅读或尝试了五花八门不少模型，有些帮助或启发的包括 CartoonGAN、TwinGAN、PGGAN、DAGAN、StarGAN 等。<br>这些网络不太通用，细节较多，就不具体讲结构了，只大体讲相关思路、改进点等，如果有训练结果，则会视情况贴在这里。</p>
+<h4 id="CartoonGAN-："><a href="#CartoonGAN-：" class="headerlink" title="CartoonGAN ："></a>CartoonGAN ：</h4><p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CartoonGAN_pdf_figure_example_1.jpg?x-oss-process=style/resize_600" alt="CartoonGAN_pdf_figure_example_1"></p>
+<p>如上图是一个 CartoonGAN 应用的效果，更多是进行动漫风格渲染。主要有以下 3 点改进：<br>1、对 B-domain 先做边缘模糊 (edge-smooth) 生成 B_smooth 数据集，用来引入一个趋避模糊的 loss，以此实现边缘平滑清晰。但从实验结果看，对 icon 变换的任务效果不明显，icon-transfer 生成的图像比较大的隐患是 栅格化 和 丧失结构化语义(线条莫名扭曲) ，相反，仅使用 cartoonGAN 的话，生成的结果有非常明显的 栅格化 现象，与 pix2pix 的训练结果相似，所以 cycle 的架构还是很重要的<br>2、使用 VGG19_4 作为语义 content loss 的想法。<br>3、训练时，先只训练 content_loss，加快训练。</p>
+<h4 id="TwinGAN："><a href="#TwinGAN：" class="headerlink" title="TwinGAN："></a>TwinGAN：</h4><p>原作者 blog 在此: <a href="https://github.com/jerryli27/TwinGAN/blob/master/docs/blog/blog_CH.md" target="_blank" rel="noopener">轻叩次元壁 – 真人头像漫画化</a><br>作者原文是实现从 人像到动漫头像 任务的，效果看起来挺不错。架构图如下：</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/TwinGAN_Diagram.png?x-oss-process=style/resize_600" alt="TwinGAN_Diagram"></p>
+<p>作者从 StyleTransfer 的思想出发， 使用 norm 参数的不同来区分不同 domain。使用 encoder-decoder 的生成器结构，encoder、decoder 分割开，共享一套主要参数，但以不同 norm 参数来区分适用于“二次元”还是“三次元”，整个网络在 PGGAN(Progressive Growing GAN) 的框架下进行训练。<br>由于是在 PGGAN 架构下训练，要有一个从小分辨率(4x)逐渐增大到目标分辨率(128x)的过程，使训练极为缓慢，在 Oblatum-&gt;MBEStyle 任务上大概花了3天(1080ti单卡)训练得到以下结果：</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/TwinGAN_icon_transfer_result.png?x-oss-process=style/resize_600" alt="TwinGAN_icon_transfer_result"></p>
+<p>效果没有想象的好，跟 CycleGAN 相似，变化更大胆，但可惜会丧失不少关键语义，好像不如 cycleGAN 好。最关键是训练太慢且无法在训练前期确定本次训练是否可靠，因此作罢。</p>
+<hr>
+<p>上面提到的 GAN 网络都是两个领域图片间的转换，而如果要处理更多领域的话，就需要多组的模型，多次训练。例如在四个风格间转换的话，就得 $C_4^2$ 这么多组模型。为了解决多领域间的转换问题，提出了 StarGAN 模型。</p>
+<h4 id="StarGAN-7"><a href="#StarGAN-7" class="headerlink" title="StarGAN[7]"></a>StarGAN<sup id="fnref:7"><a href="#fn:7" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation. https://arxiv.org/abs/1711.09020">[7]</span></a></sup></h4><p>StarGAN 只使用了一个生成和一个鉴别网络，核心是 cGAN 的思路，生成网络增加了类别信息，而鉴别网络识别真假的同时还进行分类，用于驱动训练的loss与 CycleGAN 有些相似，架构如图：</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/StarGAN_diagram.jpg?x-oss-process=style/resize_800" alt="StarGAN_diagram"></p>
+<p>在训练时，目标类别是随机出来的，像 CycleGAN 一样进行 A-&gt;B-&gt;A 的循环转换：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">label_trg = tf.random_shuffle(label_org)</span><br><span class="line">x_fake = self.generator(self.x_real, label_trg) # real a</span><br><span class="line">x_recon = self.generator(x_fake, label_org, reuse=True) # real b</span><br></pre></td></tr></table></figure>
+
+<p>原论文的效果如下：</p>
+<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/StarGAN_teaser.jpg?x-oss-process=style/resize_600" alt="StarGAN_teaser"></p>
+<hr>
+<h3 id="实战"><a href="#实战" class="headerlink" title="实战"></a><strong>实战</strong></h3><p>理顺过这么多GAN网络方法后，我们终于再回到原来的主题目标生成任务。<br>决定以CycleGAN作基础，再往其结构上增加各种辅助方法来完成目标。<br>首当其冲要解决的问题是数据集的选择和扩充：图标样本既要达到一定量，而且尽可能使生成结果直接符合黑鲨已有主题。</p>
+<p>源图标集，我们选用 Pure 图标集，这个图标集图标数量大，风格简单，轮廓特征少。<br>目标图标集，选用黑鲨 “不想长大” 主题的图标集，这里为方便，代号为 Candy 图标集。这个图标集轮廓明显且统一，隐含语义集中在中间。</p>
+<p>然后对数据集做下面处理：<br>将 pure 图标集填满背景，去掉“圆形”的外轮廓特征，作为  domain_A。（后来实验表明直接用圆形图标去训练也是基本可行的）<br>将 candy 主题图标的某一个图标提取出来，补满中间颜色，然后调色，生成10个不同颜色的符合外轮廓特征的背景图，再从网络下载 150 左右个抽象较强、无方圆外轮廓特征的小图标，两者交错拼合，生成 1500 的 domain_B 数据集。</p>
+<table>
+<thead>
+<tr>
+<th align="center">Pure图标集处理</th>
+<th align="center">Candy(“不想长大”主题)图标集处理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/pure_icons_preprocess.png?x-oss-process=style/resize_600" alt="pure_icons_preprocess"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/candy_icons_preprocess.jpg?x-oss-process=style/resize_600" alt="candy_icons_preprocess"></td>
+</tr>
+</tbody></table>
+<p>接下来对 CycleGAN 增加一些改动（开始个人臆想魔改）：<br>由于两个图标集的关键信息部分都在中间， 我们希望在从 A 转到 B 后，中间样式能尽可能得到保留，而轮廓尽可能变为 B 的样子。<br>借鉴自 CartoonGAN 的 semantic loss ，我们也引入 VGG 的高层结果作为语义特征的评估，而为了使该 loss 不至于干扰到外轮廓的变换，在计算该 loss 时，乘上一个中部区域激活的掩码（一个截断的高斯分布），从而只计算中间部分而忽略外轮廓的语义差异。主要代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">semantic_loss_a = semantic_loss_with_attention(self.domain_A, x_ab, self.batch_size)</span><br><span class="line">semantic_loss_b = semantic_loss_with_attention(self.domain_B, x_ba, self.batch_size)</span><br><span class="line"></span><br><span class="line">def semantic_loss_with_attention(real, fake, batch_size):</span><br><span class="line">    vgg.build(real)</span><br><span class="line">    real_feature_map = vgg.conv3_3_no_activation</span><br><span class="line"></span><br><span class="line">    mask_tensor = get_centre_mask_tensor(int(fake.shape[2]), batch_size)</span><br><span class="line">    fake_masked = tf.multiply(mask_tensor, fake) + tf.multiply((1 - mask_tensor), real)</span><br><span class="line"></span><br><span class="line">    vgg.build(fake_masked)</span><br><span class="line">    fake_feature_map = vgg.conv3_3_no_activation</span><br><span class="line"></span><br><span class="line">    loss = L1_loss(real_feature_map, fake_feature_map)</span><br><span class="line">    return loss</span><br></pre></td></tr></table></figure>
+
+<p>在经过一些调参训练后，得到了下面的结果：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/IconTransfer_result_1.jpg?x-oss-process=style/resize_600" alt="IconTransfer_result_1"></p>
+<p>我们还是关注第三列的效果。从上图看到，下面三个效果还是可以的，轮廓清晰，主体颜色与原图相近，而上面两个则出现了很明显的棋盘效应。distill上的<a href="https://distill.pub/2016/deconv-checkerboard/" target="_blank" rel="noopener">这篇论文</a>详细讨论了棋盘效应的成因及解决方案，不过我这里暂时还没尝试改用缩放卷积，而是借鉴 CartoonGAN 的思路，增加了一个惩罚数据集来抑制棋盘效应的出现，效果还算可以。具体来说，在原 domain_A 和 domain_B 外增加一个文件夹的图标集合，挑出明显外轮廓错误的比如棋盘效应严重的结果放进去，在训练过程中，把这些图片加入 Discriminator 的考量，使其结果趋于0，即通过 Discriminator 来抑制这种图片的产生。当然，在具体计算 loss 的时候还要套一个仅笼罩外轮廓的 mask ，这样应该不会把中间语义部分错算进 penalty 里。主要代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">cp_logit = self.discriminator(self.domain_P, reuse=True, scope=&quot;discriminator_B&quot;)</span><br><span class="line">cp_loss = lsgan_loss_discriminator_counter_penalty(cp_logit, self.batch_size)</span><br><span class="line"></span><br><span class="line">def lsgan_loss_discriminator_counter_penalty(prob_penalty, batch_size):</span><br><span class="line">    mask_tensor = get_centre_mask_tensor(int(prob_penalty.shape[2]), batch_size)</span><br><span class="line">    penalty_loss = tf.reduce_mean(tf.squared_difference(prob_penalty * (1-mask_tensor), 0))</span><br><span class="line">    return penalty_loss</span><br></pre></td></tr></table></figure>
+
+<p>继续训练，得到下面效果：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/IconTransfer_result_2.jpg?x-oss-process=style/resize_600" alt="IconTransfer_result_2"></p>
+<p>轮廓，主色调都还可以，棋盘效应暂时消失。但是中间还是略模糊，而白色变成了别的颜色。中间颜色问题，应该还是模式坍塌造成的，在domain_B的图标集里，没有前景为白色的图标，因为图标集是前景图标和背景拼成的，而又很难搞到一批颜色多样的抽象图标作为前景。</p>
+<p>当然真正难点还是清晰度问题。为了能使清晰度提高，也就要提高原图特征的比例，为此尝试了各种增加skip的方法。<br>说到这点，得先补一下之前漏说明的此处 Generator 所使用的具体网络结构，这里并没使用U-net结构，而是采用resnet为主体的方案，默认网络为下采样2层、resnet 9层、然后再上采样2层。<br>由于不打算修改resnet结构，那么加skip的话也就是在输入输出和上下采样的几层做文章， 而 skip 的实现方式又包括 值相加 或 concat。加 skip 后要更小心均衡外轮廓和中间清晰度的训练，这个实际试下来感觉有些玄学，确实会好一点，但好多少，哪种skip更好，不好说，也由于结果记录缺失了不少，这里就不再具体讨论了。</p>
+<hr>
+<h4 id="GAN-图像翻译-部分结语"><a href="#GAN-图像翻译-部分结语" class="headerlink" title="GAN 图像翻译 部分结语"></a><strong>GAN 图像翻译 部分结语</strong></h4><p>由于折腾了很久但最终效果离UI实用的标准还差得远，线条不清晰，训练不稳定，且在其他抽象更强的图标集上没什么进展，因此图像翻译方向的尝试就此搁置。 </p>
+<p>其实还有以下手段未来可以继续尝试：</p>
+<ul>
+<li>尝试 StarGAN 等网络 </li>
+<li>使用缩放卷积来解决棋盘效应 </li>
+<li>补充其他几个主题图标的数据量并尝试</li>
+<li>用 GoogleCloud VisionAPI 拿到每个图标的各种语义标签，然后借鉴 cGAN 提高转换能力</li>
+</ul>
+<p>图像翻译最近发展仍很火热，但感觉还是没有能很好处理抽象语义的方案：<br><a href="https://zhuanlan.zhihu.com/p/67532362" target="_blank" rel="noopener">生成对抗网络系列——CVPR2019中的图像转化GAN</a></p>
+<p>虽然本次尝试看起来以折戟沉沙告终，但我认为这个路子还是很有希望的，只是说受限于数据、算力、经验，不可能一步到位完成。相信在不久的将来应会有论文能在这个问题上达到比较好的结果。</p>
+<p>另外敬告未来踩坑者，数据集的准备极其重要，否则难以稳定推进下去。可以先从相似任务出发，例如 从人像转换成动漫头像 的任务。<br>GAN网络巨坑，玄学多，而近年发展越来越快，其中解构重构的思想，也利于未来理解和运用神经网络，很值得尝试。顺便提一下总结到的 GAN 技术与其他方法所不同的难点，也许会对读者有启发价值：</p>
+<ul>
+<li>评判标准难定。缺少评判标准，训练及优化方向容易迷失。</li>
+<li>工程和学术上的平衡，也就是生成效果和应用部署的平衡，增加一些外部的图像处理的方法提高最终结果。</li>
+<li>GAN网络训练很慢很不稳定，需要一些技巧，对算力的需求真的高。</li>
+</ul>
+<blockquote>
+<p>本文中实验时所使用代码基本都来自于这位作者，<a href="https://github.com/taki0112/StarGAN-Tensorflow" target="_blank" rel="noopener">taki0112/StarGAN-Tensorflow</a>，<br>其人对众多 GAN 网络都有tf版本的实现，代码结构简洁统一，非常易用，如果同是tfboy的话强烈推荐。</p>
+</blockquote>
+<hr>
+<h3 id="StyleTransfer-Approaches"><a href="#StyleTransfer-Approaches" class="headerlink" title="StyleTransfer Approaches"></a>StyleTransfer Approaches</h3><p>实现图标风格转换还有另一种或许可行的思路，就是使用 StyleTransfer 渲染出其他风格的图标。这意味着我们不往特定已有主题训练了，只要能做出某种效果统一的图标包就行。</p>
+<p>网上已经有一篇博文对 StyleTransfer 做了相当深入浅出的讨论，极其推荐： <a href="https://ctmakro.github.io/site/on_learning/image/style_transfer.html" target="_blank" rel="noopener">On Style Transfer 风格转移</a><br>如果已经看完上面那篇文章，可跳过下面对 StyleTransfer 的介绍，直接看效果部分即可。</p>
+<p>Style Transfer 的目标是输入一张原图和一张风格图，要生成一张图并使这张图内容与原图相近而风格与风格图相近。内容好说，大概就是比较语义相似度甚至像素相似度，使用 VGG 中某一较靠后的输出作为依据。而对于风格，使用 VGG 某些层的 activation 的 Gram  矩阵来表示，这点也是StyleTransfer的核心思想。</p>
+<p>Gram 矩阵数学定义如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/gram_matrix_defination.png?x-oss-process=style/resize_600" alt="gram_matrix_defination"></p>
+<p>其中 $a_1$、$a_2$ 均为向量。简单点定义就是 k 个向量 $a_1$，$a_2$，…，$a_k$ 两两间内积所形成的矩阵称为这组向量的 gram 矩阵。<br>应用在 StyleTransfer 中，$a_i$即在Channel-i上的特征向量，由于原特征是一个平面的，因此需要使用 flatten 操作变为维度 [h*w] 的特征向量。因此在 style transfer 原论文中 Gram 矩阵定义为：  $G_{ij}^l=\sum_{k}F_{ik}^lF_{jk}^l$<br>其中 i,j 表示通道，l 表示网络层数，k在原文中未讲，应该是[hxw]中的第k个特征点的意思， 那么 $F_{ik}^l$ 就是第l层网络的i通道的第k个特征值，整个计算公式就是（i,j）通道间对应特征点两两相乘再累加作为通道间（i,j）的关系。<br>网上理解：gram矩阵是计算每个通道I的feature map与每个通道j的feature map的内积。gram matrix的每个值可以说是代表i通道的feature map与j通道的feature map的互相关程度。<sup id="fnref:8"><a href="#fn:8" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://blog.csdn.net/Sun7_She/article/details/77199844">[8]</span></a></sup><br>代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">def gram_matrix(x):</span><br><span class="line">    assert isinstance(x, tf.Tensor)</span><br><span class="line">    b, h, w, ch = x.get_shape().as_list()</span><br><span class="line">    features = tf.reshape(x, [-1, h*w, ch])</span><br><span class="line">    gram = tf.matmul(features, features, transpose_a=True) / tf.constant(ch * w * h, tf.float32)</span><br><span class="line">    return gram</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>注意，上面代码中将矩阵数值顺便除以了 <code>ch*w*h</code> 。（《Perceptual Losses》”Style Reconstruction Loss.”）</p>
+</blockquote>
+<p>一个风格图片在计算不同层 Gram 矩阵的时候输入输出维度打印如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">gram_matrix input shapes  1 507 640 64</span><br><span class="line">gram_matrix shapes  (1, 64, 64)</span><br><span class="line">gram_matrix input shapes  1 254 320 128</span><br><span class="line">gram_matrix shapes  (1, 128, 128)</span><br><span class="line">gram_matrix input shapes  1 127 160 256</span><br><span class="line">gram_matrix shapes  (1, 256, 256)</span><br><span class="line">gram_matrix input shapes  1 64 80 512</span><br><span class="line">gram_matrix shapes  (1, 512, 512)</span><br><span class="line">gram_matrix input shapes  1 32 40 512</span><br><span class="line">gram_matrix shapes  (1, 512, 512)</span><br></pre></td></tr></table></figure>
+
+<p>可以看到，输入的维度有很多不规则数值，而输出的 Gram 矩阵维度总是 (ch*ch) 的。这是因为 Gram 矩阵的计算是在通道间作内积，因此Gram矩阵维度是与一个通道的维度无关的而只与通道个数相关，另一方面通道个数又已经由 VGG 网络固定了，因而 Gram 矩阵作为风格特征可以应对不同大小的图片而输出同样维度的风格，这点非常方便。</p>
+<p>计算风格差异的时候还要同时考虑多个不同层的风格结果，因为不同层代表不同粒度。关于为什么VGG上不同层的输出能够表示不同粒度的图像风格，有兴趣的话还可以再看 distill上的 <a href="https://distill.pub/2017/feature-visualization/" target="_blank" rel="noopener">Feature Visualization</a> 这篇文章 。</p>
+<p>Style Transfer 的结构图如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/Style_Transfer_diagram.png?x-oss-process=style/resize_600" alt="Style_Transfer_diagram"><sup id="fnref:9"><a href="#fn:9" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Perceptual Losses for Real-Time Style Transfer and Super-Resolution ">[9]</span></a></sup><br>将输入图$x$通过一个生成网络 $f_W$ ，生成$\hat{y}$，将该图与内容图$y_c$和风格图$y_s$比较并计算相应loss，内容图$y_c$在本问题中其实也就是输入$x$（如果已经有按需求画好的对应图，则使用该图作为$y_c$）。<br>这个结构是初始Style Transfer<sup id="fnref:10"><a href="#fn:10" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Gatys L A, Ecker A S, Bethge M. A neural algorithm of artistic style[J]. arXiv preprint arXiv:1508.06576, 2015.">[10]</span></a></sup>的改进版。在原结构中，输入是一个随机向量，生成网络也就全是上采样，这种结构训练的话，每次只能训练一对内容图和风格图，无法再应用于其他图片，训练费时。而新的结构，只要$y_s$不变，训练时输入图片$x$可以是一组图片，性能还更好，网络也可以对其他未见过的图片进行风格迁移。</p>
+<p>loss主要分为三部分，衡量风格的 $l_{style}$ ，衡量语义的 $l_{feat}$， 还有抑制过拟合、使图片更平滑的$l_{tv}$。<br>对于  $l_{feat}$，$l_{style}$ 均使用 MSE 即 L2_loss 作为误差，$l_{tv}$应用在生成结果上，使用如下代码计算：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def total_variation_loss(x, batch_size):</span><br><span class="line">    return tf.reduce_sum(tf.image.total_variation(x)) / batch_size</span><br></pre></td></tr></table></figure>
+
+<p>StyleTransfer 的网络结构比较容易理解，也没有多少可以改动的，但是需要调参的地方很多，例如 VGG 可以选用 VGG16 或 VGG19，StyleLoss 在不同论文中也有尝试使用不同层数，结果会有不同，我们可能也得试下不同的组合。训练结果对 Style_w 和 Content_w 的比例非常敏感，这点从上面提到的博文的尝试就可以看出。</p>
+<p>由于从网上找到的现有代码存在些小错误<sup id="fnref:11"><a href="#fn:11" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="https://github.com/lengstrom/fast-style-transfer/issues/102">[11]</span></a></sup>，超参数用起来不行，为了后续调参修改方便，按照之前GAN网络的风格另写了一套<a href="https://github.com/BenZstory/FastImageStyleTransfer" target="_blank" rel="noopener">代码</a>。</p>
+<h3 id="实战-1"><a href="#实战-1" class="headerlink" title="实战"></a><strong>实战</strong></h3><p>训练主要是在不同超参数间尝试哪组参数训练更稳定，以及使用不同风格图片对图标集训练比较效果如何。调参简单使用了GridSearch方法。<br>使用 GridSearch 对预设超参空间搜索完毕后，会产生大量训练结果，而我们这种图像生成的任务缺少准确的评估标准，只能一点点控制变量从训练走势和结果图大致摸索较好参数集合。首先把 learning rate、total variation weight 这种不易受影响的参数范围确定下来。<br>以 tv_w 为例， 在 Tensorboard 左下输入正则 “.<em>lr_0.001.*stylew_300.</em>“，筛选出如下图表：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_style_loss_on_diff_tv_w.png?x-oss-process=style/resize_600" alt="style_transfer_style_loss_on_diff_tv_w"><br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_on_diff_tv_w.png?x-oss-process=style/resize_600" alt="style_transfer_content_loss_on_diff_tv_w"><br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_tv_loss_on_diff_tv_w.png?x-oss-process=style/resize_600" alt="style_transfer_tv_loss_on_diff_tv_w"><br><del>基于某种直觉上的思考，</del>最终我感觉 tv_w 在 1e-05 ~ 5e-05 之间会比较好。类似的，lr 就决定是 0.001 了。</p>
+<p>更重要的是确定好 style_w（content_w已固定为1，二者比例决定训练时风格/内容倾向）：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_and_style_loss_on_diff_style_w.png?x-oss-process=style/resize_800" alt="style_transfer_content_loss_and_style_loss_on_diff_style_w"><br>style_w 应该考虑 30 ~ 300 区间: 30 的时候，style 还勉强继续在降，300的时候，content 降得不健康了。</p>
+<p>上面都是使用 stylenet_4_contentnet_4 的组合，使用 stylenet_5_contentnet_4<sup id="fnref:12"><a href="#fn:12" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="使用不同 VGG 层数表征图像风格，stylenet_4 使用 ('conv1_2'，'conv2_2'，'conv3_3'，'conv4_3')，为《Perceptual Losses》所用方法；stylenet_5 使用 ('conv1_1', 'conv2_1', 'conv3_1', 'conv4_1', 'conv5_1')，为《A Neural Algorithm of Artistic Style》所用方法。
+">[12]</span></a></sup> 的组合得到相似结果:<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_content_loss_and_style_loss_on_diff_style_w_stylenet_5.png?x-oss-process=style/resize_800" alt="style_transfer_content_loss_and_style_loss_on_diff_style_w_stylenet_5"><br>结果类似，style_w 应在 30 ~ 300 区间。</p>
+<p>style_w 具体值多少更好，这个还要具体成图效果，使用 la muse 风格图，style_w 从 50 到 1000 结果如下：<br>50<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_50_result.png?x-oss-process=style/resize_600" alt="style_transfer_lamuse_stylew_50_result"><br>100<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_100_result.png?x-oss-process=style/resize_600" alt="style_transfer_lamuse_stylew_100_result"><br>300<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_300_result.png?x-oss-process=style/resize_600" alt="style_transfer_lamuse_stylew_300_result"><br>1000<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_lamuse_stylew_1000_result.png?x-oss-process=style/resize_600" alt="style_transfer_lamuse_stylew_1000_result"></p>
+<p>具体参数见仁见智了，我觉得100就还好。</p>
+<p>OK，确定了各超参数，接着再在各种不同风格图上试一下，看看得到的图标可否实用化。之前调参时都是把图标集作为训练数据，但实际训练风格迁移时，要采用一个更大的图像数据集来训练才行，我这里是在 COCO2014 数据集上训练生成模型，然后再应用到图标集上看效果。</p>
+<p>选取部分结果如下：</p>
+<table>
+<thead>
+<tr>
+<th align="center">Style Image</th>
+<th align="center">Result</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style24.png?x-oss-process=style/resize_w200h100_center_crop" alt="style24"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_24.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_24"></td>
+</tr>
+<tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style25.png?x-oss-process=style/resize_w200h100_center_crop" alt="style25"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_25.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_25"></td>
+</tr>
+<tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style26.png?x-oss-process=style/resize_w200h100_center_crop" alt="style26"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_26.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_26"></td>
+</tr>
+<tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style28.png?x-oss-process=style/resize_w200h100_center_crop" alt="style28"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_28.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_28"></td>
+</tr>
+<tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style29.png?x-oss-process=style/resize_w200h100_center_crop" alt="style29"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_29.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_29"></td>
+</tr>
+<tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style30.png?x-oss-process=style/resize_w200h100_center_crop" alt="style30"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_of_style_30.jpg?x-oss-process=style/resize_800" alt="style_transfer_result_of_style_30"></td>
+</tr>
+</tbody></table>
+<p>可以看到，同样的 style_w 参数，对于不同的风格图，所能学到风格的程度也有很大差距，调参还是个天坑啊。</p>
+<p>图标由不同风格渲染后效果如下：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_on_icon_bocmbci_of_style_24_to_31.jpg?x-oss-process=style/resize_600" alt="style_transfer_result_on_icon_bocmbci_of_style_24_to_31"><br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/style_transfer_result_on_icon_mihoyobh3_of_style_24_to_31.jpg?x-oss-process=style/resize_600" alt="style_transfer_result_on_icon_mihoyobh3_of_style_24_to_31"></p>
+<p>我想你看到这里也猜到最后结果了，是的，由于风格参数捉摸不定，风格又只是改变笔触，最后得到的结果实在难以让UI同学满意，没有办法实用化。即便真的要实用化，估计也是偏娱乐性质，还需要加整套交互使用户能够自己选择风格以及不同参数下的结果图标(类似Prisma)，整个代价将会很大。</p>
+<h4 id="结语"><a href="#结语" class="headerlink" title="结语"></a><strong>结语</strong></h4><p>对于我们的图标生成任务，相对 GAN 网络的方法，我感觉 StyleTransfer 的方法不大行。确实能够很快搞出一批图标，但是效果有限，仅仅改变笔触而缺少抽象风格的转变，使用者应该不会买账。StyleTransfer 的上限比 GAN 方法要低很多，最近也少有进步，似乎只是多了一些控制笔触粗细之类的方法。不过 StyleTransfer 使用 Gram 矩阵来作为风格的思路很值得借鉴，之前 TwinGAN 里用 norm 参数来控制风格的方法就源于。<br>另外用 GridSearch 搜参数比在训练 GAN 网络时候的 babysitting 舒服多了，不同风格图的结果也很有趣，算是不虚此行吧。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">SRGAN超分辨率图像复原 Photo-Realistic Single Image Super-Resolution Using a Generative Adversarial Network https://arxiv.org/pdf/1609.04802.pdf<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">U-Net: Convolutional Networks for Biomedical Image Segmentation https://arxiv.org/abs/1505.04597<a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Towards Automatic Icon Design using Machine Learning https://pdfs.semanticscholar.org/ed3b/bcba8202d24280e4364432e2b5cacbcf941e.pdf<a href="#fnref:3" rev="footnote"> ↩</a></span></li><li id="fn:4"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">4.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">论文里的意思似乎是Discriminator的输入不用把生成图和原图concat一起，但在代码里是concat的，也就跟pix2pix一样了<a href="#fnref:4" rev="footnote"> ↩</a></span></li><li id="fn:5"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">5.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">pix2pix project: https://phillipi.github.io/pix2pix/<a href="#fnref:5" rev="footnote"> ↩</a></span></li><li id="fn:6"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">6.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">图标集应该是开源的，我是从酷安搜索图标包下载后再解压整理得到的图标文件，感谢原开发者们。 https://www.coolapk.com/apk/com.oblatum.iconpack<a href="#fnref:6" rev="footnote"> ↩</a></span></li><li id="fn:7"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">7.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">StarGAN: Unified Generative Adversarial Networks for Multi-Domain Image-to-Image Translation. https://arxiv.org/abs/1711.09020<a href="#fnref:7" rev="footnote"> ↩</a></span></li><li id="fn:8"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">8.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://blog.csdn.net/Sun7_She/article/details/77199844<a href="#fnref:8" rev="footnote"> ↩</a></span></li><li id="fn:9"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">9.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Perceptual Losses for Real-Time Style Transfer and Super-Resolution<a href="#fnref:9" rev="footnote"> ↩</a></span></li><li id="fn:10"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">10.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Gatys L A, Ecker A S, Bethge M. A neural algorithm of artistic style[J]. arXiv preprint arXiv:1508.06576, 2015.<a href="#fnref:10" rev="footnote"> ↩</a></span></li><li id="fn:11"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">11.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://github.com/lengstrom/fast-style-transfer/issues/102<a href="#fnref:11" rev="footnote"> ↩</a></span></li><li id="fn:12"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">12.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">使用不同 VGG 层数表征图像风格，stylenet_4 使用 ('conv1_2'，'conv2_2'，'conv3_3'，'conv4_3')，为《Perceptual Losses》所用方法；stylenet_5 使用 ('conv1_1', 'conv2_1', 'conv3_1', 'conv4_1', 'conv5_1')，为《A Neural Algorithm of Artistic Style》所用方法。<a href="#fnref:12" rev="footnote"> ↩</a></span></li></ol></div></div>
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/GAN/" rel="tag"><i class="fa fa-tag"></i> GAN</a>
+          
+            <a href="/tags/深度学习/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+          
+            <a href="/tags/StyleTransfer/" rel="tag"><i class="fa fa-tag"></i> StyleTransfer</a>
+          
+            <a href="/tags/图像生成/" rel="tag"><i class="fa fa-tag"></i> 图像生成</a>
+          
+            <a href="/tags/预研/" rel="tag"><i class="fa fa-tag"></i> 预研</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019-06-25-语音识别初探/" rel="next" title="语音识别初探">
+                <i class="fa fa-chevron-left"></i> 语音识别初探
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#原由："><span class="nav-text">原由：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GAN-Approaches"><span class="nav-text">GAN Approaches</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#IconColorization"><span class="nav-text">IconColorization:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#pix2pix"><span class="nav-text">pix2pix:</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CycleGAN"><span class="nav-text">CycleGAN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CartoonGAN-："><span class="nav-text">CartoonGAN ：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TwinGAN："><span class="nav-text">TwinGAN：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StarGAN-7"><span class="nav-text">StarGAN[7]</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实战"><span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#GAN-图像翻译-部分结语"><span class="nav-text">GAN 图像翻译 部分结语</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StyleTransfer-Approaches"><span class="nav-text">StyleTransfer Approaches</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#实战-1"><span class="nav-text">实战</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#结语"><span class="nav-text">结语</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

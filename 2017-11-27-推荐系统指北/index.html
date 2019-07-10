@@ -1,0 +1,1052 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
+<meta name="keywords" content="推荐系统,机器学习">
+<meta property="og:type" content="article">
+<meta property="og:title" content="推荐系统指北">
+<meta property="og:url" content="http://yoursite.com/2017-11-27-推荐系统指北/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/va75klwtrtkrw914s6iafrrb/image_1bvlu1trbk191e42c2n1gh415ph9.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/6enbzj5ym2hw8v1q85vymnaw/image_1bvm90stlrf6c67vdu28f88a16.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/piup56tylc0ylrb242kfm761/image_1bvm92sr71dmmnjmkrfjdfkh520.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/chtgrtxfq3i3mtux3evfcohp/image_1bvm93s00ksqgnt3dm1el110b02d.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/niotszydyyhzrqe9n5rixlgi/image_1bvm9i6qe76e3ideo3c9o1j5q2q.png">
+<meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/1kz13nlj3vpp84aozvscvd7o/image_1bvmdv7dom0qhc5lb21ldaok937.png">
+<meta property="og:updated_time" content="2019-07-08T16:07:37.389Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="推荐系统指北">
+<meta name="twitter:description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
+<meta name="twitter:image" content="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2017-11-27-推荐系统指北/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>推荐系统指北 | 奔哲明的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017-11-27-推荐系统指北/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">推荐系统指北
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-11-27 00:00:00" itemprop="dateCreated datePublished" datetime="2017-11-27T00:00:00+08:00">2017-11-27</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-09 00:07:37" itemprop="dateModified" datetime="2019-07-09T00:07:37+08:00">2019-07-09</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/推荐系统/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
+              
+                <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+              
+            </div>
+          
+
+          
+            <div class="post-description" hidden>简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="算法分类"><a href="#算法分类" class="headerlink" title="算法分类"></a>算法分类</h1><h2 id="1-memory-based"><a href="#1-memory-based" class="headerlink" title="1. memory-based :"></a>1. memory-based :</h2><p>协同过滤 collaborative filtering</p>
+<ul>
+<li><p><strong>基于用户的协同过滤：</strong><br>找到相似用户（计算用户相似度），再推荐别人喜欢而自己未接触过的。<br>用户A和用户B对相同物品集合有兴趣（阅读/点赞/购买），则A和B之间有一定的相似度。简单点的例子，用户A对物品{a, b, d}有过行为，用户B对物品{a, c}有过行为，利用余弦相似度公式计算A和B的相似度为：<br><img src="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" alt="image_1bvk4coj0mhrr3i91tngc1eovp.png-7.5kB"><br>假设要对A做推荐，而B是相似度最高的用户，则可以向A推荐物品c。</p>
+<p>详细点的例子见下图<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+</li>
+</ul>
+<p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
+<p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a> :<br><img src="http://static.zybuluo.com/benzwaltzing/va75klwtrtkrw914s6iafrrb/image_1bvlu1trbk191e42c2n1gh415ph9.png" alt="image_1bvlu1trbk191e42c2n1gh415ph9.png-75.4kB"><br>假设在已有左图用户-物品评分矩阵的情况下，对用户a做物品推荐。</p>
+<p>  首先通过一定算法，计算用户a与其他用户v的相似度S(a, v)，选择前k个相似度最高的用户，则这些用户大多都喜欢的而目标用户a却没有做评价的物品，就是值得推荐的物品。怎么衡量“大多”呢：将相似度S(a, v)作为权重，乘上用户v对每个物品的评分序列，遍历k个用户，对加过权的评分求和，然后就得到比较可靠的用户a对物品的感兴趣程度，去掉用户已经评分过的物品，做次排序即可作为推荐列表。</p>
+<p>  上述的选择k个最相近用户做参考依据来推荐物品的过程，又被称为k近邻方法。<br>  对于相似度的计算，通常有下面几种方法：</p>
+<ul>
+<li><p>Pearson相似度<br><img src="http://static.zybuluo.com/benzwaltzing/6enbzj5ym2hw8v1q85vymnaw/image_1bvm90stlrf6c67vdu28f88a16.png" alt="pearson_sim"></p>
+</li>
+<li><p>Cosine相似度<br><img src="http://static.zybuluo.com/benzwaltzing/piup56tylc0ylrb242kfm761/image_1bvm92sr71dmmnjmkrfjdfkh520.png" alt="cosine_sim"></p>
+</li>
+<li><p>Jaccard 相似度<br><img src="http://static.zybuluo.com/benzwaltzing/chtgrtxfq3i3mtux3evfcohp/image_1bvm93s00ksqgnt3dm1el110b02d.png" alt="jaccard_sim"></p>
+</li>
+<li><p>Log-Likelihood Ratio<br><img src="http://static.zybuluo.com/benzwaltzing/niotszydyyhzrqe9n5rixlgi/image_1bvm9i6qe76e3ideo3c9o1j5q2q.png" alt="log-likelihood"><br>参考： <a href="https://tech.meituan.com/mt-recommend-practice.html" target="_blank" rel="noopener">https://tech.meituan.com/mt-recommend-practice.html</a></p>
+<p>相似度算法的选择没有定论，甚至于完全可以根据一些特征，设定自己的相似度方法。现在我使用的都是余弦相似度。</p>
+</li>
+</ul>
+<ul>
+<li><p><strong>基于物品的协同过滤：</strong><br>基于物品的协同过滤，思想与基于用户的协同过滤是一样的。<br>计算物品之间的相似度，然后根据物品的相似度和用户的历史行为给用户生成推荐列表。<br>这里的物品相似度使用了以下公式：<br>  Wij = |N(i)∩N(j)| / sqrt(N(i)^2 * N(j)^2)<br>其中N(i)指喜欢物品i的用户数，N(i)∩N(j)指同时喜欢物品i和物品j的用户数。</p>
+<p>这里的物品相似度，是通过用户-物品关系矩阵算得的，而不是直接比较物品间的属性特征，这样能够更好地挖掘出物品隐性的联系，如“啤酒尿布”案例。</p>
+</li>
+</ul>
+<p>协同过滤是推荐系统里最基础也最常用的方法，推荐的结果有迹可循能够在UI上做出推荐原因的解释（如跟某某物品相似，某某用户也喜欢该物品），是绝大多数电商推荐系统的基础算法。<br>但缺点也很明显：<br>由于强依赖于用户-物品行为矩阵，当矩阵稀疏时，效果会比较差，<br>同理，当出现新物品/新用户时候，由于还没有在矩阵中建立起联系，无法通过简单的协同过滤算法给出推荐，这也就是常说的“冷启动”问题。对于冷启动问题，下文另有解释。</p>
+<p>协同过滤还可以增加许多优化，例如考虑到用户兴趣会随时间变化，将时间信息纳入相似度的计算；还可以对过于热门的物品或行为过多的用户增加惩罚系数，避免被带偏；以及对评分矩阵作归一化<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
+<p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>处理。<br>尝试过引入前两种优化，实现起来也并不难，这里就不细讲了，可以参考《推荐系统实践》的相关章节。</p>
+<h2 id="2-content-based"><a href="#2-content-based" class="headerlink" title="2. content-based :"></a>2. content-based :</h2><p>提取物品特征，把用户的行为映射到物品特征</p>
+<p>基于标签的推荐系统是典型content-based推荐系统。如果纯粹以标签为纽带，可以得到以下一种简单的算法<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
+<p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>：</p>
+<p> （1）统计每个用户最常用的标签。<br> （2）对于每个标签，统计被打过这个标签次数最多的物品。<br> （3）对于一个用户，首先找到他常用的标签，然后找到具有这些标签的最热门物品推荐给这<br>个用户。</p>
+<p>另一种思路<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
+<p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>是将标签作为用户属性寻找物品间的相似性：<br><img src="http://static.zybuluo.com/benzwaltzing/1kz13nlj3vpp84aozvscvd7o/image_1bvmdv7dom0qhc5lb21ldaok937.png" alt="content_based"></p>
+<p>在我们现有的推荐系统里，使用了前者进行推荐。<br>由于当前数据集里标签信息相对较多，且含有大量LDA算法信息，标签质量较高，在几种算法里获得了相对更好的效果。</p>
+<p>基于标签的数据集： hetrec2011-lastfm-2k</p>
+<h2 id="3-model-based"><a href="#3-model-based" class="headerlink" title="3. model-based"></a>3. model-based</h2><p>偏数学的方法，把推荐问题抽象为预测矩阵里未填值的问题，即预测评分问题。<br>电影推荐是典型的评分预测再做推荐的问题，如movieLens数据集，Netflix推荐系统比赛</p>
+<p>如果没有直白的评分，则可以将用户的各种行为映射为评分，例如：<br>阅读 +1分， 点赞 +1分， 打标签 +1分， 收藏 +2分</p>
+<p>将问题抽象为预测问题后，各种方法就非常多了，svd，svd++之类的矩阵分解方法是开胃菜，然后常见的机器学习方法，大多都可以套用算法试一下，线性回归、KNN、决策树、神经网络都可以应对此类问题，且都有不同程度的优劣，实际工程应用中以及比赛中，一般是将这些模型再套一层加权混合，在具体数据集里最终训练出合适的参数。由于这些算法对机器学习的基础知识要求较高，且做集成学习需要不少的工程经验，暂时没敢尝试，这里只实现了svd算法，效果也还算可以。</p>
+<p>svd算法还是有些难以完全理解，不容易讲清楚，可以到以下链接看具体原理：<br><a href="http://www.cnblogs.com/zrhai/p/5104928.html" target="_blank" rel="noopener">http://www.cnblogs.com/zrhai/p/5104928.html</a><br>在实际使用中，使用了Surprise库的SVD模型，直接train和predict即可，具体细节可以不关心。</p>
+<hr>
+<h1 id="推荐指标："><a href="#推荐指标：" class="headerlink" title="推荐指标："></a>推荐指标：</h1><p>准确率  召回率  覆盖率  新颖度<br>排序准确度<br>评分准确度(RMSE MAE)</p>
+<p>具体建议参考 《推荐系统评价指标综述》 电子科学大学学报 第41卷第2期</p>
+<hr>
+<h1 id="三大难点："><a href="#三大难点：" class="headerlink" title="三大难点："></a>三大难点：</h1><p>以下问题，是推荐系统业界都会碰到的问题，也是除推荐指标外，系统不断优化的方向</p>
+<ol>
+<li><p>实时性：<br>推荐系统需要实时地更新推荐列表来满足用户新的行为变化，我们希望用户的每次行为，都能触发并计算出新的更好的推荐列表。<br>但由于推荐系统模型的计算量都相当庞大，不可能每次实时重新训练整个模型，只有少数算法如协同过滤支持增量计算（但计算量仍然较大），勉强能做实时。通常的做法是，整个推荐系统分多个部分，包括离线和在线的模型，离线的模型，一般隔较长时间计算一次，作为推荐的基础，而实时的模型，要支持流式计算，主要通过最近的用户行为特征修正推荐列表。参见Netflix推荐系统架构图:<a href="http://www.infoq.com/cn/news/2013/04/netflix-ml-architecture" target="_blank" rel="noopener">http://www.infoq.com/cn/news/2013/04/netflix-ml-architecture</a></p>
+</li>
+<li><p>冷启动：<br>对于新用户，由于没有历史行为，无法与物品建立起联系，造成无法推荐。对于这种情况，不少应用会要求用户手动输入喜好，以及填充年龄、性别等信息，通过这些东西可以初步建立起用户画像，做一定程度的推荐。也可以借助社会关系或其他平台数据来获取用户特征，例如今日头条就会在用户注册时获取微博历史信息作为用户画像的一部分。<br>对于新物品，可以用数据挖掘的方法，先提取部分物品特征，基于content-based进行推荐，协同过滤强依赖于用户-物品关系矩阵，如果一个系统只实现了协同过滤而没有做content-based类型的推荐系统，那么新物品就没有机会被推荐到，可见，推荐系统的是很有必要做多种算法的集成的。<br>对这两种冷启动问题，也可以用热门物品/新物品列表暴力解决。</p>
+</li>
+<li><p>数据太稀疏：<br>对数据集做聚类处理，例如将相似物品进行聚类，用户对物品的行为太稀疏，则将同一类内的物体做同样标注处理，用户没接触过的物品，但由于用户喜欢过这一类物品，也假定会喜欢它，从而构造出一个比较稠密的矩阵。这个只是个思路，具体效果需要实验一下。</p>
+</li>
+</ol>
+<hr>
+<h1 id="其他推荐资料："><a href="#其他推荐资料：" class="headerlink" title="其他推荐资料："></a>其他推荐资料：</h1><p>《推荐系统实践》项亮</p>
+<p>IBM推荐系统系列文章<br><a href="https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html</a></p>
+<p>面向程序员的数据挖掘指南<br><a href="https://wizardforcel.gitbooks.io/guide-to-data-mining/content/2.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/guide-to-data-mining/content/2.html</a></p>
+<p>推荐系统工程比赛（预测点击率）：<br><a href="https://www.kaggle.com/c/avazu-ctr-prediction" target="_blank" rel="noopener">https://www.kaggle.com/c/avazu-ctr-prediction</a></p>
+<p>数据集：movieLens, hetrec2011-lastfm-2k,<br>    KKBox’s Music Recommendation Challenge（Kaggle）</p>
+<p>  [8]: <a href="http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png" target="_blank" rel="noopener">http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Recommender Systems From Content to Latent Factor Analysis, IDA SMU</span></li></ol></div></div></p>
+<p>[^normalization]: 面向程序员的数据挖掘指南 <a href="https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</a></p>
+<p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 <a href="https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html</a><a href="#fnref:1" rev="footnote"> ↩</a></p>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/推荐系统/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
+          
+            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017-06-19-all-about-rotations/" rel="next" title="Android屏幕旋转源码探索及应用实践">
+                <i class="fa fa-chevron-left"></i> Android屏幕旋转源码探索及应用实践
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019-06-25-语音识别初探/" rel="prev" title="语音识别初探">
+                语音识别初探 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法分类"><span class="nav-text">算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-memory-based"><span class="nav-text">1. memory-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-content-based"><span class="nav-text">2. content-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-model-based"><span class="nav-text">3. model-based</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#推荐指标："><span class="nav-text">推荐指标：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三大难点："><span class="nav-text">三大难点：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他推荐资料："><span class="nav-text">其他推荐资料：</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>

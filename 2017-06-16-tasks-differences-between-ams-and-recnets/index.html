@@ -1,0 +1,1323 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="1 概述图中左上部分是任务历史在AMS中保存的列表，右上部分是多任务界面里所会展示的任务列表，左下则是实际上还在前后台运行的task列表，可以看到，这三者是有不小区别的，并不是同步的。下面讲首先分别讲下它们三者负责什么、意义所在，然后通过一些具体方法的使用看下它们之间的关系。   1.1 任务和返回栈 - 实际数据模型   (左下)这个是指在调度体系里实际保存的TaskRecord实例，而Acti">
+<meta name="keywords" content="Android,Frameworks,AMS">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Recents和AMS中历史任务的区别">
+<meta property="og:url" content="http://yoursite.com/2017-06-16-tasks-differences-between-ams-and-recnets/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="1 概述图中左上部分是任务历史在AMS中保存的列表，右上部分是多任务界面里所会展示的任务列表，左下则是实际上还在前后台运行的task列表，可以看到，这三者是有不小区别的，并不是同步的。下面讲首先分别讲下它们三者负责什么、意义所在，然后通过一些具体方法的使用看下它们之间的关系。   1.1 任务和返回栈 - 实际数据模型   (左下)这个是指在调度体系里实际保存的TaskRecord实例，而Acti">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png">
+<meta property="og:updated_time" content="2019-07-04T13:42:48.896Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Recents和AMS中历史任务的区别">
+<meta name="twitter:description" content="1 概述图中左上部分是任务历史在AMS中保存的列表，右上部分是多任务界面里所会展示的任务列表，左下则是实际上还在前后台运行的task列表，可以看到，这三者是有不小区别的，并不是同步的。下面讲首先分别讲下它们三者负责什么、意义所在，然后通过一些具体方法的使用看下它们之间的关系。   1.1 任务和返回栈 - 实际数据模型   (左下)这个是指在调度体系里实际保存的TaskRecord实例，而Acti">
+<meta name="twitter:image" content="http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://yoursite.com/2017-06-16-tasks-differences-between-ams-and-recnets/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Recents和AMS中历史任务的区别 | 奔哲明的博客</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017-06-16-tasks-differences-between-ams-and-recnets/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Recents和AMS中历史任务的区别
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2017-06-16 00:00:00" itemprop="dateCreated datePublished" datetime="2017-06-16T00:00:00+08:00">2017-06-16</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-04 21:42:48" itemprop="dateModified" datetime="2019-07-04T21:42:48+08:00">2019-07-04</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              
+                <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+              
+                <a href="/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="1-概述"><a href="#1-概述" class="headerlink" title="1 概述"></a>1 概述</h2><p><img src="http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png" alt="任务历史保存方式关系图"><br>图中左上部分是任务历史在AMS中保存的列表，右上部分是多任务界面里所会展示的任务列表，左下则是实际上还在前后台运行的task列表，可以看到，这三者是有不小区别的，并不是同步的。<br>下面讲首先分别讲下它们三者负责什么、意义所在，然后通过一些具体方法的使用看下它们之间的关系。  </p>
+<h3 id="1-1-任务和返回栈-实际数据模型-左下"><a href="#1-1-任务和返回栈-实际数据模型-左下" class="headerlink" title="1.1 任务和返回栈 - 实际数据模型   (左下)"></a>1.1 任务和返回栈 - 实际数据模型   (左下)</h3><p>这个是指在调度体系里实际保存的TaskRecord实例，而ActivityRecord-TaskRecord-ActivityStack之间的关系建议看<a href="https://developer.android.com/guide/components/tasks-and-back-stack.html" target="_blank" rel="noopener">官方文档</a>。<br>任务栈是实际在后台的任务，因此这些任务也都有对应的显示层实例。  </p>
+<p>其创建与删除通过stack控制： ActivityStack#createTaskRecord()，ActivityStack#removeTask()<br>当前activity栈可以通过adb shell dumpsys activity activities 命令打印出来，这个命令最终会调用到方法：<br>AMS#dumpActivitiesLocked() -&gt; ActivityStackSupervisor#dumpActivitiesLocked()  </p>
+<h3 id="1-2-AMS-mRecentTasks-历史任务记录（左上）"><a href="#1-2-AMS-mRecentTasks-历史任务记录（左上）" class="headerlink" title="1.2 AMS.mRecentTasks - 历史任务记录（左上）"></a>1.2 AMS.mRecentTasks - 历史任务记录（左上）</h3><p><code>RecentTasks</code>用于在AMS中保存最近使用的task记录，可以通过adb shell dumpsys activity recents命令打印其列表。  </p>
+<p><code>RecentTasks</code>应该被看作任务的历史记录而不是实例，虽然保留了TaskRecord对象，但并不一定有对应的activity。  </p>
+<p><code>RecentTasks</code>列表是始终有序的，最近使用的task在列表中的位置最靠前。之所以有序，是因为框架里，每次resume后都会把当前应用重新添加到RecentTasks中，典型代码如下：  </p>
+<pre><code class="Java">ActivityStack#resumeTopActivityInnerLocked() {  
+            ......  
+            <span class="keyword">if</span> (DEBUG_STATES) Slog.v(TAG_STATES, <span class="string">"Moving to RESUMED: "</span> + next + <span class="string">" (in existing)"</span>);  
+            next.state = ActivityState.RESUMED;  
+            mResumedActivity = next;  
+            next.task.touchActiveTime();  
+            mRecentTasks.addLocked(next.task);  
+            mService.updateLruProcessLocked(next.app, <span class="keyword">true</span>, <span class="keyword">null</span>);  
+            updateLRUListLocked(next);  
+            mService.updateOomAdjLocked();  
+            ......  
+}  </code></pre>
+<p>如上代码第7行即将task置于mRecentTasks头部，而6行是更新task的activeTime。  </p>
+<p>与add对应的remove，则基本只有AMS#cleanUpRemovedTaskLocked()这一个地方：  </p>
+<pre><code class="Java"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">cleanUpRemovedTaskLocked</span><span class="params">(TaskRecord tr, <span class="keyword">boolean</span> killProcess,  </span></span>
+<span class="function"><span class="params">            <span class="keyword">boolean</span> removeFromRecents)</span> </span>{  
+        <span class="keyword">if</span> (removeFromRecents) {  
+            mRecentTasks.remove(tr);  
+            tr.removedFromRecents();  
+            <span class="comment">// zeusis : clear the paired TaskRecord and resize fullscreenStack to normal  </span>
+            ......  
+        }  
+        .....  
+    }  </code></pre>
+<p>通常的remove途径，就是用户在多任务上滑快照回收一个应用或在多任务点清理内存按钮批量回收应用。<br>应用按back键退出做finish，虽然activity都destroy掉了，在整个的应用栈里被删掉，但是taskrecord其实还是保留下来的，保存在mRecentTasks中直到历史记录过多<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”如果应用历史记录数超过设定的MAX值(48)，会将RecentTasks表末的记录删掉，详见AMS#addAppTask(). L10731  </a></sup></p>
+<p>[^reboot_restore]:重启后persistent的应用taskRecord会在RecentTasks中重新生成。  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png" target="_blank" rel="noopener">1</a>或重启<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”如果应用历史记录数超过设定的MAX值(48)，会将RecentTasks表末的记录删掉，详见AMS#addAppTask(). L10731  </a></sup></p>
+<p>[^reboot_restore]:重启后persistent的应用taskRecord会在RecentTasks中重新生成。  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png" target="_blank" rel="noopener">1</a>才可能销毁。  </p>
+<p>####TaskPersister<br>与RecentTasks相关的还有TaskPersister，用于保存被设定persistent属性的任务列表，并在手机重启后从本地保存的xml重新加载TaskRecord。有兴趣的话可以看TaskRecord#restoreFromXml()及相关流程。  </p>
+<h3 id="1-3-多任务-展示给用户的任务概览（右上）"><a href="#1-3-多任务-展示给用户的任务概览（右上）" class="headerlink" title="1.3 多任务 - 展示给用户的任务概览（右上）"></a>1.3 多任务 - 展示给用户的任务概览（右上）</h3><p>Recents(多任务)中记录的任务列表与其它两者是不一样的，由于是展示给用户的，所以要尽可能符合用户期待,这就造成一些实际已销毁或回收的任务也要保存显示，而一些无关紧要的或特别的应用又需要隐藏起来。  </p>
+<p>如此说来，这个任务列表首先就是与任务栈解耦的，实际上，多任务的列表是每次启动多任务时从任务历史记录处获取列表，然后再做各种过滤动作获得真正适合展示给用户的列表。在下文3.1节具体讲解了多任务的列表是如何从AMS获取并过滤的。  </p>
+<p>[Recents官方文档][3]  </p>
+<h2 id="2-关系"><a href="#2-关系" class="headerlink" title="2 关系"></a>2 关系</h2><h3 id="AMS-RecentTasks和SystemUI-Recents-TaskStack区别"><a href="#AMS-RecentTasks和SystemUI-Recents-TaskStack区别" class="headerlink" title="AMS#RecentTasks和SystemUI.Recents.TaskStack区别"></a>AMS#RecentTasks和SystemUI.Recents.TaskStack区别</h3><ul>
+<li>两者数据形式上都是线性有序的  </li>
+<li>后者列表包含于前者，后者是前者过滤而来的，具体过滤步骤见3.1的流程  </li>
+<li>前者的更新会触发回调改变后者  </li>
+</ul>
+<h3 id="AMS-RecentTasks和任务栈区别"><a href="#AMS-RecentTasks和任务栈区别" class="headerlink" title="AMS#RecentTasks和任务栈区别"></a>AMS#RecentTasks和任务栈区别</h3><ul>
+<li>任务栈是个大的数据模型，taskRecord按序排列在不同栈中，而RecentTasks是线性记录  </li>
+<li>应用destory后，在RecentTasks中仍保有其taskrecord，但在任务栈中已将其移除  </li>
+</ul>
+<h2 id="3-具体代码例子"><a href="#3-具体代码例子" class="headerlink" title="3 具体代码例子"></a>3 具体代码例子</h2><h3 id="3-1-Recents从AMS-RecentTasks更新列表"><a href="#3-1-Recents从AMS-RecentTasks更新列表" class="headerlink" title="3.1 Recents从AMS.RecentTasks更新列表"></a>3.1 Recents从AMS.RecentTasks更新列表</h3><p>Recents作为系统界面，虽然与AMS关系紧密，但毕竟是一个独立出来的app模块，所以其列表很难做到与server一侧的情况保持同步，为此，Recents每次启动时都要重刷整个列表，确保符合现场。重刷列表是比较费时的操作，故此，AOSP将Recents设计启动前先做预处理，从server一侧获取列表并作大致过滤，然后启动recentsActivity。  </p>
+<p>多任务界面的启动通过PhoneStatusBar.showRecentApps方法，在向AMS发起启动activity请求前，会先preload，一个典型的多任务界面启动时调用栈如下：  </p>
+<blockquote>
+<p>at com.android.systemui.recents.model.RecentsTaskLoadPlan.preloadRawTasks(RecentsTaskLoadPlan.java:125)<br>at com.android.systemui.recents.model.RecentsTaskLoadPlan.preloadPlan(RecentsTaskLoadPlan.java:153)<br>at com.android.systemui.recents.model.RecentsTaskLoader.preloadTasks(RecentsTaskLoader.java:384)<br>at com.android.systemui.recents.RecentsImpl.startRecentsActivity(RecentsImpl.java:924)<br>at com.android.systemui.recents.RecentsImpl.showRecents(RecentsImpl.java:316)<br>at com.android.systemui.recents.Recents.showRecents(Recents.java:308)  </p>
+</blockquote>
+<p>通过以下两层方法从AMS获得rawTasks列表SystemServiceProxy#getRecentTasks() -&gt; AMS#getRecentTasks()。<br>这是最先的两层过滤，AMS一侧的方法用来获取最近符合要求应用列表，而SSP的方法是在调用前者后再根据多任务另外设置的黑名单再过滤一遍。  </p>
+<p>我们先看AMS一侧的代码。  </p>
+<h4 id="3-1-1-第一层过滤"><a href="#3-1-1-第一层过滤" class="headerlink" title="3.1.1 第一层过滤"></a>3.1.1 第一层过滤</h4><p><strong>AMS#getRecentTasks()</strong>  </p>
+<pre><code class="Java"><span class="meta">@Override</span>  
+<span class="keyword">public</span> ParceledListSlice&lt;ActivityManager.RecentTaskInfo&gt; getRecentTasks(<span class="keyword">int</span> maxNum, <span class="keyword">int</span> flags,  
+        <span class="keyword">int</span> userId) {  
+    <span class="keyword">final</span> <span class="keyword">int</span> callingUid = Binder.getCallingUid();  
+    userId = mUserController.handleIncomingUser(Binder.getCallingPid(), callingUid, userId,  
+            <span class="keyword">false</span>, ALLOW_FULL_ONLY, <span class="string">"getRecentTasks"</span>, <span class="keyword">null</span>);  
+
+    <span class="keyword">final</span> <span class="keyword">boolean</span> includeProfiles = (flags &amp; ActivityManager.RECENT_INCLUDE_PROFILES) != <span class="number">0</span>;  
+    <span class="keyword">final</span> <span class="keyword">boolean</span> withExcluded = (flags&amp;ActivityManager.RECENT_WITH_EXCLUDED) != <span class="number">0</span>;  
+    <span class="keyword">synchronized</span> (<span class="keyword">this</span>) {  
+        <span class="keyword">final</span> <span class="keyword">boolean</span> allowed = isGetTasksAllowed(<span class="string">"getRecentTasks"</span>, Binder.getCallingPid(),  
+                callingUid);  
+        <span class="keyword">final</span> <span class="keyword">boolean</span> detailed = checkCallingPermission(  
+                android.Manifest.permission.GET_DETAILED_TASKS)  
+                == PackageManager.PERMISSION_GRANTED;  
+
+        <span class="keyword">if</span> (!isUserRunning(userId, ActivityManager.FLAG_AND_UNLOCKED)) {  
+            Slog.i(TAG, <span class="string">"user "</span> + userId + <span class="string">" is still locked. Cannot load recents"</span>);  
+            <span class="keyword">return</span> ParceledListSlice.emptyList();  
+        }  
+        mRecentTasks.loadUserRecentsLocked(userId);  
+
+        <span class="keyword">final</span> <span class="keyword">int</span> recentsCount = mRecentTasks.size();  
+        ArrayList&lt;ActivityManager.RecentTaskInfo&gt; res =  
+                <span class="keyword">new</span> ArrayList&lt;&gt;(maxNum &lt; recentsCount ? maxNum : recentsCount);  
+
+        <span class="keyword">final</span> Set&lt;Integer&gt; includedUsers;  
+        <span class="keyword">if</span> (includeProfiles) {  
+            includedUsers = mUserController.getProfileIds(userId);  
+        } <span class="keyword">else</span> {  
+            includedUsers = <span class="keyword">new</span> HashSet&lt;&gt;();  
+        }  
+        includedUsers.add(Integer.valueOf(userId));  
+
+        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; recentsCount &amp;&amp; maxNum &gt; <span class="number">0</span>; i++) {  
+            TaskRecord tr = mRecentTasks.get(i);  
+            <span class="comment">// Only add calling user or related users recent tasks   </span>
+            <span class="keyword">if</span> (!includedUsers.contains(Integer.valueOf(tr.userId))) {  
+                <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS, <span class="string">"Skipping, not user: "</span> + tr);  
+                <span class="keyword">continue</span>;<span class="comment">//不属于该用户组的跳过  </span>
+            }  
+
+            <span class="keyword">if</span> (tr.realActivitySuspended) {  
+                <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS, <span class="string">"Skipping, activity suspended: "</span> + tr);  
+                <span class="keyword">continue</span>;  
+            }  
+
+            <span class="comment">// Return the entry if desired by the caller.  We always return  </span>
+            <span class="comment">// the first entry, because callers always expect this to be the  </span>
+            <span class="comment">// foreground app.  We may filter others if the caller has  </span>
+            <span class="comment">// not supplied RECENT_WITH_EXCLUDED and there is some reason  </span>
+            <span class="comment">// we should exclude the entry.  </span>
+
+            <span class="keyword">if</span> (i == <span class="number">0</span>  
+                    || withExcluded  
+                    || (tr.intent == <span class="keyword">null</span>)  
+                    || ((tr.intent.getFlags() &amp; Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS)  
+                            == <span class="number">0</span>)) {  
+                <span class="keyword">if</span> (!allowed) {  
+                    <span class="comment">// If the caller doesn't have the GET_TASKS permission, then only  </span>
+                    <span class="comment">// allow them to see a small subset of tasks -- their own and home.  </span>
+                    <span class="keyword">if</span> (!tr.isHomeTask() &amp;&amp; tr.effectiveUid != callingUid) {  
+                        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS, <span class="string">"Skipping, not allowed: "</span> + tr);  
+                        <span class="keyword">continue</span>;<span class="comment">//没有GET_TASKS权限的不能获取其它应用的列表  </span>
+                    }  
+                }  
+
+                <span class="keyword">if</span> ((flags &amp; ActivityManager.RECENT_IGNORE_HOME_STACK_TASKS) != <span class="number">0</span>) {  
+                    <span class="keyword">if</span> (tr.stack != <span class="keyword">null</span> &amp;&amp; tr.stack.isHomeStack()) {  
+                        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                                <span class="string">"Skipping, home stack task: "</span> + tr);  
+                        <span class="keyword">continue</span>;  
+                    }  
+                }  
+                <span class="keyword">if</span> ((flags &amp; ActivityManager.RECENT_INGORE_DOCKED_STACK_TOP_TASK) != <span class="number">0</span>) {  
+                    <span class="keyword">final</span> ActivityStack stack = tr.stack;  
+                    <span class="keyword">if</span> (stack != <span class="keyword">null</span> &amp;&amp; stack.isDockedStack() &amp;&amp; stack.topTask() == tr) {  
+                        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                                <span class="string">"Skipping, top task in docked stack: "</span> + tr);  
+                        <span class="keyword">continue</span>;<span class="comment">//原生逻辑，在A/r状态下，下屏miniRecents中不会有上屏应用的快照  </span>
+                    }  
+                }  
+                <span class="keyword">if</span> ((flags &amp; ActivityManager.RECENT_INGORE_PINNED_STACK_TASKS) != <span class="number">0</span>) {  
+                    <span class="keyword">if</span> (tr.stack != <span class="keyword">null</span> &amp;&amp; tr.stack.isPinnedStack()) {  
+                        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                                <span class="string">"Skipping, pinned stack task: "</span> + tr);  
+                        <span class="keyword">continue</span>;  
+                    }  
+                }  
+                <span class="keyword">if</span> (tr.autoRemoveRecents &amp;&amp; tr.getTopActivity() == <span class="keyword">null</span>) {  
+                    <span class="comment">// Don't include auto remove tasks that are finished or finishing.  </span>
+                    <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                            <span class="string">"Skipping, auto-remove without activity: "</span> + tr);  
+                    <span class="keyword">continue</span>;<span class="comment">//autoRemoveRecents的应用在销毁后会从mRecentsTasks列表中删除，这种情况只是还没来得及删除，但也要过滤掉  </span>
+                }  
+                <span class="keyword">if</span> ((flags&amp;ActivityManager.RECENT_IGNORE_UNAVAILABLE) != <span class="number">0</span>  
+                        &amp;&amp; !tr.isAvailable) {  
+                    <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                            <span class="string">"Skipping, unavail real act: "</span> + tr);  
+                    <span class="keyword">continue</span>;  
+                }  
+
+                <span class="keyword">if</span> (!tr.mUserSetupComplete) {  
+                    <span class="comment">// Don't include task launched while user is not done setting-up.  </span>
+                    <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,  
+                            <span class="string">"Skipping, user setup not complete: "</span> + tr);  
+                    String record = tr.toString();  
+                    <span class="keyword">if</span>(record.contains(QQ_NAME) || record.contains(WEIBO_NAME) || record.contains(WECHAT_NAME)){  
+                        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS,<span class="string">"not skip for dualapp"</span> + tr);  
+                    }<span class="keyword">else</span>{  
+                        <span class="keyword">continue</span>;  
+                    }  
+                }  
+
+                ActivityManager.RecentTaskInfo rti = createRecentTaskInfoFromTaskRecord(tr);  
+                <span class="keyword">if</span> (!detailed) {  
+                    rti.baseIntent.replaceExtras((Bundle)<span class="keyword">null</span>);  
+                }  
+
+                res.add(rti);  
+                maxNum--;  
+            }  
+        }  
+        <span class="keyword">return</span> <span class="keyword">new</span> ParceledListSlice&lt;&gt;(res);  
+    }  
+}  </code></pre>
+<p>这个方法看起来比较长，但逻辑其实很简单。<br>首先从入参看，maxNum是所需的列表长度，满足数量即返回。flag是过滤条件。userId用于过滤掉不属于该应用组的应用。<br>从35行开始，遍历任务历史记录mRecentTasks，根据方法入参携带的flag做相应过滤，不符合要求的跳过，符合要求的则增加到结果列表，直到结果数目符合要求，结束遍历返回结果。  </p>
+<p>54~60行的逻辑主要针对EXCLUDE_FROM_RECENTS这个标记位。EXCLUDE_FROM_RECENTS，顾名思义，在Recents中不显示，多任务获取列表时，flag不会带有RECENT_WITH_EXCLUDED标识，withExcluded为false，此时应用如果设置了EXCLUDE_FROM_RECENTS就会被跳过不作为结果返回，不过有个<span id="exclude_fail_case">特例</span>，表头的应用不受此限制，就是说，从应用A进入多任务仍会有A的快照，也正因此，在SSP中需要另外增加黑名单逻辑对一些特殊的应用再做一次过滤。  </p>
+<p>60行之后的代码是针对flag中每一个过滤需求跳过相应task。  </p>
+<p><s>67~99行是在处理分屏问题过程中我们增加的一些过滤机制，相对应的也增加了各种flag。之所以在这里加过滤机制，是因为许多地方要判断当前后台运行的应用是否支持分屏之类的，这就一定要通过getRecent获取最近任务列表，而多任务的列表有其自己一套过滤机制，且与后台并不完全同步，不能直接拿来用，因此我们只好模仿着增加特别分屏需要的过滤。  </s></p>
+<p>从AMS一侧获取列表后，还要继续在ssp的方法中筛掉黑名单里的应用。  </p>
+<h4 id="3-1-2-第二层过滤"><a href="#3-1-2-第二层过滤" class="headerlink" title="3.1.2 第二层过滤"></a>3.1.2 第二层过滤</h4><p><strong>SystemServiceProxy#getRecentTasks()</strong>  </p>
+<pre><code class="Java"><span class="keyword">public</span> List&lt;ActivityManager.RecentTaskInfo&gt; getRecentTasks(<span class="keyword">int</span> numLatestTasks, <span class="keyword">int</span> userId,  
+        <span class="keyword">boolean</span> includeFrontMostExcludedTask, ArraySet&lt;Integer&gt; quietProfileIds) {  
+    ......  
+
+    <span class="comment">// Remove home/recents/excluded tasks  </span>
+    <span class="keyword">int</span> minNumTasksToQuery = <span class="number">10</span>;  
+    <span class="keyword">int</span> numTasksToQuery = Math.max(minNumTasksToQuery, numLatestTasks);  
+    <span class="keyword">int</span> flags = ActivityManager.RECENT_IGNORE_HOME_STACK_TASKS |  
+            <span class="comment">//ActivityManager.RECENT_INGORE_DOCKED_STACK_TOP_TASK |  </span>
+            ActivityManager.RECENT_INGORE_PINNED_STACK_TASKS |  
+            ActivityManager.RECENT_IGNORE_UNAVAILABLE |  
+            ActivityManager.RECENT_INCLUDE_PROFILES;  
+    <span class="keyword">if</span>(mIsInMultiWindowMode == <span class="keyword">true</span>) {  
+        flags |= ActivityManager.RECENT_INGORE_DOCKED_STACK_TOP_TASK;  
+    }  
+    <span class="keyword">if</span> (includeFrontMostExcludedTask) {  
+        flags |= ActivityManager.RECENT_WITH_EXCLUDED;  
+    }  
+    List&lt;ActivityManager.RecentTaskInfo&gt; tasks = <span class="keyword">null</span>;  
+    <span class="keyword">try</span> {  
+        tasks = mAm.getRecentTasksForUser(numTasksToQuery, flags, userId);  
+    } <span class="keyword">catch</span> (Exception e) {  
+        Log.e(TAG, <span class="string">"Failed to get recent tasks"</span>, e);  
+    }  
+
+    <span class="comment">// Break early if we can't get a valid set of tasks  </span>
+    <span class="keyword">if</span> (tasks == <span class="keyword">null</span>) {  
+        <span class="keyword">return</span> <span class="keyword">new</span> ArrayList&lt;&gt;();  
+    }  
+
+    <span class="keyword">boolean</span> isFirstValidTask = <span class="keyword">true</span>;  
+    Iterator&lt;ActivityManager.RecentTaskInfo&gt; iter = tasks.iterator();  
+    <span class="keyword">while</span> (iter.hasNext()) {  
+        ActivityManager.RecentTaskInfo t = iter.next();  
+
+        <span class="comment">// <span class="doctag">NOTE:</span> The order of these checks happens in the expected order of the traversal of the  </span>
+        <span class="comment">// tasks  </span>
+
+        <span class="comment">// Remove the task if it or it's package are blacklsited  </span>
+        <span class="keyword">if</span> (sRecentsBlacklist.contains(t.realActivity.getClassName()) ||  
+                sRecentsBlacklist.contains(t.realActivity.getPackageName())) {  
+            iter.remove();  
+            <span class="keyword">continue</span>;  
+        }  
+        ......  
+    }  
+
+    <span class="keyword">return</span> tasks.subList(<span class="number">0</span>, Math.min(tasks.size(), numLatestTasks));  
+}  </code></pre>
+<p>8~12行是多任务从AMS获取列表的默认flag。  </p>
+<p>上述代码中的21行从AMS获得列表，然后在40~44行里，将黑名单中的去掉。  </p>
+<p>上文提到，某些<a href="#exclude_fail_case">特例</a>下，设置了从多任务排除掉的应用仍会在多任务显示，像这种无论如何都不希望在多任务显示的应用，可以在此处加入黑名单，就能够确保从列表中去掉了。  </p>
+<p>除了这些基本的过滤，Recents还有进行自己的一套过滤，比如说丢弃掉已经太久没有激活过的应用。  </p>
+<h4 id="3-1-3-第三层过滤"><a href="#3-1-3-第三层过滤" class="headerlink" title="3.1.3 第三层过滤"></a>3.1.3 第三层过滤</h4><p>在RecentsTaskLoadPlan#preloadPlan中，上述的preloadRawTasks()执行完后，还会遍历得到的mRawTasks做深一步的预处理和过滤。<br>其中有个判定项<code>isStackTask</code>将会在后面用作过滤。  </p>
+<pre><code class="Java"><span class="keyword">boolean</span> isStackTask = isFreeformTask || !isHistoricalTask(t) ||  
+        (t.lastActiveTime &gt;= lastStackActiveTime &amp;&amp; i &gt;= (taskCount - MIN_NUM_TASKS));  
+
+<span class="comment">/**  </span>
+<span class="comment"> * Returns whether this task is too old to be shown.  </span>
+<span class="comment"> */</span>  
+<span class="function"><span class="keyword">private</span> <span class="keyword">boolean</span> <span class="title">isHistoricalTask</span><span class="params">(ActivityManager.RecentTaskInfo t)</span> </span>{  
+    <span class="keyword">return</span> t.lastActiveTime &lt; (System.currentTimeMillis() - SESSION_BEGIN_TIME <span class="comment">/* 6h */</span>);  
+}  </code></pre>
+<p>如上代码，如果应用有太久没有使用，isHistoricalTask将会为true，isStackTask将可能为false(后面一个条件具体解释起来比较复杂，有兴趣的可以继续阅读源码相关部分思考其用处)。  </p>
+<p>在随后的处理中，mRawTasks会继续被处理成FilteredTaskList：<code>mStackTaskList</code>，并根据acceptTask()接口返回的值决定是否保留在FilterdTaskList。  </p>
+<blockquote>
+<p>at com.android.systemui.recents.model.TaskStack$2.acceptTask(TaskStack.java:608)<br>at com.android.systemui.recents.model.FilteredTaskList.updateFilteredTasks(TaskStack.java:204)<br>at com.android.systemui.recents.model.FilteredTaskList.set(TaskStack.java:159)<br>at com.android.systemui.recents.model.TaskStack.setTasks(TaskStack.java:851)<br>at com.android.systemui.recents.model.RecentsTaskLoadPlan.preloadPlan(RecentsTaskLoadPlan.java:228)<br>at com.android.systemui.recents.model.RecentsTaskLoader.preloadTasks(RecentsTaskLoader.java:384)  </p>
+</blockquote>
+<pre><code class="Java"><span class="function"><span class="keyword">public</span> <span class="title">TaskStack</span><span class="params">()</span> </span>{  
+        <span class="comment">// Ensure that we only show non-docked tasks  </span>
+        mStackTaskList.setFilter(<span class="keyword">new</span> TaskFilter() {  
+            <span class="meta">@Override</span>  
+            <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">acceptTask</span><span class="params">(SparseArray&lt;Task&gt; taskIdMap, Task t, <span class="keyword">int</span> index)</span> </span>{  
+                <span class="keyword">if</span> (RecentsDebugFlags.Static.EnableAffiliatedTaskGroups) {  
+                    <span class="keyword">if</span> (t.isAffiliatedTask()) {  
+                        <span class="comment">// If this task is affiliated with another parent in the stack, then the  </span>
+                        <span class="comment">// historical state of this task depends on the state of the parent task  </span>
+                        Task parentTask = taskIdMap.get(t.affiliationTaskId);  
+                        <span class="keyword">if</span> (parentTask != <span class="keyword">null</span>) {  
+                            t = parentTask;  
+                        }  
+                    }  
+                }  
+                <span class="keyword">return</span> t.isStackTask;  
+            }  
+        });  
+    }  </code></pre>
+<p>如上代码中16行，如果之前计算得出的isStackTask为false，那就会被过滤掉。<code>mStackTaskList</code>才是最后在多任务中被拿来用的任务列表。  </p>
+<h3 id="3-2-应用如何设定自己不在多任务中显示"><a href="#3-2-应用如何设定自己不在多任务中显示" class="headerlink" title="3.2 应用如何设定自己不在多任务中显示"></a>3.2 应用如何设定自己不在多任务中显示</h3><p>首先要增加EXCLUDE_FROM_RECENTS属性，具体来说，在模块manifest中的<activity>里增加如下代码  </activity></p>
+<pre><code class="xml"><span class="tag">&lt;<span class="name">activity</span>  </span>
+<span class="tag">  <span class="attr">android:name</span>=<span class="string">"XYZ"</span>  </span>
+<span class="tag">  <span class="attr">android:excludeFromRecents</span>=<span class="string">"true"</span>&gt;</span>  </code></pre>
+<p>但原生逻辑下，从应用直接进入多任务的时候，及时加了exclude属性，当前应用的快照也会保留，如果这种情况也不希望显示。那么需要将自己加入多任务黑名单。<br><strong>SystemServiceProxy.sRecentsBlacklist:</strong>  </p>
+<pre><code>final static List&lt;String&gt; sRecentsBlacklist;  
+static {  
+    sRecentsBlacklist = new ArrayList&lt;&gt;();  
+    sRecentsBlacklist.add(&quot;com.android.systemui.tv.pip.PipOnboardingActivity&quot;);  
+    sRecentsBlacklist.add(&quot;com.android.systemui.tv.pip.PipMenuActivity&quot;);  
+}  </code></pre><p><s>上面是我们ROM里当前的黑名单，头两个是原生就有的，后面是针对JUI系统界面需求所增加的，像全局搜索、bigbang这类的，对用户算是系统界面的一部分，但实际上却是通过app实现的应用适合加入黑名单。  </s></p>
+<h3 id="3-3-如何获取后台应用列表而不是历史记录"><a href="#3-3-如何获取后台应用列表而不是历史记录" class="headerlink" title="3.3 如何获取后台应用列表而不是历史记录"></a>3.3 如何获取后台应用列表而不是历史记录</h3><p>前面一直讲的getRecentTasks()获取的列表包含了已经处于destoryed状态的tasks，如果只想要后台运行应用的列表，可以使用mAm.getRunningTasks(maxNum)方法，这个方法会调用到AMS#getTasks():  </p>
+<pre><code>@Override  
+    public List&lt;RunningTaskInfo&gt; getTasks(int maxNum, int flags) {  
+        final int callingUid = Binder.getCallingUid();  
+        ArrayList&lt;RunningTaskInfo&gt; list = new ArrayList&lt;RunningTaskInfo&gt;();  
+        synchronized(this) {  
+            final boolean allowed = isGetTasksAllowed(&quot;getTasks&quot;, Binder.getCallingPid(),  
+                    callingUid);  
+
+            // TODO: Improve with MRU list from all ActivityStacks.  
+            mStackSupervisor.getTasksLocked(maxNum, list, callingUid, allowed);  
+        }  
+        return list;  
+    }  </code></pre><p>StackSuperVisor#getTasksLocked()方法会深搜遍历activity任务栈，然后截取所需数目的列表并返回。<br>不过mAm.getRunningTasks()这个方法已经是@Deprecated的了。<br>我们看到第9行有个TODO，但这个已经好几年没有变化了，大概是RecentTasks已经基本够用了。  </p>
+<h3 id="3-2-mRecentTasks中的taskRecord重回任务栈舞台"><a href="#3-2-mRecentTasks中的taskRecord重回任务栈舞台" class="headerlink" title="3.2 mRecentTasks中的taskRecord重回任务栈舞台"></a>3.2 mRecentTasks中的taskRecord重回任务栈舞台</h3><p>从多任务点击快照与一般启动应用的方式不一样。一般从Launcher启动或是应用间跳转都是借助Intent，在新建task之前，会遍历任务栈中的应用看是否有intent相同的task并复用之。<br>而从多任务启动应用，却与intent无关，是直接使用taskId的：<br><strong>ASS#startActivityFromRecentsInner</strong>  </p>
+<pre><code class="Java"><span class="function"><span class="keyword">final</span> <span class="keyword">int</span> <span class="title">startActivityFromRecentsInner</span><span class="params">(<span class="keyword">int</span> taskId, Bundle bOptions)</span> </span>{  
+    ......  
+    task = anyTaskForIdLocked(taskId, RESTORE_FROM_RECENTS, launchStackId);  
+    <span class="keyword">if</span> (task == <span class="keyword">null</span>) {  
+        continueUpdateBounds(HOME_STACK_ID);  
+        mWindowManager.executeAppTransition();  
+        <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentException(  
+                <span class="string">"startActivityFromRecentsInner: Task "</span> + taskId + <span class="string">" not found."</span>);  
+    }  
+    ......  
+}  </code></pre>
+<p><strong>ASS#anyTaskForIdLocked</strong>  </p>
+<pre><code class="Java"><span class="function">TaskRecord <span class="title">anyTaskForIdLocked</span><span class="params">(<span class="keyword">int</span> id, <span class="keyword">boolean</span> restoreFromRecents, <span class="keyword">int</span> stackId)</span> </span>{  
+        <span class="keyword">int</span> numDisplays = mActivityDisplays.size();  
+        <span class="keyword">for</span> (<span class="keyword">int</span> displayNdx = <span class="number">0</span>; displayNdx &lt; numDisplays; ++displayNdx) {  
+            ArrayList&lt;ActivityStack&gt; stacks = mActivityDisplays.valueAt(displayNdx).mStacks;  
+            <span class="keyword">for</span> (<span class="keyword">int</span> stackNdx = stacks.size() - <span class="number">1</span>; stackNdx &gt;= <span class="number">0</span>; --stackNdx) {  
+                ActivityStack stack = stacks.get(stackNdx);  
+                TaskRecord task = stack.taskForIdLocked(id);  
+                <span class="keyword">if</span> (task != <span class="keyword">null</span>) {  
+                    <span class="keyword">return</span> task;  
+                }  
+            }  
+        }  
+
+        <span class="comment">// Don't give up! Look in recents.//如果任务栈中没有，尝试在RecentTasks中搜索  </span>
+        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.v(TAG_RECENTS, <span class="string">"Looking for task id="</span> + id + <span class="string">" in recents"</span>);  
+        TaskRecord task = mRecentTasks.taskForIdLocked(id);  
+        <span class="keyword">if</span> (task == <span class="keyword">null</span>) {  
+            <span class="keyword">if</span> (DEBUG_RECENTS) Slog.d(TAG_RECENTS, <span class="string">"\tDidn't find task id="</span> + id + <span class="string">" in recents"</span>);  
+            <span class="keyword">return</span> <span class="keyword">null</span>;  
+        }  
+
+        <span class="keyword">if</span> (!restoreFromRecents) {  
+            <span class="keyword">return</span> task;  
+        }  
+
+        <span class="keyword">if</span> (!restoreRecentTaskLocked(task, stackId)) {  
+            <span class="keyword">if</span> (DEBUG_RECENTS) Slog.w(TAG_RECENTS,  
+                    <span class="string">"Couldn't restore task id="</span> + id + <span class="string">" found in recents"</span>);  
+            <span class="keyword">return</span> <span class="keyword">null</span>;  
+        }  
+        <span class="keyword">if</span> (DEBUG_RECENTS) Slog.w(TAG_RECENTS, <span class="string">"Restored task id="</span> + id + <span class="string">" from in recents"</span>);  
+        <span class="keyword">return</span> task;  
+    }  </code></pre>
+<p>由于<code>多任务</code>中显示的是最近任务列表，对用户来说，更是所谓在后台运行的应用，正常情况通过taskid是一定能找到一个可重用的taskrecord的。在anyTaskForIdLocked()中，首先遍历任务栈寻找相同taskid应用，如果找不到则在RecentTasks中继续找，找到后通过restoreRecentTaskLocked将taskRecord重新加入合适的ActivityStack中去。这样，本已被销毁的应用从<code>RecentTasks</code>中被加回<code>任务栈</code>，taskId等信息都不变。<br>与上面相对的，直接通过intent方式启动activity时，虽然也会尽可能寻找可重用的task，但却只是从<code>任务栈</code>中遍历寻找intent相同的Task，不会从<code>RecentTasks</code>中再寻找一边。<br>可以说，一个taskRecord实例的唯一标识是taskId，而一个应用task的唯一标识是intent。  </p>
+<hr>
+<p><strong>注</strong>:</p>
+<p>  [3]: <a href="https://developer.android.com/guide/components/recents.html" target="_blank" rel="noopener">https://developer.android.com/guide/components/recents.html</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">如果应用历史记录数超过设定的MAX值(48)，会将RecentTasks表末的记录删掉，详见AMS#addAppTask(). L10731<br></span></li></ol></div></div></p>
+<p>[^reboot_restore]:重启后persistent的应用taskRecord会在RecentTasks中重新生成。<a href="#fnref:1" rev="footnote"> ↩</a></p>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+          
+            <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+          
+            <a href="/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017-06-19-all-about-rotations/" rel="prev" title="Android屏幕旋转源码探索及应用实践">
+                Android屏幕旋转源码探索及应用实践 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">15</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-概述"><span class="nav-text">1 概述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-任务和返回栈-实际数据模型-左下"><span class="nav-text">1.1 任务和返回栈 - 实际数据模型   (左下)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-AMS-mRecentTasks-历史任务记录（左上）"><span class="nav-text">1.2 AMS.mRecentTasks - 历史任务记录（左上）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-3-多任务-展示给用户的任务概览（右上）"><span class="nav-text">1.3 多任务 - 展示给用户的任务概览（右上）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-关系"><span class="nav-text">2 关系</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#AMS-RecentTasks和SystemUI-Recents-TaskStack区别"><span class="nav-text">AMS#RecentTasks和SystemUI.Recents.TaskStack区别</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AMS-RecentTasks和任务栈区别"><span class="nav-text">AMS#RecentTasks和任务栈区别</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-具体代码例子"><span class="nav-text">3 具体代码例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Recents从AMS-RecentTasks更新列表"><span class="nav-text">3.1 Recents从AMS.RecentTasks更新列表</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-第一层过滤"><span class="nav-text">3.1.1 第一层过滤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-第二层过滤"><span class="nav-text">3.1.2 第二层过滤</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-3-第三层过滤"><span class="nav-text">3.1.3 第三层过滤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-应用如何设定自己不在多任务中显示"><span class="nav-text">3.2 应用如何设定自己不在多任务中显示</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-3-如何获取后台应用列表而不是历史记录"><span class="nav-text">3.3 如何获取后台应用列表而不是历史记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-mRecentTasks中的taskRecord重回任务栈舞台"><span class="nav-text">3.2 mRecentTasks中的taskRecord重回任务栈舞台</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
