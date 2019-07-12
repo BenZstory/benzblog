@@ -38,7 +38,7 @@
 
   
   
-  <link rel="stylesheet" href="/benzblog/lib/fancybox/source/jquery.fancybox.css">
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
 
 
 
@@ -46,21 +46,21 @@
 
 
 
-<link rel="stylesheet" href="/benzblog/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
 
-<link rel="stylesheet" href="/benzblog/css/main.css?v=7.2.0">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/benzblog/images/apple-touch-icon-next.png?v=7.2.0">
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
 
 
-  <link rel="icon" type="image/png" sizes="32x32" href="/benzblog/images/favicon.ico?v=7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
 
 
-  <link rel="icon" type="image/png" sizes="16x16" href="/benzblog/images/favicon_16x16.ico?v=7.2.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
 
 
-  <link rel="mask-icon" href="/benzblog/images/logo.svg?v=7.2.0" color="#222">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
 
 
 
@@ -71,7 +71,7 @@
 <script id="hexo.configurations">
   var NexT = window.NexT || {};
   var CONFIG = {
-    root: '/benzblog/',
+    root: '/',
     scheme: 'Pisces',
     version: '7.2.0',
     sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
@@ -103,7 +103,7 @@
 <meta name="keywords" content="Android,Frameworks,AMS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Recents和AMS中历史任务的区别">
-<meta property="og:url" content="https://benzstory.github.io/benzblog/2017-06-16-tasks-differences-between-ams-and-recnets/index.html">
+<meta property="og:url" content="http://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
 <meta property="og:description" content="1 概述图中左上部分是任务历史在AMS中保存的列表，右上部分是多任务界面里所会展示的任务列表，左下则是实际上还在前后台运行的task列表，可以看到，这三者是有不小区别的，并不是同步的。下面讲首先分别讲下它们三者负责什么、意义所在，然后通过一些具体方法的使用看下它们之间的关系。   1.1 任务和返回栈 - 实际数据模型   (左下)这个是指在调度体系里实际保存的TaskRecord实例，而Acti">
 <meta property="og:locale" content="zh-CN">
@@ -120,7 +120,7 @@
 
   
   
-  <link rel="canonical" href="https://benzstory.github.io/benzblog/2017-06-16-tasks-differences-between-ams-and-recnets/">
+  <link rel="canonical" href="http://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/">
 
 
 
@@ -187,7 +187,7 @@
     
 
     <div class="custom-logo-site-title">
-      <a href="/benzblog/" class="brand" rel="start">
+      <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
         <span class="site-title">奔哲明的博客</span>
         <span class="logo-line-after"><i></i></span>
@@ -225,7 +225,7 @@
 
     
 
-    <a href="/benzblog/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
 
   </li>
         
@@ -241,7 +241,7 @@
 
     
 
-    <a href="/benzblog/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
 
   </li>
         
@@ -257,7 +257,7 @@
 
     
 
-    <a href="/benzblog/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
 
   </li>
         
@@ -273,7 +273,7 @@
 
     
 
-    <a href="/benzblog/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
 
   </li>
         
@@ -289,7 +289,7 @@
 
     
 
-    <a href="/benzblog/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
 
   </li>
 
@@ -337,7 +337,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://benzstory.github.io/benzblog/benzblog/2017-06-16-tasks-differences-between-ams-and-recnets/">
+    <link itemprop="mainEntityOfPage" href="http://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="BenZ">
@@ -409,7 +409,7 @@
                 <span class="post-meta-item-text">分类于</span>
               
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/benzblog/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Tech/" itemprop="url" rel="index"><span itemprop="name">Tech</span></a></span>
 
                 
                 
@@ -440,11 +440,11 @@
             
             <div class="post-tags">
               
-                <a href="/benzblog/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+                <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
               
-                <a href="/benzblog/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+                <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
               
-                <a href="/benzblog/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
+                <a href="/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
               
             </div>
           
@@ -845,11 +845,11 @@ static {
         
         <div class="post-tags">
           
-            <a href="/benzblog/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
           
-            <a href="/benzblog/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+            <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
           
-            <a href="/benzblog/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
+            <a href="/tags/AMS/" rel="tag"><i class="fa fa-tag"></i> AMS</a>
           
         </div>
       
@@ -868,7 +868,7 @@ static {
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/benzblog/2017-06-19-all-about-rotations/" rel="prev" title="Android屏幕旋转源码探索及应用实践">
+              <a href="/2017-06-19-all-about-rotations/" rel="prev" title="Android屏幕旋转源码探索及应用实践">
                 Android屏幕旋转源码探索及应用实践 <i class="fa fa-chevron-right"></i>
               </a>
             
@@ -939,7 +939,7 @@ static {
               
                 <div class="site-state-item site-state-posts">
                 
-                  <a href="/benzblog/archives/">
+                  <a href="/archives/">
                 
                     <span class="site-state-item-count">5</span>
                     <span class="site-state-item-name">日志</span>
@@ -953,7 +953,7 @@ static {
                 <div class="site-state-item site-state-categories">
                   
                     
-                      <a href="/benzblog/categories/">
+                      <a href="/categories/">
                     
                   
                     
@@ -976,7 +976,7 @@ static {
                 <div class="site-state-item site-state-tags">
                   
                     
-                      <a href="/benzblog/tags/">
+                      <a href="/tags/">
                     
                   
                     
@@ -1177,49 +1177,49 @@ static {
 
 
   
-  <script src="/benzblog/lib/jquery/index.js?v=3.4.1"></script>
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
 
   
-  <script src="/benzblog/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
 
   
-  <script src="/benzblog/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
 
   
-  <script src="/benzblog/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
 
-
-
-
-  
-
-
-  <script src="/benzblog/js/utils.js?v=7.2.0"></script>
-
-  <script src="/benzblog/js/motion.js?v=7.2.0"></script>
-
-
-
-  
-  
-
-
-  <script src="/benzblog/js/affix.js?v=7.2.0"></script>
-
-  <script src="/benzblog/js/schemes/pisces.js?v=7.2.0"></script>
-
-
-
-  
-  <script src="/benzblog/js/scrollspy.js?v=7.2.0"></script>
-<script src="/benzblog/js/post-details.js?v=7.2.0"></script>
 
 
 
   
 
 
-  <script src="/benzblog/js/next-boot.js?v=7.2.0"></script>
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
 
 
   
