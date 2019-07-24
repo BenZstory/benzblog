@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。 这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用">
+<meta name="keywords" content="skill,web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改">
+<meta property="og:url" content="http://benzblog.site/2019-07-12-HexoTricks/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。 这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-07-24T13:11:58.096Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改">
+<meta name="twitter:description" content="罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。 这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://benzblog.site/2019-07-12-HexoTricks/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改 | 奔哲明的博客</title>
+  
+
+
+
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-101354718-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?311511b30756494577b67a167866028f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://benzblog.site/2019-07-12-HexoTricks/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-07-12 00:00:00" itemprop="dateCreated datePublished" datetime="2019-07-12T00:00:00+08:00">2019-07-12</time>
+            </span>
+          
+
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-07-24 21:11:58" itemprop="dateModified" datetime="2019-07-24T21:11:58+08:00">2019-07-24</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/skill/" itemprop="url" rel="index"><span itemprop="name">skill</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/2019-07-12-HexoTricks/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019-07-12-HexoTricks/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/skill/" rel="tag"><i class="fa fa-tag"></i> skill</a>
+              
+                <a href="/tags/web/" rel="tag"><i class="fa fa-tag"></i> web</a>
+              
+            </div>
+          
+
+          
+            <div class="post-description" hidden>罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。 这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>本博客使用 hexo 搭建，主题为 next，这也是国内博客现在比较常见的选择。以前已用 jekyll 打好了个博客，但看到网上有人说 hexo 是直接把静态资源推到 gh-pages上的，渲染更快等等，而且确实界面简洁许多。果断抛弃原项目，重搭了个 hexo 博客。</p>
+<p>具体怎样部署博客就不多讲了，这里罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。<br>这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用。</p>
+<h2 id="修改-next-主题，使用-fancybox，点击时加载原始大图。"><a href="#修改-next-主题，使用-fancybox，点击时加载原始大图。" class="headerlink" title="修改 next 主题，使用 fancybox，点击时加载原始大图。"></a>修改 next 主题，使用 fancybox，点击时加载原始大图。</h2><p>我博客里的图片都是保存在阿里云OSS上的，为了排版以及减少流量消耗，md文件中的图片名都有后缀来做自动图片缩放处理。<br>点击查看原始大图是多数网站很自然的一个功能，但在 hexo 博客里，即使使用 fancybox<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="hexo_next 上使用 fancybox，按此 README.md 流程即可： https://github.com/theme-next/theme-next-fancybox3">[1]</span></a></sup> 这种插件，也只会使打开图片的效果更 fancy 一点，并不会自动解析图片 url 把图片处理的后缀给去掉，于是这里就只好自己动手了。</p>
+<p>例如下面两个 url，前一个是增加了阿里云OSS自动缩放的，后一个是原始图，也是我们在展示大图时期望的 url。</p>
+<p><code>https://benzgallery.oss-cn-shanghai.aliyuncs.com/style25.png?x-oss-process=style/resize_w200h100_center_crop</code><br><code>https://benzgallery.oss-cn-shanghai.aliyuncs.com/style25.png</code></p>
+<p>OK，那就是把 <code>?x-oss-process</code> 以及之后的字符串通过正则的方式匹配再去掉就行。</p>
+<p>接下来，从 fancybox 以及使用它的 next 主题的源代码找到相关地方，搞清楚，fancybox 是怎么调用生效、哪里是渲染原文图片的链接，哪里是渲染fancybox展示大图的链接。</p>
+<p>这里不赘述所有修改地方，主要是按照自己的需求修改以下代码里的 imageLink 满足自己要求就行。<br>在我这里，其中 replace_from 为 <code>/(\?x-oss-process=style\S+)/</code> ，replace_to 为 <code>&quot;&quot;</code>，从而实现正则替换的效果。replace_from，replace_to 是自己增加的参数，从 themes\next_config.yml 传递过来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># themes\next\source\js\utils.js</span><br><span class="line">wrapImageWithFancyBox: function(replace_from, replace_to, with_caption) &#123;</span><br><span class="line">    $(&apos;.content img&apos;)</span><br><span class="line">      .not(&apos;:hidden&apos;)</span><br><span class="line">      .each(function() &#123;</span><br><span class="line">        var $image = $(this);</span><br><span class="line">        var imageTitle = $image.attr(&apos;title&apos;) || $image.attr(&apos;alt&apos;);</span><br><span class="line">        var $imageWrapLink = $image.parent(&apos;a&apos;);</span><br><span class="line"></span><br><span class="line">        if ($imageWrapLink.length &lt; 1) &#123;</span><br><span class="line">          var imageLink = $image.attr(&apos;data-original&apos;) || $image.attr(&apos;src&apos;);</span><br><span class="line">          imageLink = imageLink.replace(replace_from, replace_to)</span><br><span class="line">          </span><br><span class="line">          $imageWrapLink = $image.wrap(&apos;&lt;a class=&quot;fancybox fancybox.image&quot; href=&quot;&apos; + imageLink + &apos;&quot; itemscope itemtype=&quot;http://schema.org/ImageObject&quot; itemprop=&quot;url&quot;&gt;&lt;/a&gt;&apos;).parent(&apos;a&apos;);</span><br><span class="line">          </span><br><span class="line">          ...</span><br></pre></td></tr></table></figure>
+
+<p>具体修改参考 : <a href="https://github.com/BenZstory/hexo-theme-next/commit/784beb7424d2693d01728a99c6ab7d061e4db7a2" target="_blank" rel="noopener">https://github.com/BenZstory/hexo-theme-next/commit/784beb7424d2693d01728a99c6ab7d061e4db7a2</a></p>
+<h2 id="hexo-增加脚本，对-md-中部分元素内容禁止渲染，从而真正隐藏该部分文本"><a href="#hexo-增加脚本，对-md-中部分元素内容禁止渲染，从而真正隐藏该部分文本" class="headerlink" title="hexo 增加脚本，对 md 中部分元素内容禁止渲染，从而真正隐藏该部分文本"></a>hexo 增加脚本，对 md 中部分元素内容禁止渲染，从而真正隐藏该部分文本</h2><p><code>&lt;hidden&gt;&lt;/hidden&gt;</code><br><code>hexo_root\scripts\hide.js</code></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">hexo.extend.filter.register(&apos;before_post_render&apos;, function(data) &#123;</span><br><span class="line">	// do not render the content wraped in &lt;hidden&gt; &lt;/hidden&gt;</span><br><span class="line">	var reHideText = /(\&lt;hidden\&gt;[\S\s]*?\&lt;\/hidden\&gt;)/g</span><br><span class="line">    data.content = data.content.replace(reHideText, function (match, to_hide) &#123;</span><br><span class="line">		if (to_hide.length &gt; 10) &#123;</span><br><span class="line">			return &quot;&lt;p&gt;(Hidden Content)&lt;/p&gt;&quot;</span><br><span class="line">		&#125; else &#123;</span><br><span class="line">			return &quot;&quot;</span><br><span class="line">		&#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">    return data;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="未完待续…"><a href="#未完待续…" class="headerlink" title="未完待续…"></a>未完待续…</h2><p>(Hidden Content)</p>
+
+
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">hexo_next 上使用 fancybox，按此 README.md 流程即可： https://github.com/theme-next/theme-next-fancybox3<a href="#fnref:1" rev="footnote"> ↩</a></span></li></ol></div></div>
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/skill/" rel="tag"><i class="fa fa-tag"></i> skill</a>
+          
+            <a href="/tags/web/" rel="tag"><i class="fa fa-tag"></i> web</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019-07-04-IconTransfer 图标生成技术预研/" rel="next" title="IconTransfer 图标生成技术预研">
+                <i class="fa fa-chevron-left"></i> IconTransfer 图标生成技术预研
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/GMIS 2019 精华梳理及收获/" rel="prev" title="GMIS 2019 精华梳理及收获">
+                GMIS 2019 精华梳理及收获 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">7</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">19</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#修改-next-主题，使用-fancybox，点击时加载原始大图。"><span class="nav-text">修改 next 主题，使用 fancybox，点击时加载原始大图。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#hexo-增加脚本，对-md-中部分元素内容禁止渲染，从而真正隐藏该部分文本"><span class="nav-text">hexo 增加脚本，对 md 中部分元素内容禁止渲染，从而真正隐藏该部分文本</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#未完待续…"><span class="nav-text">未完待续…</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://benzblog.site/2019-07-12-HexoTricks/";
+    this.page.identifier = "2019-07-12-HexoTricks/";
+    this.page.title = '本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
