@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-CN">
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+<link rel="stylesheet" href="/css/main.css?v=7.2.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '7.2.0',
+    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: {
+      enable: true,
+      replace_from: /(\?x-oss-process=style\S+)/,
+      replace_to: '',
+      with_caption: false,
+    },
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <meta name="description" content="Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。 最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考">
+<meta name="keywords" content="机器学习,Tensorflow,tf-serving">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow Serving 要点 ">
+<meta property="og:url" content="http://benzblog.site/how_to_use_tf_serving_model/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。 最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/dir_structure_of_portrait2anime_serving_.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/serving_model_config_content_of_portrait2anime.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_of_Kim_Jong_Un.png?x-oss-process=style/resize_600">
+<meta property="og:updated_time" content="2019-08-26T16:18:52.597Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Tensorflow Serving 要点 ">
+<meta name="twitter:description" content="Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。 最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考">
+<meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/dir_structure_of_portrait2anime_serving_.png?x-oss-process=style/resize_600">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="http://benzblog.site/how_to_use_tf_serving_model/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>Tensorflow Serving 要点  | 奔哲明的博客</title>
+  
+
+
+
+
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !true) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-101354718-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?311511b30756494577b67a167866028f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-right page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">奔哲明的博客</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+    </ul>
+  
+
+  
+
+  
+</nav>
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://benzblog.site/how_to_use_tf_serving_model/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Tensorflow Serving 要点 
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+
+          
+          
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-08-27 00:00:00 / 修改时间：00:18:52" itemprop="dateCreated datePublished" datetime="2019-08-27T00:00:00+08:00">2019-08-27</time>
+            </span>
+          
+
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+              
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+            
+                <span class="post-meta-item-text">评论数：</span>
+                <a href="/how_to_use_tf_serving_model/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="how_to_use_tf_serving_model/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+
+          <br>
+          
+
+          
+
+          
+            
+              
+            
+            <div class="post-tags">
+              
+                <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+              
+                <a href="/tags/Tensorflow/" rel="tag"><i class="fa fa-tag"></i> Tensorflow</a>
+              
+                <a href="/tags/tf-serving/" rel="tag"><i class="fa fa-tag"></i> tf-serving</a>
+              
+            </div>
+          
+
+          
+            <div class="post-description" hidden>Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。 最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考</div>
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考。</p>
+<p>Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。<br>之前我的模型都是最后部署到移动端的，而这次的项目需要部署在服务端，也因此是首次使用 serving。</p>
+<p>Serving Model 有以下步骤：<br>1、将模型转换为 SavedModel 格式<br> （主要讲两个例子，一个是会讲怎么把已有 checkpoint 截取部分转成用来推演的 SavedModel，另外讲一例在 serving 中使用 assets的麻烦事）<br>2、使用 tf-serving 把模型跑起来(这里使用docker方式)<br>3、通过 restful API 或 gRPC API 使用模型（这里只讲后者）</p>
+<h2 id="Extract-a-subgraph-and-export-to-SavedModel"><a href="#Extract-a-subgraph-and-export-to-SavedModel" class="headerlink" title="Extract a subgraph and export to SavedModel"></a>Extract a subgraph and export to SavedModel</h2><p>首先，读者至少要有能力区分 tf 三类模型主要保存方式，即 checkpoint、frozen model(.pb, protobuffer)、SavedModel。<br>Serving 需要使用 SavedModel 类型的模型文件，如果训练时不是使用 Estimator， 估计很少会有人用 SavedModel 保存最终的网络，因此这里就需要把之前保存好的 pb 或 checkpoint 额外转一下格式。</p>
+<p>简单的模型，看下这里官方教程 <a href="https://www.tensorflow.org/tfx/serving/serving_basic" target="_blank" rel="noopener">Serving a TensorFlow Model</a> 一般足以搞定 SavedModel。</p>
+<p>如果是 .pb 文件，使用 tf.import_graph_def， 如果是 ckpt， 使用 tf.train.import_meta_graph，总结起来可以用下面的代码方便地导入 graph:<br><a href="https://gist.github.com/BenZstory/3ef2d6e59dc8ff133708c8b6122738b1#file-load_model-python" target="_blank" rel="noopener">https://gist.github.com/BenZstory/3ef2d6e59dc8ff133708c8b6122738b1#file-load_model-python</a></p>
+<p>在本节的例子中，我们的目标是将一个已有模型 ckpt 截取部分来实现 serving，具体来说，我希望把 TwinGAN 的 encoder-decoder 架构中，只固化和截取 encoder 部分，然后导出为 SavedModel 格式，从而减少模型参数。而在这个过程中，假设手上并没有整个模型的架构代码，而只根据 ckpt 中现有的节点名指定输入输出来做截断，那就需要下面的方法了。</p>
+<p>整个步骤，包括 </p>
+<p>1、加载graph<br>2、指定要截取子图的输入输出节点并固化<br>3、重新加载子图再导出为 SavedModel</p>
+<p>关键就在于第2步的实现方式。如果有熟悉 SavedModel 的同学可能会疑问何必这么麻烦，导出 SavedModel 的时候可以设定好输入输出，足以使用子图。但是我实验下来，<code>#build_signature_def</code>时设定的<code>inputs</code>、<code>outputs</code>并不会自动帮助截取最小子图，这造成输出的 SavedModel 里有太多冗余内容，以我的实际问题为例，增加手动截子图后，把SavedModel大小从 270mb 降低到 11mb。</p>
+<p>第1步，使用上文提到的load_model加载好ckpt。<br>第2步，截取子图并固化的方法参考自<a href="https://stackoverflow.com/questions/49268505/how-to-reuse-a-frozen-previously-learned-subgraph-in-new-computation-graphs" target="_blank" rel="noopener">这里</a>，核心就三行代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">g = tf.graph_util.convert_variables_to_constants(sess, sess.graph_def, [ENDPOINTS_OP_NAME])</span><br><span class="line">g = tf.graph_util.extract_sub_graph(g, [ENDPOINTS_OP_NAME])</span><br><span class="line">g = tf.graph_util.remove_training_nodes(g, protected_nodes=[&quot;images_ph&quot;, ENDPOINTS_OP_NAME])</span><br></pre></td></tr></table></figure>
+
+<p>在上面代码中，graph 在 sess 中已经整个加载好，<code>&quot;images_ph&quot;</code> 为输入节点，<code>[ENDPOINTS_OP_NAME]</code> 为输出节点列表。最终 g 是截好的子图，只有子图和固化好的参数。接下来把 sess 中的图 切到子图 g，为保险起见，我这里是把 g 输出后再重新加载：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">TMP_SUBGRAPH_PB_NAME = &apos;twingan_subgraph_tmp.pb&apos;</span><br><span class="line">with open(os.path.join(DATA_ROOT, TMP_SUBGRAPH_PB_NAME), &apos;wb&apos;) as fout:</span><br><span class="line">    fout.write(g.SerializeToString())</span><br><span class="line">    </span><br><span class="line">tf.reset_default_graph()</span><br><span class="line">pb_path = os.path.join(DATA_ROOT, TMP_SUBGRAPH_PB_NAME)</span><br><span class="line">gd = tf.GraphDef()</span><br><span class="line">with open(pb_path, &apos;rb&apos;) as f:</span><br><span class="line">    gd.ParseFromString(f.read())</span><br><span class="line">tf.import_graph_def(gd, name=&apos;&apos;)</span><br><span class="line"></span><br><span class="line">now_graph = tf.get_default_graph()</span><br><span class="line"></span><br><span class="line">images_placeholder = now_graph.get_tensor_by_name(&apos;images_ph:0&apos;)</span><br><span class="line">encoder_endpoints_tensor = now_graph.get_tensor_by_name(&apos;encoder_content_4/downsample_to_4x4x256/AvgPool:0&apos;)</span><br></pre></td></tr></table></figure>
+
+<p>sess、图、输入输出节点等环境都准备好了，进入第3步，终于导出为 SavedModel 格式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">EXPORT_DIR = os.path.join(DATA_ROOT, &apos;twingan_latent_encoder&apos;, str(int(time.time())))</span><br><span class="line">if os.path.exists(EXPORT_DIR):</span><br><span class="line">    shutil.rmtree(EXPORT_DIR)</span><br><span class="line">builder = tf.saved_model.builder.SavedModelBuilder(EXPORT_DIR)</span><br><span class="line"></span><br><span class="line">model_signature = tf.saved_model.signature_def_utils.build_signature_def(</span><br><span class="line">    inputs=&#123;</span><br><span class="line">        &quot;input_images&quot;: tf.saved_model.utils.build_tensor_info(images_placeholder)</span><br><span class="line">    &#125;,</span><br><span class="line">    outputs=&#123;</span><br><span class="line">        &quot;output&quot;: tf.saved_model.utils.build_tensor_info(encoder_endpoints_tensor)</span><br><span class="line">    &#125;,</span><br><span class="line">    method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME)</span><br><span class="line"></span><br><span class="line">builder.add_meta_graph_and_variables(</span><br><span class="line">    sess, [tf.saved_model.tag_constants.SERVING],</span><br><span class="line">    signature_def_map=&#123;</span><br><span class="line">        tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:</span><br><span class="line">        model_signature,</span><br><span class="line">    &#125;,</span><br><span class="line">    clear_devices=True</span><br><span class="line">)</span><br><span class="line">builder.save()</span><br></pre></td></tr></table></figure>
+
+<p>(Hidden Content)</p>
+
+
+<h2 id="Export-with-assets"><a href="#Export-with-assets" class="headerlink" title="Export with assets"></a>Export with assets</h2><p>接下来同样是对模型导出 SavedModel 技巧的讲解，但这一例中要用到 assets。<br>在我们平常训练、推演模型的时候，由于一般直接在 python 环境下，所以好多信息是通过 python 模块如 numpy 加载数据成为常量后给到模型的，在固化后以 tf.constants 保存，如果导出为 SavedModel，会和整个图结构存在 protobuffer 中。</p>
+<p>再回顾下 <a href="https://www.tensorflow.org/guide/saved_model?hl=zh-cn#structure_of_a_savedmodel_directory" target="_blank" rel="noopener">SavedModel 的目录结构</a>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">assets/</span><br><span class="line">assets.extra/</span><br><span class="line">variables/</span><br><span class="line">    variables.data-?????-of-?????</span><br><span class="line">    variables.index</span><br><span class="line">saved_model.pb|saved_model.pbtxt</span><br></pre></td></tr></table></figure>
+
+<p>参数会保存在 variables 下，constants 和图保存在 .pb 中，那 assets 用来干什么的呢，官网解释如下：</p>
+<blockquote>
+<p>assets 是包含辅助（外部）文件（如词汇表）的子文件夹。资源被复制到 SavedModel 的位置，并且可以在加载特定的 MetaGraphDef 时被读取。</p>
+</blockquote>
+<p>熟悉 Android 开发的都知道项目里有 <code>/assets</code> 用来放资源文件，这里概念也类似。资源文件的分出，从设计上，基本都是因为放不下、加载慢才剥出来，而我这里，正是由于常量太大在转为SavedModel时报错 <code>&quot;A protocol message was rejected because it was too big&quot;</code>，我的模型会超过2G，在 github-issue 里有<a href="https://github.com/tensorflow/serving/issues/24" target="_blank" rel="noopener">相关讨论</a>。</p>
+<p>正确的做法是把不必固化在图里的常量放到 assets 中，在加载图后再加载常量。这里以我的模型为例，讲下是什么要放到 assets 中以及具体操作步骤。</p>
+<h3 id="模型目标"><a href="#模型目标" class="headerlink" title="模型目标"></a>模型目标</h3><p>我的模型实现一个简单的 top-k 算法来查找特征相似图片。将图片库中每个文件使用特定模型（就是上一例模型）计算得到其隐含空间编码(latent embeddings)，对新文件做同样编码，在已知图片空间中搜索得到距离最近的k个图片并返回。已知图片的编码都是预处理好的，topk 计算时会把整个矩阵塞进去，而就是这个数据量太大就会造成我们的问题。要使用 ssets 解决该问题，就需要把这些已知的编码使用 numpy 保存成一个文件，放到 assets 目录中去再使用。</p>
+<h3 id="模型实现"><a href="#模型实现" class="headerlink" title="模型实现"></a>模型实现</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">anime_latents_file = os.path.join(DATA_ROOT, &apos;latent&apos;, &apos;anime_latents_bytes&apos;)</span><br><span class="line">anime_latents_asset_path = os.path.join(DATA_ROOT, &apos;latent&apos;, &apos;anime_latents_bytes.assets&apos;)</span><br><span class="line">anime_latents_index_asset_path = os.path.join(DATA_ROOT, &apos;latent&apos;, &apos;anime_latents_indexes.assets&apos;)    </span><br><span class="line">LATENT_SHAPE = [1, 4, 4, 256]</span><br><span class="line"></span><br><span class="line">graph = tf.Graph()</span><br><span class="line">with graph.as_default():</span><br><span class="line">    </span><br><span class="line">    original_latents_asset_path = tf.constant(anime_latents_asset_path)</span><br><span class="line">    latents_asset_path = tf.Variable(original_latents_asset_path, name=&apos;latents_asset_path&apos;, trainable=False, collections=[])</span><br><span class="line">    assign_latents_asset_path = latents_asset_path.assign(original_latents_asset_path)</span><br><span class="line">    </span><br><span class="line">    original_index_asset_path = tf.constant(anime_latents_index_asset_path)</span><br><span class="line">    index_asset_path = tf.Variable(original_index_asset_path, name=&apos;index_asset_path&apos;, trainable=False, collections=[])</span><br><span class="line">    assign_index_asset_path = index_asset_path.assign(original_index_asset_path)</span><br><span class="line">    </span><br><span class="line">    x_input = tf.read_file(latents_asset_path)</span><br><span class="line">    </span><br><span class="line">    x_input = tf.decode_raw(x_input, tf.float32) # decode_raw means the file should be written out like this `f.write(np.array(anime_latents).tobytes())`</span><br><span class="line">    x_input = tf.reshape(x_input, [-1, *LATENT_SHAPE])</span><br><span class="line">    </span><br><span class="line">    y_input_ph = tf.placeholder(tf.float32, shape=[1, *LATENT_SHAPE], name=&apos;y_ph&apos;)</span><br><span class="line">    k_num_ph = tf.placeholder(tf.int32)</span><br><span class="line"></span><br><span class="line">    x_reshaped = tf.layers.flatten(x_input)</span><br><span class="line">    y_reshaped = tf.layers.flatten(y_input_ph)</span><br><span class="line"></span><br><span class="line">    distance = tf.norm(tf.subtract(x_reshaped, y_reshaped), axis=1)</span><br><span class="line">    top_k_xvals, top_k_indices = tf.nn.top_k(tf.negative(distance), k=k_num_ph)</span><br><span class="line">    </span><br><span class="line">    table = tf.contrib.lookup.index_to_string_table_from_file(vocabulary_file=index_asset_path, default_value=&quot;UNKNOWN&quot;)</span><br><span class="line">    nearest_filenames = table.lookup(tf.cast(top_k_indices, tf.int64))</span><br><span class="line"></span><br><span class="line">    tf.add_to_collection(tf.GraphKeys.ASSET_FILEPATHS, original_latents_asset_path)</span><br><span class="line">    tf.add_to_collection(tf.GraphKeys.ASSET_FILEPATHS, original_index_asset_path)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">sess = tf.InteractiveSession(graph=graph, config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))</span><br><span class="line"></span><br><span class="line">init_global_val = tf.global_variables_initializer()</span><br><span class="line">init_assign = tf.group([assign_latents_asset_path, assign_index_asset_path])</span><br><span class="line">init_table = tf.group([tf.tables_initializer()])</span><br><span class="line"></span><br><span class="line">init_op = tf.group(init_global_val, init_assign, init_table)</span><br><span class="line"></span><br><span class="line">sess.run(init_op)</span><br></pre></td></tr></table></figure>
+
+<p>top_k 在 29 行，整个 graph 构建部分，主要进行 资源文件路径和内容的载入，reshape 等预处理，计算top_k，把结果id映射到对应文件名并结束。</p>
+<p>处理题述问题及使用 assets 的核心在于 9~11 行代码。资源文件通过路径指明，随后在17行 tf.read_file 加载，而路径则首先用一个 constant 保存具体路径值，然后再使用 <code>tf.assign</code> 方法写入预定的 variable 中，最后使用 variable 中的路径值。为什么要绕一圈这么麻烦而不直接写死路径呢，因为我们的目标是要生成 SavedModel 的，打包放到另外目录时 assets 文件路径当然也会变化，因而路径不能写死，还要借助 34 行 <code>tf.add_to_collection</code> 以及后面导出 SavedModel 时指明 <code>assets_collection</code> 来实现模型导出时路径值的自然过渡。</p>
+<p>通过这样的方法，基本实现了 SavedModel 构建模型时 assets 的使用。</p>
+<p>读者在上面的代码中应该能明显意识到模型这里其实使用了两个 assets ，除了 <code>anime_latents_asset</code>，还有一个 <code>anime_latents_index</code>。后者是为了在计算得到文件 id 后，便利地映射到对应文件名中去，具体映射的实现借助 31 行代码 [<code>tf.contrib.lookup.index_to_string_table_from_file</code>] 提供的一个 table 数据结构来完成，可以查阅<a href="(https://www.tensorflow.org/api_docs/python/tf/contrib/lookup/index_to_string_table_from_file)">相关文档</a>了解更多具体用法。这个 api 是被设计用来把 word_id 映射到字典中具体 String 的，做 NLP 的会更多用到它，我也是从一个讨论<a href="https://github.com/tensorflow/serving/issues/770" target="_blank" rel="noopener">怎样 Serving Seq2Seq 的github-issue</a> 中才知道这个 api 的。</p>
+<p>不过在结合使用 index_to_string_table_from_file 和 serving 的时候，还是另外踩进了一个深坑：</p>
+<p>这只 api 的实现需要创建一种 <code>tf.lookup.StaticHashTable</code> 格式，而这种格式需要一个额外的初始化动作，即 tf.tables_initializer()，这也是为什么在<a href="https://www.tensorflow.org/tfx/serving/serving_basic" target="_blank" rel="noopener">官方serving基础教程</a>的转换代码中有写 <code>main_op=tf.tables_initializer()</code>。OK，那我们在使用模型以及转为 SavedModel 的时候都注意下要增加它的初始化操作，即上面代码中 44 行，把各个 initilizer 一个不落组合在一起，并在下面 <code>模型导出</code> 一节的代码中，传给legacy_init_op(或main_op)来实现初始化。然后，问题出现了，在实际 serving 跑起来时，会有概率报以下错误:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">E tensorflow_serving/util/retrier.cc:37] Loading servable: &#123;name: latent_search_model version: 1565713790&#125; failed: Failed precondition: Attempting to use uninitialized value index_asset_path</span><br><span class="line">         [[&#123;&#123;node index_asset_path/read&#125;&#125;]]</span><br></pre></td></tr></table></figure>
+
+<p>在创建 look_table 的时候，发现 index_asset_path 这个 variable 节点还没初始化而报错。而有时候运气好的话又会正常运行。</p>
+<p>这是因为，虽然我们把 variable 和 table 的初始化都给到了初始化参数中，但是这个初始化只接受一个operator，我们使用 tf.group() 把多个 initilizer 组合在一起，在实际初始化时，是并行无序做的。但我们的模型中，确实又有 table 对某个 variable 的依赖，进而报错。</p>
+<p>对这个问题，我尝试在构建模型时和 tf.group 各个 initilizer 时增加 <code>tf.control_dependencies()</code> 来控制初始化顺序，但改来改去还是没效果，最是初始化还是并行跑的。也考虑如果简单的话干脆改下 serving 初始化源码，但是因为有概率 serving 能直接跑起来，只要初始化顺利后就能稳定运行，tf-serving 模块又是用 c++ 实现的，于是就没动力继续改了。我认为这个应该是 tf 的设计缺陷，一定会找机会提个 issue。</p>
+<h3 id="模型导出"><a href="#模型导出" class="headerlink" title="模型导出"></a>模型导出</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">EXPORT_DIR = os.path.join(DATA_ROOT, &apos;latent_search_model&apos;, str(int(time.time())))</span><br><span class="line">if os.path.exists(EXPORT_DIR):</span><br><span class="line">    shutil.rmtree(EXPORT_DIR)</span><br><span class="line">builder = tf.saved_model.builder.SavedModelBuilder(EXPORT_DIR)</span><br><span class="line"></span><br><span class="line">model_signature = tf.saved_model.signature_def_utils.build_signature_def(</span><br><span class="line">    inputs=&#123;</span><br><span class="line">        &quot;k_num&quot;: tf.saved_model.utils.build_tensor_info(k_num_ph),</span><br><span class="line">        &quot;target_latent&quot;: tf.saved_model.utils.build_tensor_info(y_input_ph)</span><br><span class="line">    &#125;,</span><br><span class="line">    outputs=&#123;</span><br><span class="line">        &quot;xvals&quot;: tf.saved_model.utils.build_tensor_info(top_k_xvals),</span><br><span class="line">        &quot;indices&quot;: tf.saved_model.utils.build_tensor_info(top_k_indices),</span><br><span class="line">        &quot;filenames&quot;: tf.saved_model.utils.build_tensor_info(nearest_filenames)</span><br><span class="line">    &#125;,</span><br><span class="line">    method_name=tf.saved_model.signature_constants.PREDICT_METHOD_NAME)</span><br><span class="line"></span><br><span class="line">builder.add_meta_graph_and_variables(</span><br><span class="line">    sess, [tf.saved_model.tag_constants.SERVING],</span><br><span class="line">    signature_def_map=&#123;</span><br><span class="line">        tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY:</span><br><span class="line">        model_signature,</span><br><span class="line">    &#125;,</span><br><span class="line">    assets_collection=tf.get_collection(tf.GraphKeys.ASSET_FILEPATHS),</span><br><span class="line">    legacy_init_op=init_op  # please try changing `legacy_init_op` to `main_op` if you tf version is not that early</span><br><span class="line">)</span><br><span class="line">builder.save()</span><br></pre></td></tr></table></figure>
+
+<p>这里与一般导出 SavedModel 时代码不同就主要在于 <code>assets_collection</code> 和 <code>legacy_init_op</code> 参数。</p>
+<p>前者用于 assets 文件处理，会帮助把指定路径文件拷贝到 SavedModel 目录下，并自动更正路径。<br>后者初始化参数在较新的 api 中应改用 <code>main_op</code>，平时不传值的话，会自动增加 <code>tf.global_variables_initilizer()</code>、<code>tf.local_variable_initilizer()</code> 等初始化动作，而我们这里要使用 assets 和 lookup_table，因而不能漏掉。</p>
+<h2 id="Start-serving"><a href="#Start-serving" class="headerlink" title="Start serving"></a>Start serving</h2><table>
+<thead>
+<tr>
+<th align="center">serving 目录样例</th>
+<th align="center">serving_models.config</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/dir_structure_of_portrait2anime_serving_.png?x-oss-process=style/resize_600" alt="dir_structure_of_portrait2anime_serving_"></td>
+<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/serving_model_config_content_of_portrait2anime.png?x-oss-process=style/resize_600" alt="serving_model_config_content_of_portrait2anime"></td>
+</tr>
+</tbody></table>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">sudo docker run -p 8500:8500 -p 8501:8501 \</span><br><span class="line">--mount type=bind,source=path_to_serving_folder/twingan_latent_encoder,target=/models/twingan_latent_encoder \</span><br><span class="line">--mount type=bind,source=path_to_serving_folder/latent_search_model,target=/models/latent_search_model \</span><br><span class="line">--mount type=bind,source=path_to_serving_folder/ugatit_selfie2anime,target=/models/ugatit_selfie2anime \</span><br><span class="line">--mount type=bind,source=path_to_serving_folder/face_detection,target=/models/face_detection \</span><br><span class="line">--mount type=bind,source=path_to_serving_folder/serving_models.config,target=/models/serving_models.config \</span><br><span class="line">-t tensorflow/serving \</span><br><span class="line">--model_config_file=/models/serving_models.config</span><br></pre></td></tr></table></figure>
+
+<p><a href="https://www.tensorflow.org/tfx/serving/docker" target="_blank" rel="noopener">使用 docker 来执行 serving</a>，需要根据文档安装好 docker 以及 pull 下来 tf/serving 的 docker。(在 windows 环境下如果有 mount 问题，注意要在 docker 客户端内 Settings-&gt;Shared Drivers 把权限之类的勾上)</p>
+<p><code>--mount</code> 来传递文件信息，如果要同时 serving 多个模型，则要配置 <code>--model_config_file</code>，注意这个 config 文件也要用 <code>--mount</code> 挂载到 docker 空间内。</p>
+<p>在 <code>model_config_file</code> 对应文件中，每个模型一个 config：<br><code>name</code>-&gt; 这个可以自行设定，后面使用模型时 <code>model_spec.name</code> 使用该值；<br><code>base_path</code>-&gt; <code>mount</code> 选项中对应 target 的值，<br><code>model_platform</code> -&gt; 就是 “tensorflow”， 未找到相关文档。</p>
+<h2 id="Execute-with-flask"><a href="#Execute-with-flask" class="headerlink" title="Execute with flask"></a>Execute with flask</h2><p>模型跑起来了，我们还需要使用 tf 提供的 restful API 或 gRPC API 来与对应端口通信，进而执行模型。这里讲 gRPC API 的使用。</p>
+<p>简化版的代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"># 导入依赖</span><br><span class="line">import grpc</span><br><span class="line">from tensorflow_serving.apis import predict_pb2</span><br><span class="line">from tensorflow_serving.apis import prediction_service_pb2_grpc</span><br><span class="line"></span><br><span class="line"># 然后建立好通信：</span><br><span class="line">channel = grpc.insecure_channel(&quot;localhost:8500&quot;)</span><br><span class="line">stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)</span><br><span class="line"></span><br><span class="line"># 设定模型参数、输入节点及内容，最后执行predict</span><br><span class="line">request = predict_pb2.PredictRequest()</span><br><span class="line">request.model_spec.name = &apos;your_model_name&apos;</span><br><span class="line">request.model_spec.signature_name = &apos;serving_default&apos;  # tf.saved_model.signature_constants.DEFAULT_SERVING_SIGNATURE_DEF_KEY</span><br><span class="line">request.inputs[&apos;input_y&apos;].CopyFrom(tf.contrib.util.make_tensor_proto(test_endpoints, shape=test_endpoints.shape))</span><br><span class="line">result = stub.Predict(request, 10.0)  # 10 secs timeout</span><br><span class="line">print(result)</span><br></pre></td></tr></table></figure>
+
+<p>我的项目是使用 flask 来运行和部署的，以其中人脸检测(使用mobilenet_ssd进行face_detection)模型的部分代码为例的模板代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br></pre></td><td class="code"><pre><span class="line">app = Flask(__name__, static_url_path=&apos;/static&apos;)</span><br><span class="line"></span><br><span class="line">def allowed_img_file(filename):</span><br><span class="line">    return &apos;.&apos; in filename and filename.rsplit(&apos;.&apos;, 1)[1] in IMG_EXTENSIONS</span><br><span class="line"></span><br><span class="line">class ServingModel:</span><br><span class="line">    def __init__(self, model_name, signature_name=&apos;serving_default&apos;):</span><br><span class="line">        channel = grpc.insecure_channel(&quot;localhost:8500&quot;)</span><br><span class="line">        self.stub = prediction_service_pb2_grpc.PredictionServiceStub(channel)</span><br><span class="line"></span><br><span class="line">        self.request = predict_pb2.PredictRequest()</span><br><span class="line">        self.request.model_spec.name = model_name</span><br><span class="line">        self.request.model_spec.signature_name = signature_name</span><br><span class="line"></span><br><span class="line">    def run(self, input_dict, time_out=30.0):</span><br><span class="line">        for key, value in input_dict.items():</span><br><span class="line">            self.request.inputs[key].CopyFrom(tf.contrib.util.make_tensor_proto(value, shape=value.shape))</span><br><span class="line">        result = self.stub.Predict(self.request, time_out)</span><br><span class="line">        return result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def parsed_prediction(result, key):</span><br><span class="line">    if not key in result.outputs:</span><br><span class="line">        return None</span><br><span class="line">    output_proto = result.outputs[key]</span><br><span class="line">    shape = [d.size for d in output_proto.tensor_shape.dim]</span><br><span class="line">    dtype = tf.dtypes.DType(output_proto.dtype)</span><br><span class="line">    if dtype.is_floating:</span><br><span class="line">        parsed_data = np.reshape(output_proto.float_val, shape)</span><br><span class="line">    elif dtype.is_integer:</span><br><span class="line">        parsed_data = np.reshape(output_proto.int_val, shape)</span><br><span class="line">    else:</span><br><span class="line">        print(&quot;#parsed_prediction do not support type &#123;&#125; yet:&quot;.format(dtype))</span><br><span class="line">        return None</span><br><span class="line">    return parsed_data</span><br><span class="line">    </span><br><span class="line">modelFaceDetection = ServingModel(model_name=&apos;face_detection&apos;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def detect_face(img_path, thereshold=0.9, scale=1.75):</span><br><span class="line">    assert os.path.exists(img_path), &quot;Image not found on path : &quot; + str(img_path)</span><br><span class="line"></span><br><span class="line">    image = Image.open(img_path)</span><br><span class="line">    image = image.convert(&apos;RGB&apos;)</span><br><span class="line">    image_np = np.array(image)   #.astype(np.float32)</span><br><span class="line">    image_np = np.expand_dims(image_np, axis=0)</span><br><span class="line"></span><br><span class="line">    input_dict = &#123;&apos;input_images&apos;: image_np&#125;</span><br><span class="line">    result = modelFaceDetection.run(input_dict=input_dict)</span><br><span class="line"></span><br><span class="line">    boxes = parsed_prediction(result, &quot;boxes&quot;)</span><br><span class="line">    scores = parsed_prediction(result, &quot;scores&quot;)</span><br><span class="line">    classes = parsed_prediction(result, &quot;classes&quot;)</span><br><span class="line">    num_detections = parsed_prediction(result, &quot;num_detections&quot;)</span><br><span class="line"></span><br><span class="line">    if np.squeeze(scores)[0] &lt; thereshold:</span><br><span class="line">        return None</span><br><span class="line">    l, t, r, b = get_absolute_bbox(np.squeeze(boxes)[0], image.size[0], image.size[1], scale=scale)</span><br><span class="line">    face = image.crop((l, t, r, b))</span><br><span class="line"></span><br><span class="line">    cv2_face = cv2.cvtColor(np.asarray(face), cv2.COLOR_RGB2BGR)</span><br><span class="line">    return cv2_face</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@app.route(&apos;/detect_face/image&apos;, methods=[&apos;POST&apos;])</span><br><span class="line">def api_detect_face():</span><br><span class="line">    file = request.files[&apos;image_file&apos;]</span><br><span class="line"></span><br><span class="line">    if not (file and allowed_img_file(file.filename)):</span><br><span class="line">        return jsonify(packed_response(1001, &quot;请检查上传的图片类型，仅限于png、PNG、jpg、JPG、bmp&quot;))</span><br><span class="line"></span><br><span class="line">    # temporally store the original uploaded images</span><br><span class="line">    img_save_path = os.path.join(img_storage_dir, file.filename)</span><br><span class="line">    file.save(img_save_path)</span><br><span class="line">    img_save_path_no_static = img_save_path.replace(&quot;static/&quot;, &quot;&quot;)</span><br><span class="line"></span><br><span class="line">    face = detect_face(img_save_path)</span><br><span class="line"></span><br><span class="line">    face_image_path = os.path.join(img_storage_dir, &apos;detected_face_&apos; + file.filename)</span><br><span class="line">    cv2.imwrite(face_image_path, face)</span><br><span class="line">    face_image_path_no_static = face_image_path.replace(&quot;static/&quot;, &quot;&quot;)</span><br><span class="line"></span><br><span class="line">    return render_template(&apos;index.html&apos;, uploaded_image_path=img_save_path_no_static,</span><br><span class="line">                           face_image_path=face_image_path_no_static)</span><br><span class="line">                           </span><br><span class="line">                           </span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    app.run(host=&quot;your_server_ip&quot;, port=5000)</span><br></pre></td></tr></table></figure>
+
+<p>其中，ServingModel 用于构建模型 Stub, 需要 inference 时，直接配置 input_dict 并 run 即可。<br>gRPC 的返回是 protobuffer 格式的，解析有时稍麻烦些，这里写了个 parsed_prediction()， 可以比较方便地解析 int、float 类型数据，基本够用了。</p>
+<p>本文所涉及项目，几个模型全跑通后，演示效果一例如图：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_of_Kim_Jong_Un.png?x-oss-process=style/resize_600" alt="result_portrait2anime_of_Kim_Jong_Un"></p>
+
+      
+    </div>
+
+    
+
+    
+      
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+
+      
+        
+          
+        
+        <div class="post-tags">
+          
+            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+          
+            <a href="/tags/Tensorflow/" rel="tag"><i class="fa fa-tag"></i> Tensorflow</a>
+          
+            <a href="/tags/tf-serving/" rel="tag"><i class="fa fa-tag"></i> tf-serving</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/training_a_face_segmentation_model_with_deeplab/" rel="next" title="使用 DeepLab 训练一个人脸语义分割模型">
+                <i class="fa fa-chevron-left"></i> 使用 DeepLab 训练一个人脸语义分割模型
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+    <div class="comments" id="comments">
+      <div id="disqus_thread">
+        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+      </div>
+    </div>
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
+            
+              <p class="site-author-name" itemprop="name">BenZ</p>
+              <div class="site-description motion-element" itemprop="description"></div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">9</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">4</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Extract-a-subgraph-and-export-to-SavedModel"><span class="nav-text">Extract a subgraph and export to SavedModel</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Export-with-assets"><span class="nav-text">Export with assets</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#模型目标"><span class="nav-text">模型目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模型实现"><span class="nav-text">模型实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#模型导出"><span class="nav-text">模型导出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Start-serving"><span class="nav-text">Start serving</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Execute-with-flask"><span class="nav-text">Execute with flask</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=3.4.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
+
+
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.2.0"></script>
+
+  <script src="/js/motion.js?v=7.2.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/affix.js?v=7.2.0"></script>
+
+  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.2.0"></script>
+<script src="/js/post-details.js?v=7.2.0"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.2.0"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+
+
+<script>
+  var disqus_config = function() {
+    this.page.url = "http://benzblog.site/how_to_use_tf_serving_model/";
+    this.page.identifier = "how_to_use_tf_serving_model/";
+    this.page.title = 'Tensorflow Serving 要点 ';
+    };
+  function loadComments() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', '' + +new Date());
+    (d.head || d.body).appendChild(s);
+  }
+  
+    window.addEventListener('load', loadComments, false);
+  
+</script>
+
+
+
+
+
+  
+
+
+  
+
+
+
+
+  
+
+  
+
+  
+  
+
+  
+  
+
+  
+    
+      <script type="text/x-mathjax-config">
+  
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
+        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
+      }
+    });
+  });
+</script>
+
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+    
+  
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+</body>
+</html>
