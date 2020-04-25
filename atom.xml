@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://benzblog.site/"/>
-  <updated>2020-04-25T08:09:53.507Z</updated>
+  <updated>2020-04-25T08:17:36.892Z</updated>
   <id>https://benzblog.site/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>cmder 软件使用技巧</title>
+    <link href="https://benzblog.site/2020-04-24-Cmder%20%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/"/>
+    <id>https://benzblog.site/2020-04-24-Cmder%20%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/</id>
+    <published>2020-04-23T16:00:00.000Z</published>
+    <updated>2020-04-25T08:17:36.892Z</updated>
+    
+    <summary type="html">
+    
+      Windows 上的 cmder 是个很好的 terminal 工具，极力推荐，有些配置稍改下可更加得心应手，稍作纪录
+    
+    </summary>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/categories/skill/"/>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/tags/skill/"/>
+    
+      <category term="software" scheme="https://benzblog.site/tags/software/"/>
+    
+  </entry>
   
   <entry>
     <title>Kaldi 训练声学模型</title>
@@ -227,17 +250,11 @@
     <link href="https://benzblog.site/2017-06-19-all-about-rotations/"/>
     <id>https://benzblog.site/2017-06-19-all-about-rotations/</id>
     <published>2017-06-18T16:00:00.000Z</published>
-    <updated>2019-07-04T15:22:20.000Z</updated>
+    <updated>2020-04-25T08:22:47.595Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;1-引言&quot;&gt;&lt;a href=&quot;#1-引言&quot; class=&quot;headerlink&quot; title=&quot;1 引言&quot;&gt;&lt;/a&gt;1 引言&lt;/h2&gt;&lt;p&gt;在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。  
-        
-      
+      本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新
     
     </summary>
     
@@ -258,17 +275,11 @@
     <link href="https://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/"/>
     <id>https://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/</id>
     <published>2017-06-15T16:00:00.000Z</published>
-    <updated>2019-07-04T13:42:48.000Z</updated>
+    <updated>2020-04-25T08:28:31.103Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;1-概述&quot;&gt;&lt;a href=&quot;#1-概述&quot; class=&quot;headerlink&quot; title=&quot;1 概述&quot;&gt;&lt;/a&gt;1 概述&lt;/h2&gt;&lt;p&gt;&lt;img data-src=&quot;http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png&quot;
-        
-      
+      从 AOSP 源码角度简单梳理Recents和AMS中历史任务的关系和区别
     
     </summary>
     
