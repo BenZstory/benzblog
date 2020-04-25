@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="kaldi 是最为流行的语音识别开发工具，这次我们使用 kaldi 来进行一个唤醒词（keyword spotting）模型的训练。本篇主要涉及声学模型部分。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kaldi 训练声学模型">
+<meta property="og:url" content="https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="kaldi 是最为流行的语音识别开发工具，这次我们使用 kaldi 来进行一个唤醒词（keyword spotting）模型的训练。本篇主要涉及声学模型部分。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/kaldi_asr_hotwords_training_guide_01.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/kaldi_asr_hotwords_training_guide_02.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/20200424113932.png?x-oss-process=style/resize_600">
+<meta property="article:published_time" content="2020-04-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-04-25T08:09:53.507Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="ASR">
+<meta property="article:tag" content="kaldi">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/kaldi_asr_hotwords_training_guide_01.png?x-oss-process=style/resize_600">
+
+<link rel="canonical" href="https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Kaldi 训练声学模型 | 奔哲明的博客</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?311511b30756494577b67a167866028f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kaldi 训练声学模型
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-15 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-15T00:00:00+08:00">2020-04-15</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-04-25 16:09:53" itemprop="dateModified" datetime="2020-04-25T16:09:53+08:00">2020-04-25</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020-04-15-Kaldi 训练声学模型/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
+                <a href="/tags/kaldi/" rel="tag"><i class="fa fa-tag"></i> kaldi</a>
+            </div>
+            <div class="post-description" hidden>kaldi 是最为流行的语音识别开发工具，这次我们使用 kaldi 来进行一个唤醒词（keyword spotting）模型的训练。本篇主要涉及声学模型部分。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>kaldi 是最为流行的语音识别开发工具，这次我们使用 kaldi 来进行一个唤醒词（keyword spotting）模型的训练。本篇主要涉及声学模型部分。</p>
+<p>智能音箱、语音助手往往都需要一个唤醒词，唤醒词部分离线低功耗处理，成功唤醒后的音频数据再交给服务端进行在线识别，例如 “小爱同学” 的唤醒就是通过唤醒词模型实现的。我这里虽然简单将目标描述为“唤醒词模型”，但其实与业界一般意义上的唤醒词还不大一样，用“命令词识别”可能会更准确些。我的需求是要对一系列词汇即时唤醒，而非单个词。</p>
+<h3 id="需求描述："><a href="#需求描述：" class="headerlink" title="需求描述："></a>需求描述：</h3><p>1、在 Android 手机端运行，因此需要保证模型低功耗、内存占用相对较小;<br>2、支持多个命令词唤醒;<br>3、当有新的命令词汇列表需求时，能够快速训练适配.</p>
+<h3 id="方案对比，Guideboard"><a href="#方案对比，Guideboard" class="headerlink" title="方案对比，Guideboard:"></a>方案对比，Guideboard:</h3><ol>
+<li><p>Tensorflow <a href="https://github.com/tensorflow/docs/blob/master/site/en/r1/tutorials/sequences/audio_recognition.md" target="_blank" rel="noopener">audio recognition 官方入门文档</a></p>
+<p>需要大量样本数据，每次修改词汇列表需要整个模型重训练。</p>
+</li>
+<li><p>Snowboy 方案<br>本质原理类似指纹识别，与模板进行相似度比较，不适用于词汇很多的情况。</p>
+</li>
+<li><p>使用厂商SDK<br> 例如<a href="https://ai.baidu.com/tech/speech/wake" target="_blank" rel="noopener">百度语音唤醒</a>，基本能够满足我们的需求，但自由度不够大。</p>
+</li>
+<li><p>PocketSphinx<br> 可以在一定程度上满足需求，之前有过很多尝试（详见另一篇文章），但效果不够理想。</p>
+</li>
+<li><p><a href="https://github.com/kaldi-asr/kaldi/pull/3467" target="_blank" rel="noopener">kaldi-egs-mobvoi</a><br> 最近刚发现也是最近刚合入kaldi项目的，出门问问在kaldi上开源的 E2E LF-MMI recipes。还没来得及研究尝试。</p>
+</li>
+<li><p>本文方案：<br> 基于 kaldi aishell2 训练得到通用语音识别模型，即 LVCSR（Large Vocabulary Continuous Speech Recognition），然后修改语言模型使之应用于唤醒词。</p>
+<p>思路主要源于这篇文章： <a href="https://blog.csdn.net/cj1989111/article/details/88017908" target="_blank" rel="noopener">基于kaldi训练唤醒词模型的一种方法</a>，以及 PocketSphinx 的使用经验。</p>
+<p>对语言模型的修改方法源于 <a href="http://kaldi-asr.org/doc/online_decoding.html" target="_blank" rel="noopener">kaldi 官方文档 online_decoding 一节</a></p>
+</li>
+</ol>
+<h3 id="前置条件"><a href="#前置条件" class="headerlink" title="前置条件"></a>前置条件</h3><ul>
+<li>python2 环境</li>
+<li>kaldi github 下载下来，并进行了 kaldi 的环境编译</li>
+<li>如果使用 aishell2 的模型，并使用 aishell 数据，先把数据手动下载下来</li>
+</ul>
+<h2 id="基本配置"><a href="#基本配置" class="headerlink" title="基本配置"></a>基本配置</h2><p>将空的 aishell2 复制一份，这样之后，在自己新建的 recipe 下（我本次例子中为 <code>kaldi_root/egs/benz_wakeup2</code> ）应有 s5 文件夹，s5 文件夹下有以下文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RESULTS  cmd.sh  conf  local  path.sh  run.sh  steps  utils</span><br></pre></td></tr></table></figure>
+
+<p>在 <code>aishell2</code> recipe 中，<code>steps</code> 和 <code>utils</code> 其实都是软链接到 <code>../../wsj/s5</code> 里的对应文件夹的，也就是复用了这些脚本，<code>local</code> 文件夹中的脚本是针对本 recipe 的一些代码，也是我们将要主要修改的地方。</p>
+<p>为了能在单机而不是集群上跑起来，首先需要把 <code>cmd.sh</code> 脚本中的 <code>queue.pl</code> 都改为 <code>run.pl</code>，文件头有如下注释说明：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"># If you have no queueing system and want to run on a local machine, you</span><br><span class="line"># can change all instances &#39;queue.pl&#39; to run.pl (but be careful and run</span><br><span class="line"># commands one by one: most recipes will exhaust the memory on your</span><br><span class="line"># machine).  queue.pl works with GridEngine (qsub).</span><br></pre></td></tr></table></figure>
+
+<p>接下来，<code>run.sh</code> 可以用来执行训练，但是不建议直接尝试训练，而是应该把里面的每步拎出来，厘清参数分别手动执行。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#</span><span class="bash"> prepare trn/dev/tst data, lexicon, lang etc</span></span><br><span class="line">if [ $stage -le 1 ]; then</span><br><span class="line">  local/prepare_all.sh $&#123;trn_set&#125; $&#123;dev_set&#125; $&#123;tst_set&#125; || exit 1;</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> GMM</span></span><br><span class="line">if [ $stage -le 2 ]; then</span><br><span class="line">  local/run_gmm.sh --nj $nj --stage $gmm_stage</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"><span class="meta">#</span><span class="bash"> chain</span></span><br><span class="line">if [ $stage -le 3 ]; then</span><br><span class="line">  local/chain/run_tdnn.sh --nj $nj</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>可以从调用脚本的名字和注释可以了解到，大致分为三步：</p>
+<ol>
+<li>准备数据和环境： prepare_all.sh</li>
+<li>run_gmm： 进行 gmm hmm 等训练</li>
+<li>run_tdnn: 进行 tdnn 模型训练</li>
+</ol>
+<p>下面分别讲解：</p>
+<h2 id="数据准备-以及-语言模型的训练"><a href="#数据准备-以及-语言模型的训练" class="headerlink" title="数据准备 以及 语言模型的训练"></a>数据准备 以及 语言模型的训练</h2><p>关于训练音频<strong>语料的数据准备</strong>，有下面三个选择：</p>
+<ol>
+<li>自己录制或搜寻语料，并修改为 aishell2 的组织格式</li>
+<li>下载 aishell recipe 的免费语料，得到 <code>data_aishell.tar.gz</code>，约 15G，然后借助以下脚本将文件组织为 aishell2 的结构： <code>I19tModel/hotword_detection/tools/prepare_aishell2_corpus.ipynb</code></li>
+<li>使用软链接指向已有的语料目录:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ln -s &#x2F;home&#x2F;benjamin&#x2F;workspace&#x2F;I19tModel&#x2F;hotword_detection&#x2F;kaldi&#x2F;egs&#x2F;aishell2&#x2F;corpus corpus</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>语料数据准备好后，在你的 egs recipe 目录下，除了 s5 文件夹外，还会有个 corpus 文件夹，其内的数据组织为如下结构。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">.</span><br><span class="line">├── dev</span><br><span class="line">│   ├── trans.txt</span><br><span class="line">│   ├── wav</span><br><span class="line">│   └── wav.scp</span><br><span class="line">├── test</span><br><span class="line">│   ├── trans.txt</span><br><span class="line">│   ├── wav</span><br><span class="line">│   └── wav.scp</span><br><span class="line">└── train</span><br><span class="line">    ├── trans.txt</span><br><span class="line">    ├── wav</span><br><span class="line">    └── wav.scp</span><br></pre></td></tr></table></figure>
+
+<p><code>wav</code> 文件夹下则是说话人编号的文件夹，而其内即对应的音频样本。</p>
+<p>接下来可以直接使用 <code>prepare_all.sh</code> 进行语料预处理和语言模型的训练了。<br>进入 <code>s5</code> 目录，然后执行以下命令即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local&#x2F;prepare_all.sh ..&#x2F;corpus&#x2F;train ..&#x2F;corpus&#x2F;dev ..&#x2F;corpus&#x2F;test</span><br></pre></td></tr></table></figure>
+<p>脚本的前半部分（1、2步）会进行语料音素映射，以备后续训练；后半部分是进行语言模型的训练。<br>这部分脚本都不必做修改，<code>prepare_dict.sh</code> 值得再看一下，因为里面涉及到 aishell2 对中文词汇的处理以及对词汇外音素的选择：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"># download the DaCiDian from github</span><br><span class="line">if [ ! -d $download_dir ]; then</span><br><span class="line">  git clone https:&#x2F;&#x2F;github.com&#x2F;aishell-foundation&#x2F;DaCiDian.git $download_dir</span><br><span class="line">fi</span><br><span class="line"></span><br><span class="line"># here we map &lt;UNK&gt; to the phone spn(spoken noise)</span><br><span class="line">mkdir -p $dir</span><br><span class="line">python $download_dir&#x2F;DaCiDian.py $download_dir&#x2F;word_to_pinyin.txt $download_dir&#x2F;pinyin_to_phone.txt &gt; $dir&#x2F;lexicon.txt</span><br><span class="line">echo -e &quot;&lt;UNK&gt;\tspn&quot; &gt;&gt; $dir&#x2F;lexicon.txt</span><br></pre></td></tr></table></figure>
+<p>aishell2 将中文文本语料使用 DaCiDian.py，先把词汇转为拼音，然后再转为音素。这样可以简化词汇的标注工作。详见该项目 github README。</p>
+<p>训练完成后，主要是多了 <code>s5/data</code> 文件夹，其下包括这些文件夹：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dev  lang  lang_test  local  test  train</span><br></pre></td></tr></table></figure>
+<p><code>lang</code> 是主要语言模型训练的主要结果，<code>train dev test</code> 里都是些索引文件，方便后续训练的，而 <code>local</code> 文件夹中是刚才训练时的临时文件，里面可以看到有 <code>DaCiDian</code> 文件夹。</p>
+<h3 id="GMM-HMM-训练"><a href="#GMM-HMM-训练" class="headerlink" title="GMM-HMM 训练"></a>GMM-HMM 训练</h3><p>然后参照<code>run.sh</code>中的步骤，使用<code>run_gmm.sh</code>进行接下来GMM-HMM的训练。不过，为了使训练出的模型能耗尽可能小，这里我们把 mfcc 特征提取中的 pitch 特征去掉，从 <code>make_mfcc_pitch.sh</code> 换用到 <code>make_mfcc.sh</code>。</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/kaldi_asr_hotwords_training_guide_01.png?x-oss-process=style/resize_600" alt=""></p>
+<p>上图中圈出来的第二个部分，也可能需要根据自己数据集的数据量进行相应修改。</p>
+<p>另外，由于去掉了 pitch 所带来的变化，还要像下面一样把 mono、tri1、tri2、tri3 训练步骤中的 decoding 部分都给注释掉，这些部分主要是用来进行测试的，对训练不会有影响。</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/kaldi_asr_hotwords_training_guide_02.png?x-oss-process=style/resize_600" alt=""></p>
+<p>最后，执行以下脚本开始 GMM-HMM 的训练</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">local&#x2F;run_gmm.sh --nj 30 --stage 1</span><br></pre></td></tr></table></figure>
+
+<p>训练完成后：<br>提示 <code>local/run_gmm.sh succeeded</code><br>在 s5 文件夹下，多出了 exp 和 mfcc 目录，在 exp 下，有如下训练结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">make_mfcc  mono  mono_ali  tri1  tri1_ali  tri2  tri2_ali  tri3  tri3_ali  tri3_ali_dev</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="进行-chain-神经网络模型的训练"><a href="#进行-chain-神经网络模型的训练" class="headerlink" title="进行 chain 神经网络模型的训练"></a>进行 chain 神经网络模型的训练</h3><p>前面提到，为了降低模型能耗，在 mfcc 时，我们省掉了 pitch 特征的提取。在 chain 神经网络训练时，还会重复进行一次 mfcc 特征提取，即 run_tdnn.sh 中的 stage 5 的部分，因此，这个时候也要做适当修改来略过 pitch 特征。</p>
+<p>两种方法：</p>
+<p>1、我们可以将原脚本中的 make_mfcc_pitch.sh 改为 make_mfcc.sh，随后注释掉  limit_feature_dim.sh 脚本等部分，把后续脚本中 <code>${datadir}_hires_nopitch</code>  都改为 <code>${datadir}_hire</code> 。</p>
+<p>2、 也可以维持特征提取的部分不变，在 Stage 10 和 stage 11 中，把相关输入特征改为 <code>${datadir}_hires_nopitch</code> 即可。</p>
+<p>这里我采用后者方法。（因为我打算保留 ivector 特征，而 ivector 特征原本就是用 <code>${datadir}_hires_nopitch</code> 训练的）<a href="https://blog.csdn.net/cj1989111/article/details/88017908" target="_blank" rel="noopener">这篇博文</a>中还提到了去掉 ivector 特征以减少内存消耗，也值得参考下，原文有附整个脚本，注意在 stage 10 和 stage 11 中要把 ivector 作为输入的相关代码注掉。</p>
+<p>stage 10 是将模型结构预先输出到一个 xconfig  配置文件中，我们通过修改该部分来极大缩减神经网络规模，还是主要参考自<a href="https://blog.csdn.net/cj1989111/article/details/88017908" target="_blank" rel="noopener">这篇博文</a>，改后如下：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">if [ $stage -le 10 ]; then</span><br><span class="line">  echo "$0: creating neural net configs using the xconfig parser";</span><br><span class="line"><span class="meta">  #</span><span class="bash">feat_dim=$(feat-to-dim scp:data/<span class="variable">$&#123;train_set&#125;</span>_hires/feats.scp -)</span></span><br><span class="line">  feat_dim=$(feat-to-dim scp:data/$&#123;train_set&#125;_hires_nopitch/feats.scp -)</span><br><span class="line">  num_targets=$(tree-info $treedir/tree | grep num-pdfs | awk '&#123;print $2&#125;')</span><br><span class="line">  learning_rate_factor=$(echo "print (0.5/$xent_regularize)" | python)</span><br><span class="line">  opts="l2-regularize=0.002"</span><br><span class="line">  linear_opts="orthonormal-constraint=1.0"</span><br><span class="line">  output_opts="l2-regularize=0.0005 bottleneck-dim=64"</span><br><span class="line"></span><br><span class="line">  mkdir -p $dir/configs</span><br><span class="line">  cat &lt;&lt;EOF &gt; $dir/configs/network.xconfig</span><br><span class="line">  input dim=100 name=ivector</span><br><span class="line">  input dim=$feat_dim name=input</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> please note that it is important to have input layer with the name=input</span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> as the layer immediately preceding the fixed-affine-layer to <span class="built_in">enable</span></span></span><br><span class="line"><span class="meta">  #</span><span class="bash"> the use of short notation <span class="keyword">for</span> the descriptor</span></span><br><span class="line">  fixed-affine-layer name=lda input=Append(-1,0,1,ReplaceIndex(ivector, t, 0)) affine-transform-file=$dir/configs/lda.mat</span><br><span class="line"></span><br><span class="line"><span class="meta">  #</span><span class="bash"> the first splicing is moved before the lda layer, so no splicing here</span></span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn1 $opts dim=320</span><br><span class="line">  linear-component name=tdnn2l dim=64 $linear_opts input=Append(-1,0)</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn2 $opts input=Append(0,1) dim=320</span><br><span class="line">  linear-component name=tdnn3l dim=64 $linear_opts</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn3 $opts dim=320</span><br><span class="line">  linear-component name=tdnn4l dim=64 $linear_opts input=Append(-1,0)</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn4 $opts input=Append(0,1) dim=320</span><br><span class="line">  linear-component name=tdnn5l dim=64 $linear_opts</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn5 $opts dim=320 input=Append(tdnn5l, tdnn3l)</span><br><span class="line">  linear-component name=tdnn6l dim=64 $linear_opts input=Append(-3,0)</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn6 $opts input=Append(0,3) dim=320</span><br><span class="line">  linear-component name=tdnn7l dim=64 $linear_opts input=Append(-3,0)</span><br><span class="line">  relu-batchnorm-dropout-layer name=tdnn7 $opts input=Append(0,3,tdnn6l,tdnn4l,tdnn2l) dim=320</span><br><span class="line"><span class="meta">#</span><span class="bash">  linear-component name=tdnn8l dim=256 <span class="variable">$linear_opts</span> input=Append(-3,0)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  relu-batchnorm-dropout-layer name=tdnn8 <span class="variable">$opts</span> input=Append(0,3) dim=1280</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  linear-component name=tdnn9l dim=256 <span class="variable">$linear_opts</span> input=Append(-3,0)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  relu-batchnorm-dropout-layer name=tdnn9 <span class="variable">$opts</span> input=Append(0,3,tdnn8l,tdnn6l,tdnn4l) dim=1280</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  linear-component name=tdnn10l dim=256 <span class="variable">$linear_opts</span> input=Append(-3,0)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  relu-batchnorm-dropout-layer name=tdnn10 <span class="variable">$opts</span> input=Append(0,3) dim=1280</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  linear-component name=tdnn11l dim=256 <span class="variable">$linear_opts</span> input=Append(-3,0)</span></span><br><span class="line"><span class="meta">#</span><span class="bash">  relu-batchnorm-dropout-layer name=tdnn11 <span class="variable">$opts</span> input=Append(0,3,tdnn10l,tdnn8l,tdnn6l) dim=1280</span></span><br><span class="line">  linear-component name=prefinal-l dim=64 $linear_opts</span><br><span class="line"></span><br><span class="line">  relu-batchnorm-layer name=prefinal-chain input=prefinal-l $opts dim=320</span><br><span class="line">  output-layer name=output include-log-softmax=false dim=$num_targets $output_opts</span><br><span class="line"></span><br><span class="line">  relu-batchnorm-layer name=prefinal-xent input=prefinal-l $opts dim=320</span><br><span class="line">  output-layer name=output-xent dim=$num_targets learning-rate-factor=$learning_rate_factor $output_opts</span><br><span class="line"></span><br><span class="line">EOF</span><br><span class="line">  steps/nnet3/xconfig_to_configs.py --xconfig-file $dir/configs/network.xconfig --config-dir $dir/configs/</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+<p>模型结构应该还有很大调优空间的，这里就先拿来主义了。</p>
+<p>接下来正式启动训练，local/chain/run_tdnn.sh，运行到 stage 11， 也就是真正进行神经网络训练的时候，可能需要减少工作线程，如果报错请修改 stage 和 nj 参数后再继续跑下去。</p>
+<p>到此，我们所要的声学模型部分就训练完成了。事实上，到这里也已经训练得到了一个基准的 LVCSR 模型，此时可以进行一些简单的语音识别服务了。在 <code>s5/exp/chain/</code> 目录下应有新生成的相关模型文件，其中 <code>s5/exp/chain/tdnn_1b_all_sp/final.mdl</code>  是关键的声学模型文件，<code>s5/exp/chain/tdnn_1b_all_sp/graph</code>  下的 HCLG.fst 和 words.txt 则为语言模型文件和词典，有他们再加一点配置参数，就可以进行解码、识别了。</p>
+<h2 id="解码："><a href="#解码：" class="headerlink" title="解码："></a>解码：</h2><p>这里使用搭建 TCP server 的方式测试下在线解码能力。</p>
+<p>官方文档其实已经有很详细的说明，在 <a href="">online_decoding</a> 的 <code>TCP server for nnet3 online decoding</code> 一节。</p>
+<p>从官方文档上看到，部署  tcp server 通过 <code>online2-tcp-nnet3-decode-faster</code> 完成。除了 nnet3-in(声学模型)  fst-in(语言模型) word-symbol-table(词典) 这三个必要参数外，还需要先准备一个 <code>online.conf</code> 文件，通过类似下面的命令实现：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">steps/online/nnet3/prepare_online_decoding.sh --add-pitch false data/lang exp/chain/extractor_all exp/chain/tdnn_1b_all_sp ./online_conf</span><br></pre></td></tr></table></figure>
+
+<p>由于我训练时保留了 ivector 特征，命令中才会有 <code>exp/chain/extractor_all</code> ，这个参数是可选的，如果没用到 ivector 就可以去掉，详见 <code>prepare_online_decoding.sh</code> 的参数说明。</p>
+<p>命令结束后，会在 <code>./online_conf</code> 目录中多出很多文件，从<code>online_conf/conf/online.conf</code> 的内容可以看到，这步骤所做的事情本质是把各个 <code>.conf</code> 配置文件链接绑定起来，以方便后续使用。进行在线解码时就会用到这个配置文件。</p>
+<p>不过，由于我们是基于 aishell2 训练的模型，aishell2 训练时的特征提取是以 <code>mfcc_hires.conf</code> 来进行的，与此时配置文件中的 <code>mfcc.conf</code> 中所定义的维度不同，所以需要把配置文件再手动做点修改，否则会报 <a href="https://www.cnblogs.com/sunhongwen/p/9417954.html" target="_blank" rel="noopener">类似这里</a> 提到的错误。</p>
+<p>把 <code>config/mfcc_hires.conf</code> 拷贝到 <code>online_conf/conf/</code> 中，将 <code>online_conf/conf/online.conf</code> 中 <code>--mfcc-config</code> 参数的路径改为该 <code>mfcc_hires.conf</code> 文件的绝对路径。</p>
+<p>接下来用以下命令启动解码的tcp服务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">online2-tcp-nnet3-decode-faster \</span><br><span class="line">--config&#x3D;.&#x2F;online_conf&#x2F;conf&#x2F;online.conf \</span><br><span class="line">--max-active&#x3D;7000 --frame-subsampling-factor&#x3D;3 \</span><br><span class="line">--beam&#x3D;15.0 --lattice-beam&#x3D;6.0 --acoustic-scale&#x3D;1.0 \</span><br><span class="line">--samp-freq&#x3D;16000 --frames-per-chunk&#x3D;20 --extra-left-context-initial&#x3D;0 \</span><br><span class="line">--port-num&#x3D;5050 \</span><br><span class="line"> exp&#x2F;chain&#x2F;tdnn_1b_all_sp&#x2F;final.mdl exp&#x2F;chain&#x2F;tdnn_1b_all_sp&#x2F;graph&#x2F;HCLG.fst exp&#x2F;chain&#x2F;tdnn_1b_all_sp&#x2F;graph&#x2F;words.txt</span><br></pre></td></tr></table></figure>
+
+<p><code>--config</code> 参数对应的是刚刚生成的配置文件， <code>--port-num</code> 参数对应 tcp 服务监听的端口号，其它的是解码相关参数，最后一行的三个对应对应训练得到的模型。</p>
+<p>命令执行成功后，应有下面的log，提示在监听端口等待数据了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LOG (online2-tcp-nnet3-decode-faster[5.5.543~1-7249c]:Listen():online2-tcp-nnet3-decode-faster.cc:385) TcpServer: Listening on port: 5050</span><br><span class="line">LOG (online2-tcp-nnet3-decode-faster[5.5.543~1-7249c]:Accept():online2-tcp-nnet3-decode-faster.cc:399) Waiting for client...</span><br></pre></td></tr></table></figure>
+
+<p>接下来另起一个 terminal，通过 sox 和 netcat 工具，把音频文件转为数据流并传给这个端口供其识别：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sox test.wav -t raw -c 1 -b 16 -r 16k -e signed-integer - | nc localhost 5050</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 按照官方文档说法， <code>nc</code> 之后还应该增加 <code>-N</code> 参数，但我这里会报错没有该命令，所以暂且略过了，仍能正常测试。</p>
+</blockquote>
+<p>结果类似如下：</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/20200424113932.png?x-oss-process=style/resize_600" alt=""></p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>到此，我们已经完成了一个语音识别模型的训练和解码，就着 TCP server 的路子继续走下去，还可以实现一个通用的实时语音识别服务。不过我们的目标是在 Android 端实现命令词唤醒，所以还需要研究如何让模型在 Android 端跑起来，以及语言模型的修改。</p>
+<hr>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/" title="Kaldi 训练声学模型">https://benzblog.site/2020-04-15-Kaldi 训练声学模型/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
+              <a href="/tags/kaldi/" rel="tag"><i class="fa fa-tag"></i> kaldi</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/how_to_use_tf_serving_model/" rel="prev" title="Tensorflow Serving 要点 ">
+      <i class="fa fa-chevron-left"></i> Tensorflow Serving 要点 
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#需求描述："><span class="nav-number">1.1.</span> <span class="nav-text">需求描述：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方案对比，Guideboard"><span class="nav-number">1.2.</span> <span class="nav-text">方案对比，Guideboard:</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#前置条件"><span class="nav-number">1.3.</span> <span class="nav-text">前置条件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基本配置"><span class="nav-number">2.</span> <span class="nav-text">基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数据准备-以及-语言模型的训练"><span class="nav-number">3.</span> <span class="nav-text">数据准备 以及 语言模型的训练</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GMM-HMM-训练"><span class="nav-number">3.1.</span> <span class="nav-text">GMM-HMM 训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#进行-chain-神经网络模型的训练"><span class="nav-number">3.2.</span> <span class="nav-text">进行 chain 神经网络模型的训练</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解码："><span class="nav-number">4.</span> <span class="nav-text">解码：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">5.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/";
+    this.page.identifier = "2020-04-15-Kaldi 训练声学模型/";
+    this.page.title = "Kaldi 训练声学模型";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>奔哲明的博客</title>
+  <icon>https://benzblog.site/images/favicon.ico</icon>
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="https://benzblog.site/"/>
+  <updated>2020-04-25T08:09:53.507Z</updated>
+  <id>https://benzblog.site/</id>
+  
+  <author>
+    <name>BenZ</name>
+    
+  </author>
+  
+  <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Kaldi 训练声学模型</title>
+    <link href="https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/"/>
+    <id>https://benzblog.site/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/</id>
+    <published>2020-04-14T16:00:00.000Z</published>
+    <updated>2020-04-25T08:09:53.507Z</updated>
+    
+    <summary type="html">
+    
+      kaldi 是最为流行的语音识别开发工具，这次我们使用 kaldi 来进行一个唤醒词（keyword spotting）模型的训练。本篇主要涉及声学模型部分。
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="ASR" scheme="https://benzblog.site/tags/ASR/"/>
+    
+      <category term="kaldi" scheme="https://benzblog.site/tags/kaldi/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Tensorflow Serving 要点 </title>
+    <link href="https://benzblog.site/how_to_use_tf_serving_model/"/>
+    <id>https://benzblog.site/how_to_use_tf_serving_model/</id>
+    <published>2019-08-26T16:00:00.000Z</published>
+    <updated>2019-11-28T15:11:10.000Z</updated>
+    
+    <summary type="html">
+    
+      Tensorflow serving 是用来帮助把模型部署到 Server 上的，模型格式为 SavedModel。 最近在使用 Tensorflow serving 时踩了一些坑，这里聊作记录，以供后来者参考
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="Tensorflow" scheme="https://benzblog.site/tags/Tensorflow/"/>
+    
+      <category term="tf-serving" scheme="https://benzblog.site/tags/tf-serving/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用 DeepLab 训练一个人脸语义分割模型</title>
+    <link href="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/"/>
+    <id>https://benzblog.site/training_a_face_segmentation_model_with_deeplab/</id>
+    <published>2019-08-22T16:00:00.000Z</published>
+    <updated>2019-08-26T16:13:18.000Z</updated>
+    
+    <summary type="html">
+    
+      DeepLab 是语义分割的STOA，我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="深度学习" scheme="https://benzblog.site/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="SemanticSegmentation" scheme="https://benzblog.site/tags/SemanticSegmentation/"/>
+    
+      <category term="slim" scheme="https://benzblog.site/tags/slim/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>GMIS 2019 精华梳理及收获</title>
+    <link href="https://benzblog.site/GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/"/>
+    <id>https://benzblog.site/GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/</id>
+    <published>2019-07-23T16:00:00.000Z</published>
+    <updated>2019-07-24T13:01:03.000Z</updated>
+    
+    <summary type="html">
+    
+      全球机器智能峰会 (Global Machine Intelligence Summit 简称 GMIS)  本次由机器之心和市北高新集团联合举办 https://gmis.jiqizhixin.com/  简单讲讲与会收获
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="会议分享" scheme="https://benzblog.site/tags/%E4%BC%9A%E8%AE%AE%E5%88%86%E4%BA%AB/"/>
+    
+      <category term="AI" scheme="https://benzblog.site/tags/AI/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>本博客搭建总结的一些可供参考的技术要点 Hexo Next 修改</title>
+    <link href="https://benzblog.site/2019-07-12-HexoTricks/"/>
+    <id>https://benzblog.site/2019-07-12-HexoTricks/</id>
+    <published>2019-07-11T16:00:00.000Z</published>
+    <updated>2019-07-29T13:49:08.000Z</updated>
+    
+    <summary type="html">
+    
+      罗列下搭建本博客对原 hexo 以及 next 主题的一些细小改动。 这些改动主要是为了满足个人的一些功能需求，比如说，我需要点击图片能放大，我需要更符合 markdown 语法的注脚插件等等。其他人或许也有相似需求，简单讲下思路，没准能有启发作用
+    
+    </summary>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/categories/skill/"/>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/tags/skill/"/>
+    
+      <category term="web" scheme="https://benzblog.site/tags/web/"/>
+    
+      <category term="js" scheme="https://benzblog.site/tags/js/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>IconTransfer 图标生成技术预研</title>
+    <link href="https://benzblog.site/2019-07-04-IconTransfer%20%E5%9B%BE%E6%A0%87%E7%94%9F%E6%88%90%E6%8A%80%E6%9C%AF%E9%A2%84%E7%A0%94/"/>
+    <id>https://benzblog.site/2019-07-04-IconTransfer%20%E5%9B%BE%E6%A0%87%E7%94%9F%E6%88%90%E6%8A%80%E6%9C%AF%E9%A2%84%E7%A0%94/</id>
+    <published>2019-07-03T16:00:00.000Z</published>
+    <updated>2019-07-08T15:58:11.000Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h3 id=&quot;原由：&quot;&gt;&lt;a href=&quot;#原由：&quot; class=&quot;headerlink&quot; title=&quot;原由：&quot;&gt;&lt;/a&gt;&lt;strong&gt;原由&lt;/strong&gt;：&lt;/h3&gt;&lt;p&gt;深度学习技术不仅落地难，找到合适需求点甚至更难。在一次头脑风暴中，同事提到或许可以尝试用深度学习手段解决手机ROM里主题图标包的问题，一下子就觉得这是个无论技术可行性、使用价值、技术壁垒都很有亮点的需求。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="GAN" scheme="https://benzblog.site/tags/GAN/"/>
+    
+      <category term="深度学习" scheme="https://benzblog.site/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="StyleTransfer" scheme="https://benzblog.site/tags/StyleTransfer/"/>
+    
+      <category term="图像生成" scheme="https://benzblog.site/tags/%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90/"/>
+    
+      <category term="预研" scheme="https://benzblog.site/tags/%E9%A2%84%E7%A0%94/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>语音识别初探</title>
+    <link href="https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/"/>
+    <id>https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/</id>
+    <published>2019-06-24T16:00:00.000Z</published>
+    <updated>2019-07-08T15:53:31.000Z</updated>
+    
+    <summary type="html">
+    
+      语音识别的基础知识讲解，包括传统方法和应用深度学习的方法。听声辩位的功能开发中使用到了简单的基于CNN的音频识别模型，为SharkTime自定义录屏功能扩展语音触发时，尝试了传统ASR方法。
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="语音识别" scheme="https://benzblog.site/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/"/>
+    
+      <category term="音频处理" scheme="https://benzblog.site/tags/%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86/"/>
+    
+      <category term="ASR" scheme="https://benzblog.site/tags/ASR/"/>
+    
+      <category term="唤醒词" scheme="https://benzblog.site/tags/%E5%94%A4%E9%86%92%E8%AF%8D/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>推荐系统指北</title>
+    <link href="https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/"/>
+    <id>https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/</id>
+    <published>2017-11-26T16:00:00.000Z</published>
+    <updated>2019-07-08T16:07:37.000Z</updated>
+    
+    <summary type="html">
+    
+      简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="推荐系统" scheme="https://benzblog.site/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Android屏幕旋转源码探索及应用实践</title>
+    <link href="https://benzblog.site/2017-06-19-all-about-rotations/"/>
+    <id>https://benzblog.site/2017-06-19-all-about-rotations/</id>
+    <published>2017-06-18T16:00:00.000Z</published>
+    <updated>2019-07-04T15:22:20.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;1-引言&quot;&gt;&lt;a href=&quot;#1-引言&quot; class=&quot;headerlink&quot; title=&quot;1 引言&quot;&gt;&lt;/a&gt;1 引言&lt;/h2&gt;&lt;p&gt;在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。  
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Android" scheme="https://benzblog.site/categories/Android/"/>
+    
+    
+      <category term="Android" scheme="https://benzblog.site/tags/Android/"/>
+    
+      <category term="Frameworks" scheme="https://benzblog.site/tags/Frameworks/"/>
+    
+      <category term="WMS" scheme="https://benzblog.site/tags/WMS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Recents和AMS中历史任务的区别</title>
+    <link href="https://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/"/>
+    <id>https://benzblog.site/2017-06-16-tasks-differences-between-ams-and-recnets/</id>
+    <published>2017-06-15T16:00:00.000Z</published>
+    <updated>2019-07-04T13:42:48.000Z</updated>
+    
+    <summary type="html">
+    
+      
+      
+        
+        
+          &lt;link rel=&quot;stylesheet&quot; type=&quot;text/css&quot; href=&quot;https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css&quot;&gt;&lt;h2 id=&quot;1-概述&quot;&gt;&lt;a href=&quot;#1-概述&quot; class=&quot;headerlink&quot; title=&quot;1 概述&quot;&gt;&lt;/a&gt;1 概述&lt;/h2&gt;&lt;p&gt;&lt;img data-src=&quot;http://or5nesfx1.bkt.clouddn.com/%E4%BB%BB%E5%8A%A1%E6%A0%88_%E5%85%B3%E7%B3%BB%E5%9B%BE.png&quot;
+        
+      
+    
+    </summary>
+    
+    
+      <category term="Tech" scheme="https://benzblog.site/categories/Tech/"/>
+    
+    
+      <category term="Android" scheme="https://benzblog.site/tags/Android/"/>
+    
+      <category term="Frameworks" scheme="https://benzblog.site/tags/Frameworks/"/>
+    
+      <category term="AMS" scheme="https://benzblog.site/tags/AMS/"/>
+    
+  </entry>
+  
+</feed>

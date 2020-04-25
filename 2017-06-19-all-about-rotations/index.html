@@ -1,157 +1,72 @@
 <!DOCTYPE html>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.9.0">
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
-
-<link rel="stylesheet" href="/css/main.css?v=7.2.0">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
-
-
-
-
-
-
-
-<script id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    version: '7.2.0',
-    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
-    back2top: true,
-    back2top_sidebar: false,
-    fancybox: {
-      enable: true,
-      replace_from: /(\?x-oss-process=style\S+)/,
-      replace_to: '',
-      with_caption: false,
-    },
-    fastclick: false,
-    lazyload: false,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
 
   <meta name="description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
-<meta name="keywords" content="Android,Frameworks,WMS">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android屏幕旋转源码探索及应用实践">
-<meta property="og:url" content="http://benzblog.site/2017-06-19-all-about-rotations/index.html">
+<meta property="og:url" content="https://benzblog.site/2017-06-19-all-about-rotations/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
 <meta property="og:description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
-<meta property="og:locale" content="zh-CN">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_landscape.png?imageView2/2/w/200/q/95">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/RotationFlow.png">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/configurationChange_flow.png">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png">
 <meta property="og:image" content="http://or5nesfx1.bkt.clouddn.com/landscape_start_flow.png">
-<meta property="og:updated_time" content="2019-07-04T15:22:20.647Z">
+<meta property="article:published_time" content="2017-06-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-07-04T15:22:20.000Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="Android">
+<meta property="article:tag" content="Frameworks">
+<meta property="article:tag" content="WMS">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Android屏幕旋转源码探索及应用实践">
-<meta name="twitter:description" content="1 引言在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。    本文试图从AOSP源码角度，讲解屏幕旋转和配置改变时系统和App都分别发生了什么，并据此给出应用开发时比较好的实践做法，包括如何强制设置旋转方向、如何应对生命周期变化和资源更新，对冗长">
 <meta name="twitter:image" content="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95">
 
+<link rel="canonical" href="https://benzblog.site/2017-06-19-all-about-rotations/">
 
 
-
-
-  
-  
-  <link rel="canonical" href="http://benzblog.site/2017-06-19-all-about-rotations/">
-
-
-
-<script id="page.configurations">
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
   <title>Android屏幕旋转源码探索及应用实践 | 奔哲明的博客</title>
   
-
-
-
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
-  <script>
-    var host = window.location.hostname;
-    if (host !== "localhost" || !true) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-101354718-1');
-    }
-  </script>
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
 
 
   <script>
@@ -167,12 +82,8 @@
 
 
 
-
-
-
   <noscript>
   <style>
-  .use-motion .motion-element,
   .use-motion .brand,
   .use-motion .menu-item,
   .sidebar-inner,
@@ -181,9 +92,8 @@
   .use-motion .comments,
   .use-motion .post-header,
   .use-motion .post-body,
-  .use-motion .collection-title { opacity: initial; }
+  .use-motion .collection-header { opacity: initial; }
 
-  .use-motion .logo,
   .use-motion .site-title,
   .use-motion .site-subtitle {
     opacity: initial;
@@ -195,139 +105,71 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-right page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">奔哲明的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-    
-    
   </div>
 
-  <div class="site-nav-toggle">
-    <button aria-label="切换导航栏">
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
   </div>
 </div>
 
 
 
+
 <nav class="site-nav">
-  
-    <ul id="menu" class="menu">
-      
-        
-        
-        
-          
-          <li class="menu-item menu-item-home">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-about">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-tags">
+        <li class="menu-item menu-item-tags">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-categories">
+        <li class="menu-item menu-item-categories">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-archives">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
-
-      
-      
-    </ul>
-  
-
-  
-
-  
+  </ul>
 </nav>
+
 
 
 
@@ -337,169 +179,89 @@
     
 
 
-    <main id="main" class="main">
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
           
+
+          <div class="content post posts-expand">
             
 
-          
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://benzblog.site/2017-06-19-all-about-rotations/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2017-06-19-all-about-rotations/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="BenZ">
-      <meta itemprop="description" content>
       <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="奔哲明的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">Android屏幕旋转源码探索及应用实践
-
-              
-            
-          </h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          Android屏幕旋转源码探索及应用实践
+        </h1>
 
         <div class="post-meta">
-
-          
-          
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
+              <span class="post-meta-item-text">发表于</span>
 
               <time title="创建时间：2017-06-19 00:00:00" itemprop="dateCreated datePublished" datetime="2017-06-19T00:00:00+08:00">2017-06-19</time>
             </span>
-          
-
-          
-            
-
-            
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
+                  <i class="far fa-calendar-check"></i>
                 </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
+                <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2019-07-04 23:22:20" itemprop="dateModified" datetime="2019-07-04T23:22:20+08:00">2019-07-04</time>
               </span>
-            
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
+                <i class="far fa-folder"></i>
               </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Android/" itemprop="url" rel="index"><span itemprop="name">Android</span></a>
                 </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2017-06-19-all-about-rotations/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017-06-19-all-about-rotations/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
             
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/2017-06-19-all-about-rotations/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017-06-19-all-about-rotations/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-            
-              
-            
-            <div class="post-tags">
-              
+            <div class="post-tags" style="margin:5px">
                 <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
-              
                 <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
-              
                 <a href="/tags/WMS/" rel="tag"><i class="fa fa-tag"></i> WMS</a>
-              
             </div>
-          
-
-          
 
         </div>
       </header>
-    
 
     
     
     
     <div class="post-body" itemprop="articleBody">
-
-      
-      
 
       
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1 引言"></a>1 引言</h2><p>在Android开发中，屏幕旋转是个很重要的知识点，但网上多是列举应用端的实现方法，少有深一步探索原因的。不久前工作中遇到不少旋转屏幕时的动画和时序问题，深为困扰，但在网上又找不到细致讲解原理的文章。   </p>
@@ -514,8 +276,8 @@
 </tr>
 </thead>
 <tbody><tr>
-<td align="center"><img src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" alt="竖屏"></td>
-<td align="center"><img src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_landscape.png?imageView2/2/w/200/q/95" alt="横屏"></td>
+<td align="center"><img data-src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" alt="竖屏"></td>
+<td align="center"><img data-src="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_landscape.png?imageView2/2/w/200/q/95" alt="横屏"></td>
 </tr>
 <tr>
 <td align="center">WMS.mRotation == 0</td>
@@ -572,7 +334,7 @@
 <p>在freezeRotation时，除了设置<code>mUserRotationMode</code>为1，还会为<code>mUserRotation</code>赋值，一般是0，即竖屏方向，这样如果应用没有自行设置orientation，那么方向判断时就会使用这里的<code>mUserRotation</code>，从而尽可能保持竖屏。  </p>
 <p>设置这两个值的具体过程还涉及到Setting、PhoneWindowManager.SettingObserver，有兴趣的可以看此处blog的详细代码和流程分析：<a href="http://blog.csdn.net/kc58236582/article/details/53671134" target="_blank" rel="noopener">WMS注册传感器回调</a>  </p>
 <p><code>mUserRotationMode</code>和<code>mUserRotation</code>将在判断orientation的时候起到关键作用，在后续具体流程还会讲到。  </p>
-<h2 id="4-旋转，从Sensor到onConfigurationChanged"><a href="#4-旋转，从Sensor到onConfigurationChanged" class="headerlink" title="4 旋转，从Sensor到onConfigurationChanged"></a>4 旋转，从Sensor到onConfigurationChanged</h2><p><img src="http://or5nesfx1.bkt.clouddn.com/RotationFlow.png" alt="旋转流程"><br>上图是一般情况下在应用内屏幕从竖屏旋转到竖屏时的调用流程图，这里我们分为三部分讲，包括WMS一侧rotation更新逻辑，AMS一侧的configuration控制逻辑，以及AMS将configuration分发到app和WMS的逻辑。  </p>
+<h2 id="4-旋转，从Sensor到onConfigurationChanged"><a href="#4-旋转，从Sensor到onConfigurationChanged" class="headerlink" title="4 旋转，从Sensor到onConfigurationChanged"></a>4 旋转，从Sensor到onConfigurationChanged</h2><p><img data-src="http://or5nesfx1.bkt.clouddn.com/RotationFlow.png" alt="旋转流程"><br>上图是一般情况下在应用内屏幕从竖屏旋转到竖屏时的调用流程图，这里我们分为三部分讲，包括WMS一侧rotation更新逻辑，AMS一侧的configuration控制逻辑，以及AMS将configuration分发到app和WMS的逻辑。  </p>
 <h3 id="4-1-Sensor-gt-PWM-gt-WMS"><a href="#4-1-Sensor-gt-PWM-gt-WMS" class="headerlink" title="4.1 Sensor -&gt; PWM  -&gt; WMS"></a>4.1 Sensor -&gt; PWM  -&gt; WMS</h3><p>特别值得看的有两个地方：<br>一个是<code>WMS#updateRotationUnchecked()</code>，还有一个是<code>WMS#rotationForOrientationLw()</code>。  </p>
 <p>updateRotationUnchecked方法可以看作是更新旋转的枢纽，它联系了PWM、AMS和WMS，代码如下：<br><strong>updateRotationUnchecked()</strong>  </p>
 <pre><code class="Java"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateRotationUnchecked</span><span class="params">(<span class="keyword">boolean</span> alwaysSendConfiguration, <span class="keyword">boolean</span> forceRelayout)</span> </span>{  
@@ -922,11 +684,11 @@ boolean ensureActivityConfigurationLocked(
     ......  
     handleLaunchActivity(r, currentIntent, &quot;handleRelaunchActivity&quot;);  
     ......  
-}  </code></pre><p>可以看到，代码里顺次进行了pause、destroy、launch，前面两个就是一般意义上的onPause、onDestroy生命周期。<br>而launch流程，它则是与一般的start流程<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
-<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>一样的，relaunch就是我们常说的旋转屏幕时Activity会销毁重建的原因。<br>然后我们还看到第8行调用了onSaveInstanceState，所以应对屏幕旋转时的重新实例化的改变，通常需要在onSaveInstanceState()中保留必要的现场数据，应对屏幕旋转的其它技术细节见第6节。  </p>
+}  </code></pre><p>可以看到，代码里顺次进行了pause、destroy、launch，前面两个就是一般意义上的onPause、onDestroy生命周期。<br>而launch流程，它则是与一般的start流程<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a></span></a></sup>一样的，relaunch就是我们常说的旋转屏幕时Activity会销毁重建的原因。<br>然后我们还看到第8行调用了onSaveInstanceState，所以应对屏幕旋转时的重新实例化的改变，通常需要在onSaveInstanceState()中保留必要的现场数据，应对屏幕旋转的其它技术细节见第6节。  </p>
 <p>回到AMS，除了对top应用的处理，还有对其它activities的处理。ensureActivitiesVisibleLocked将会遍历task，确定其它的activity的visible和configuration状态都正常，如果还有需要显示的activity（例如前台是透明应用的情况），也要走一遍<code>ensureActivityConfigurationLocked</code>流程。  </p>
 <h3 id="4-3-AMS-gt-AppThread-onConfigurationChanged"><a href="#4-3-AMS-gt-AppThread-onConfigurationChanged" class="headerlink" title="4.3 AMS -&gt; AppThread.onConfigurationChanged"></a><span id="4_3_schedulConfig">4.3 AMS -&gt; AppThread.onConfigurationChanged</span></h3><p>首先给出结论，只要系统AMS里的configuration确认发生了变化，所有app都会接收到新的configuration，并根据其配置可能执行onConfigurationChanged方法。  </p>
-<p>在上一节<a href="#ams_updateconfiglocked">AMS#updateConfigurationLocked</a>方法中，我们讲到其会遍历mLruProcesses，对每个appThread调用scheduleConfigurationChanged接口，这里我们讲一讲app在config变化后都做了什么以及如何继续步入onConfigurationChanged方法，流程图如下<br><img src="http://or5nesfx1.bkt.clouddn.com/configurationChange_flow.png" alt="onConfigurationChanged流程图"><br>首先在2.updatePendingConfiguration里把新值保存在mPendingConfiguration里，丢出msg，AMS继续遍历，app侧在handleConfigurationChanged继续处理。<br>紧接着，执行4.applyConfigurationToResourcesLocked，顾名思义，讲config应用到resource上，可以想见，这里将会遍历resource，按照config的变化刷新资源，具体是交给ResourcesImpl.updateConfiguration处理，值得细看，但我对resource不太熟悉，就不细讲了。<br>接下来collectComponentCallbacks()，收集应用的组件，再遍历组件执行performConfigurationChanged(cb)，这也是我们比较关心的地方。<br>这个方法里主要是判断一下当前config的改变是否应该触发onConfigurationChanged，后面也有例子细讲。<br>再接下来正式进入各个组件的onConfigurationChanged方法，在service、contentprovider中都是空方法，activity有些不同：  </p>
+<p>在上一节<a href="#ams_updateconfiglocked">AMS#updateConfigurationLocked</a>方法中，我们讲到其会遍历mLruProcesses，对每个appThread调用scheduleConfigurationChanged接口，这里我们讲一讲app在config变化后都做了什么以及如何继续步入onConfigurationChanged方法，流程图如下<br><img data-src="http://or5nesfx1.bkt.clouddn.com/configurationChange_flow.png" alt="onConfigurationChanged流程图"><br>首先在2.updatePendingConfiguration里把新值保存在mPendingConfiguration里，丢出msg，AMS继续遍历，app侧在handleConfigurationChanged继续处理。<br>紧接着，执行4.applyConfigurationToResourcesLocked，顾名思义，讲config应用到resource上，可以想见，这里将会遍历resource，按照config的变化刷新资源，具体是交给ResourcesImpl.updateConfiguration处理，值得细看，但我对resource不太熟悉，就不细讲了。<br>接下来collectComponentCallbacks()，收集应用的组件，再遍历组件执行performConfigurationChanged(cb)，这也是我们比较关心的地方。<br>这个方法里主要是判断一下当前config的改变是否应该触发onConfigurationChanged，后面也有例子细讲。<br>再接下来正式进入各个组件的onConfigurationChanged方法，在service、contentprovider中都是空方法，activity有些不同：  </p>
 <pre><code>public void onConfigurationChanged(Configuration newConfig) {  
     if (DEBUG_LIFECYCLE) Slog.v(TAG, &quot;onConfigurationChanged &quot; + this + &quot;: &quot; + newConfig);  
     mCalled = true;  
@@ -958,8 +720,8 @@ boolean ensureActivityConfigurationLocked(
 <pre><code class="xml"><span class="tag">&lt;<span class="name">activity</span> <span class="attr">android:name</span>=<span class="string">".MainActivity"</span>  </span>
 <span class="tag">            <span class="attr">android:screenOrientation</span>=<span class="string">"portrait"</span>&gt;</span>  </code></pre>
 <p>还有更多属性值用法见<a href="https://developer.android.com/guide/topics/manifest/activity-element.html?hl=zh-cn#screen" target="_blank" rel="noopener">官方文档</a>。  </p>
-<p>这里网上有说法认为使用了screenOrientation也应该同时使用configChanges，这样可以避免 应用在后台时由于其它应用的旋转切换回本应用时会onCreate<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
-<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>。  </p>
+<p>这里网上有说法认为使用了screenOrientation也应该同时使用configChanges，这样可以避免 应用在后台时由于其它应用的旋转切换回本应用时会onCreate<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a></span></a></sup>。  </p>
 <p>这种问题意味着多走了relaunch流程，我实测了下未出现此种问题。<br>在resume一个应用时，确实会再次做ensureActivityConfig，ActivityStack#resumeTopActivityInnerLocked()中有如下一段代码：  </p>
 <pre><code>// Have the window manager re-evaluate the orientation of  
 // the screen based on the new activity order.  
@@ -975,8 +737,8 @@ if (mStackSupervisor.isFocusedStack(this)) {
 }  </code></pre><p>第11行updateConfigurationLocked是之前讲到的AMS更新config的方法，方法内会执行ensureActivityConfig()<br>但我们可以看到，在updateConfigurationLocked之前，第5行重新从wms计算了一遍config，而这个config在下面ensureAtyConfig判断时，会发现前后Aty已有的config与此值一样，所以正常不应该再走relaunch流程。<br>不过有鉴于异常情况总会意想不到地出现，这里还是<strong>推荐增加相应configChanges属性值</strong>。  </p>
 <h3 id="5-2-动态-setRequestedOrientation"><a href="#5-2-动态-setRequestedOrientation" class="headerlink" title="5.2 动态 setRequestedOrientation"></a>5.2 动态 setRequestedOrientation</h3><p>上一小节我们讲了静态修改的方法，接下来是用代码动态生效的方法。  </p>
 <p>代码动态修改orientation为横屏，例子如下：  </p>
-<pre><code>setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)  </code></pre><p>直接在activity中执行该方法即可，它会调用到AMS#setRequestedOrientation()，并最终执行WMS#setAppOrientation来修改AppToken.requestOrientation的值，用于保存应用设定的屏幕方向。<br>其实，前面静态设置屏幕方向的screenOrientation值，最终也是传递到了AppToken.requestOrientation<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </a></sup></p>
-<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a>才生效，二者殊途同归。  </p>
+<pre><code>setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE)  </code></pre><p>直接在activity中执行该方法即可，它会调用到AMS#setRequestedOrientation()，并最终执行WMS#setAppOrientation来修改AppToken.requestOrientation的值，用于保存应用设定的屏幕方向。<br>其实，前面静态设置屏幕方向的screenOrientation值，最终也是传递到了AppToken.requestOrientation<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()  </p>
+<p>  “&gt;<a href="http://or5nesfx1.bkt.clouddn.com/screenshot_0614_portrait.png?imageView2/2/w/200/q/95" target="_blank" rel="noopener">1</a></span></a></sup>才生效，二者殊途同归。  </p>
 <p>那么这个值究竟又是如何影响屏幕旋转方向的呢？  </p>
 <h3 id="5-3-应用强制屏幕方向生效原理"><a href="#5-3-应用强制屏幕方向生效原理" class="headerlink" title="5.3 应用强制屏幕方向生效原理"></a>5.3 应用强制屏幕方向生效原理</h3><p>前面 4.1.1 和 4.1.2 具体讲解了WMS如何判断决定屏幕方向，主要通过PWM.rotationForOrientationLw方法，而这个方法里，screenOrientation几乎是起决定性作用的，这个参数的值则是WMS.mLastOrientation。全局搜索这个WMS.mLastOrientation的引用，发现只有一个写操作的地方：WMS#updateOrientationFromAppTokensLocked(boolean)。  </p>
 <p><strong>WindowManagerService#updateOrientationFromAppTokensLocked(boolean)</strong>  </p>
@@ -1015,11 +777,11 @@ if (mStackSupervisor.isFocusedStack(this)) {
     }  
 }  </code></pre>
 <p>在此方法中，通过getOrientationLocked()计算并更新mLastOrientation的值。具体计算过程大致就是注释里第9行开始说的，先根据系统状态看是否有确定的orientation（比如锁屏时一般就只能是portrait），如果没有，则取前台应用appToken里的requestedOrientation拿来用。<br>WMS#updateOrientationFromAppTokensLocked通常在应用resume时被调用，它的调用流程见下一节流程图。  </p>
-<p>所以我们可以总结出应用强制设置orientation的数据流图大概如下：<br><img src="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" alt="数据流">  </p>
-<h3 id="5-4-横屏应用载入流程"><a href="#5-4-横屏应用载入流程" class="headerlink" title="5.4 横屏应用载入流程"></a>5.4 横屏应用载入流程</h3><p>这个就直接窃用网上<a href="http://blog.csdn.net/guoqifa29/article/details/40504189" target="_blank" rel="noopener">博客</a>图了，各个方法前面基本也都有讲到，这里就略过了。<br><img src="http://or5nesfx1.bkt.clouddn.com/landscape_start_flow.png" alt="landscape_start_flow">  </p>
+<p>所以我们可以总结出应用强制设置orientation的数据流图大概如下：<br><img data-src="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" alt="数据流">  </p>
+<h3 id="5-4-横屏应用载入流程"><a href="#5-4-横屏应用载入流程" class="headerlink" title="5.4 横屏应用载入流程"></a>5.4 横屏应用载入流程</h3><p>这个就直接窃用网上<a href="http://blog.csdn.net/guoqifa29/article/details/40504189" target="_blank" rel="noopener">博客</a>图了，各个方法前面基本也都有讲到，这里就略过了。<br><img data-src="http://or5nesfx1.bkt.clouddn.com/landscape_start_flow.png" alt="landscape_start_flow">  </p>
 <h2 id="6-更好的应对旋转布局变化以及持久化"><a href="#6-更好的应对旋转布局变化以及持久化" class="headerlink" title="6 更好的应对旋转布局变化以及持久化"></a>6 更好的应对旋转布局变化以及持久化</h2><h3 id="6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化"><a href="#6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化" class="headerlink" title="6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化"></a>6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化</h3><p>自行处理配置变更，官方文档<a href="https://developer.android.com/guide/topics/resources/runtime-changes.html?hl=zh-cn#HandlingTheChange" target="_blank" rel="noopener">在此</a>，简单来说需要做两件事情：  </p>
 <ol>
-<li>在manifest的<activity>标签里增加configChanges属性，例如，如果你准备在onConfigurationChanged处理旋转屏幕的情况，要这样写：  </activity></li>
+<li>在manifest的<activity>标签里增加configChanges属性，例如，如果你准备在onConfigurationChanged处理旋转屏幕的情况，要这样写：  </li>
 </ol>
 <pre><code>&lt;activity android:name=&quot;.MyActivity&quot;  
           android:configChanges=&quot;orientation|screenSize&quot;  
@@ -1105,376 +867,204 @@ if (mStackSupervisor.isFocusedStack(this)) {
 <p><strong>注</strong>:</p>
 <div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">LocalActivityManager#moveToState(INITIALIZING)-&gt;startActivityNow() 和 handleLaunch() 都会走到performLaunchActivity() -&gt; onStart() -&gt; onCreate()<br>
 
-<p><a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">8</a>: <a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png</a><a href="#fnref:1" rev="footnote"> ↩</a></p></span></li></ol></div></div><p></p>
-
-      
-    </div>
-
-    
-
-    
-      
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-
-      
-        
-          
-        
-        <div class="post-tags">
-          
-            <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
-          
-            <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
-          
-            <a href="/tags/WMS/" rel="tag"><i class="fa fa-tag"></i> WMS</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017-06-16-tasks-differences-between-ams-and-recnets/" rel="next" title="Recents和AMS中历史任务的区别">
-                <i class="fa fa-chevron-left"></i> Recents和AMS中历史任务的区别
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017-11-27-推荐系统指北/" rel="prev" title="推荐系统指北">
-                推荐系统指北 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-  </div>
-
-
-          </div>
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="disqus_thread">
-        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-      </div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
-            
-              <p class="site-author-name" itemprop="name">BenZ</p>
-              <div class="site-description motion-element" itemprop="description"></div>
-          </div>
-
-          
-            <nav class="site-state motion-element">
-              
-                <div class="site-state-item site-state-posts">
-                
-                  <a href="/archives/">
-                
-                    <span class="site-state-item-count">9</span>
-                    <span class="site-state-item-name">日志</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-categories">
-                  
-                    
-                      <a href="/categories/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">4</span>
-                    <span class="site-state-item-name">分类</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  
-                    
-                      <a href="/tags/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">24</span>
-                    <span class="site-state-item-name">标签</span>
-                  </a>
-                </div>
-              
-            </nav>
-          
-
-          
-
-          
-
-          
-            <div class="links-of-author motion-element">
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                </span>
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
-                </span>
-              
-            </div>
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </div>
-
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-引言"><span class="nav-text">1 引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Rotation-与-Orientation区别"><span class="nav-text">2 Rotation 与 Orientation区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-rotation"><span class="nav-text">2.1 rotation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-orientation"><span class="nav-text">2.2 orientation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-自动旋转开关"><span class="nav-text">3 自动旋转开关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-旋转，从Sensor到onConfigurationChanged"><span class="nav-text">4 旋转，从Sensor到onConfigurationChanged</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Sensor-gt-PWM-gt-WMS"><span class="nav-text">4.1 Sensor -&gt; PWM  -&gt; WMS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-应用不设置横竖屏的情况"><span class="nav-text">4.1.1 应用不设置横竖屏的情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-应用设置强制竖屏的情况"><span class="nav-text">4.1.2 应用设置强制竖屏的情况</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-AMS"><span class="nav-text">4.2 AMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-AMS-gt-AppThread-onConfigurationChanged"><span class="nav-text">4.3 AMS -&gt; AppThread.onConfigurationChanged</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-应用强制横屏竖屏"><span class="nav-text">5 应用强制横屏竖屏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-静态-screenOrientation属性"><span class="nav-text">5.1 静态 screenOrientation属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-动态-setRequestedOrientation"><span class="nav-text">5.2 动态 setRequestedOrientation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-应用强制屏幕方向生效原理"><span class="nav-text">5.3 应用强制屏幕方向生效原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-横屏应用载入流程"><span class="nav-text">5.4 横屏应用载入流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-更好的应对旋转布局变化以及持久化"><span class="nav-text">6 更好的应对旋转布局变化以及持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化"><span class="nav-text">6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-需要实例化的情况，做好现场的保存与恢复"><span class="nav-text">6.2 需要实例化的情况，做好现场的保存与恢复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-DividerBar-分屏分割条如何在旋转时附加特殊动画"><span class="nav-text">7 DividerBar 分屏分割条如何在旋转时附加特殊动画</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
-
-      
+<p><a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">8</a>: <a href="http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png" target="_blank" rel="noopener">http://or5nesfx1.bkt.clouddn.com/prief_force_orientation_flow.png</a><a href="#fnref:1" rev="footnote"> ↩</a></span></li></ol></div></div></p>
 
     </div>
-  </aside>
-  
 
-
+    
+    
+    
         
-      </div>
-    </main>
 
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love" id="animate">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">BenZ</span>
-
-  
-
-  
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2017-06-19-all-about-rotations/" title="Android屏幕旋转源码探索及应用实践">https://benzblog.site/2017-06-19-all-about-rotations/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
-
-
-
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/Android/" rel="tag"><i class="fa fa-tag"></i> Android</a>
+              <a href="/tags/Frameworks/" rel="tag"><i class="fa fa-tag"></i> Frameworks</a>
+              <a href="/tags/WMS/" rel="tag"><i class="fa fa-tag"></i> WMS</a>
+          </div>
 
         
 
 
-
-
-
-
-
-
         
-      </div>
-    </footer>
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017-06-16-tasks-differences-between-ams-and-recnets/" rel="prev" title="Recents和AMS中历史任务的区别">
+      <i class="fa fa-chevron-left"></i> Recents和AMS中历史任务的区别
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/" rel="next" title="推荐系统指北">
+      推荐系统指北 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
 
-    
 
+          </div>
+          
     
-
-    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
   </div>
-
   
 
 <script>
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-引言"><span class="nav-number">1.</span> <span class="nav-text">1 引言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-Rotation-与-Orientation区别"><span class="nav-number">2.</span> <span class="nav-text">2 Rotation 与 Orientation区别</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-rotation"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 rotation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-orientation"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 orientation</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-自动旋转开关"><span class="nav-number">3.</span> <span class="nav-text">3 自动旋转开关</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-旋转，从Sensor到onConfigurationChanged"><span class="nav-number">4.</span> <span class="nav-text">4 旋转，从Sensor到onConfigurationChanged</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#4-1-Sensor-gt-PWM-gt-WMS"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 Sensor -&gt; PWM  -&gt; WMS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-1-应用不设置横竖屏的情况"><span class="nav-number">4.1.1.</span> <span class="nav-text">4.1.1 应用不设置横竖屏的情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-2-应用设置强制竖屏的情况"><span class="nav-number">4.1.2.</span> <span class="nav-text">4.1.2 应用设置强制竖屏的情况</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-2-AMS"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 AMS</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-3-AMS-gt-AppThread-onConfigurationChanged"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 AMS -&gt; AppThread.onConfigurationChanged</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-应用强制横屏竖屏"><span class="nav-number">5.</span> <span class="nav-text">5 应用强制横屏竖屏</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1-静态-screenOrientation属性"><span class="nav-number">5.1.</span> <span class="nav-text">5.1 静态 screenOrientation属性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-动态-setRequestedOrientation"><span class="nav-number">5.2.</span> <span class="nav-text">5.2 动态 setRequestedOrientation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-应用强制屏幕方向生效原理"><span class="nav-number">5.3.</span> <span class="nav-text">5.3 应用强制屏幕方向生效原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-横屏应用载入流程"><span class="nav-number">5.4.</span> <span class="nav-text">5.4 横屏应用载入流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-更好的应对旋转布局变化以及持久化"><span class="nav-number">6.</span> <span class="nav-text">6 更好的应对旋转布局变化以及持久化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-在onConfigurationChanged里处理configuration的变化，避免重新实例化"><span class="nav-number">6.1.</span> <span class="nav-text">6.1 在onConfigurationChanged里处理configuration的变化，避免重新实例化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-2-需要实例化的情况，做好现场的保存与恢复"><span class="nav-number">6.2.</span> <span class="nav-text">6.2 需要实例化的情况，做好现场的保存与恢复</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-DividerBar-分屏分割条如何在旋转时附加特殊动画"><span class="nav-number">7.</span> <span class="nav-text">7 DividerBar 分屏分割条如何在旋转时附加特殊动画</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
 
 
 
@@ -1483,6 +1073,27 @@ if (mStackSupervisor.isFocusedStack(this)) {
 
 
 
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -1499,62 +1110,71 @@ if (mStackSupervisor.isFocusedStack(this)) {
 
 
 
-  
-  <script src="/lib/jquery/index.js?v=3.4.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
 
 
 
 
   
 
+  
+      
 
-  <script src="/js/utils.js?v=7.2.0"></script>
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
 
-  <script src="/js/motion.js?v=7.2.0"></script>
-
-
+    
 
   
-  
 
-
-  <script src="/js/affix.js?v=7.2.0"></script>
-
-  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
-
-
-
-  
-  <script src="/js/scrollspy.js?v=7.2.0"></script>
-<script src="/js/post-details.js?v=7.2.0"></script>
-
-
-
-  
-
-
-  <script src="/js/next-boot.js?v=7.2.0"></script>
-
-
-  
-
-  
-
-  
-
-  
-
-  
-  
 <script>
   function loadCount() {
     var d = document, s = d.createElement('script');
@@ -1565,114 +1185,26 @@ if (mStackSupervisor.isFocusedStack(this)) {
   // defer loading until the whole page loading is completed
   window.addEventListener('load', loadCount, false);
 </script>
-
-
 <script>
   var disqus_config = function() {
-    this.page.url = "http://benzblog.site/2017-06-19-all-about-rotations/";
+    this.page.url = "https://benzblog.site/2017-06-19-all-about-rotations/";
     this.page.identifier = "2017-06-19-all-about-rotations/";
-    this.page.title = 'Android屏幕旋转源码探索及应用实践';
+    this.page.title = "Android屏幕旋转源码探索及应用实践";
     };
-  function loadComments() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://benzbloghexo.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', '' + +new Date());
-    (d.head || d.body).appendChild(s);
-  }
-  
-    window.addEventListener('load', loadComments, false);
-  
-</script>
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-  
-
-  
-
-  
-  
-
-  
-  
-
-  
-    
-      <script type="text/x-mathjax-config">
-  
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-      
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
-        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
-      }
-    });
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
     }
   });
 </script>
-<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    
-  
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-
-  
 
 </body>
 </html>

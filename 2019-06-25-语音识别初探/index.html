@@ -1,112 +1,33 @@
 <!DOCTYPE html>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.9.0">
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
-
-<link rel="stylesheet" href="/css/main.css?v=7.2.0">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
-
-
-
-
-
-
-
-<script id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    version: '7.2.0',
-    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
-    back2top: true,
-    back2top_sidebar: false,
-    fancybox: {
-      enable: true,
-      replace_from: /(\?x-oss-process=style\S+)/,
-      replace_to: '',
-      with_caption: false,
-    },
-    fastclick: false,
-    lazyload: false,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
 
   <meta name="description" content="语音识别的基础知识讲解，包括传统方法和应用深度学习的方法。听声辩位的功能开发中使用到了简单的基于CNN的音频识别模型，为SharkTime自定义录屏功能扩展语音触发时，尝试了传统ASR方法。">
-<meta name="keywords" content="机器学习,语音识别,音频处理,ASR,唤醒词">
 <meta property="og:type" content="article">
 <meta property="og:title" content="语音识别初探">
-<meta property="og:url" content="http://benzblog.site/2019-06-25-语音识别初探/index.html">
+<meta property="og:url" content="https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
 <meta property="og:description" content="语音识别的基础知识讲解，包括传统方法和应用深度学习的方法。听声辩位的功能开发中使用到了简单的基于CNN的音频识别模型，为SharkTime自定义录屏功能扩展语音触发时，尝试了传统ASR方法。">
-<meta property="og:locale" content="zh-CN">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/WaveNet-BlogPost-Fig1-Anim-160908-r01.gif">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_img_from_zhihu.jpg">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_xiao_sha_tong_xue.png?x-oss-process=style/resize_400">
@@ -122,45 +43,41 @@
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/lmtool_6412_result_dict_phones_added.png?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_noisy.png?x-oss-process=style/resize_400">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_quite.png?x-oss-process=style/resize_400">
-<meta property="og:updated_time" content="2019-07-08T15:53:31.922Z">
+<meta property="article:published_time" content="2019-06-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-07-08T15:53:31.000Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="语音识别">
+<meta property="article:tag" content="音频处理">
+<meta property="article:tag" content="ASR">
+<meta property="article:tag" content="唤醒词">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="语音识别初探">
-<meta name="twitter:description" content="语音识别的基础知识讲解，包括传统方法和应用深度学习的方法。听声辩位的功能开发中使用到了简单的基于CNN的音频识别模型，为SharkTime自定义录屏功能扩展语音触发时，尝试了传统ASR方法。">
 <meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/WaveNet-BlogPost-Fig1-Anim-160908-r01.gif">
 
+<link rel="canonical" href="https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/">
 
 
-
-
-  
-  
-  <link rel="canonical" href="http://benzblog.site/2019-06-25-语音识别初探/">
-
-
-
-<script id="page.configurations">
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
   <title>语音识别初探 | 奔哲明的博客</title>
   
-
-
-
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
-  <script>
-    var host = window.location.hostname;
-    if (host !== "localhost" || !true) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-101354718-1');
-    }
-  </script>
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
 
 
   <script>
@@ -176,12 +93,8 @@
 
 
 
-
-
-
   <noscript>
   <style>
-  .use-motion .motion-element,
   .use-motion .brand,
   .use-motion .menu-item,
   .sidebar-inner,
@@ -190,9 +103,8 @@
   .use-motion .comments,
   .use-motion .post-header,
   .use-motion .post-body,
-  .use-motion .collection-title { opacity: initial; }
+  .use-motion .collection-header { opacity: initial; }
 
-  .use-motion .logo,
   .use-motion .site-title,
   .use-motion .site-subtitle {
     opacity: initial;
@@ -204,139 +116,71 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-right page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">奔哲明的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-    
-    
   </div>
 
-  <div class="site-nav-toggle">
-    <button aria-label="切换导航栏">
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
   </div>
 </div>
 
 
 
+
 <nav class="site-nav">
-  
-    <ul id="menu" class="menu">
-      
-        
-        
-        
-          
-          <li class="menu-item menu-item-home">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-about">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-tags">
+        <li class="menu-item menu-item-tags">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-categories">
+        <li class="menu-item menu-item-categories">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-archives">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
-
-      
-      
-    </ul>
-  
-
-  
-
-  
+  </ul>
 </nav>
+
 
 
 
@@ -346,167 +190,87 @@
     
 
 
-    <main id="main" class="main">
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
           
+
+          <div class="content post posts-expand">
             
 
-          
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://benzblog.site/2019-06-25-语音识别初探/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="BenZ">
-      <meta itemprop="description" content>
       <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="奔哲明的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">语音识别初探
-
-              
-            
-          </h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          语音识别初探
+        </h1>
 
         <div class="post-meta">
-
-          
-          
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
+              <span class="post-meta-item-text">发表于</span>
 
               <time title="创建时间：2019-06-25 00:00:00" itemprop="dateCreated datePublished" datetime="2019-06-25T00:00:00+08:00">2019-06-25</time>
             </span>
-          
-
-          
-            
-
-            
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
+                  <i class="far fa-calendar-check"></i>
                 </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
+                <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2019-07-08 23:53:31" itemprop="dateModified" datetime="2019-07-08T23:53:31+08:00">2019-07-08</time>
               </span>
-            
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
+                <i class="far fa-folder"></i>
               </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
                 </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019-06-25-语音识别初探/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
             
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/2019-06-25-语音识别初探/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2019-06-25-语音识别初探/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-            
-              
-            
-            <div class="post-tags">
-              
-                <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-              
-                <a href="/tags/语音识别/" rel="tag"><i class="fa fa-tag"></i> 语音识别</a>
-              
-                <a href="/tags/音频处理/" rel="tag"><i class="fa fa-tag"></i> 音频处理</a>
-              
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+                <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag"><i class="fa fa-tag"></i> 语音识别</a>
+                <a href="/tags/%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> 音频处理</a>
                 <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
-              
-                <a href="/tags/唤醒词/" rel="tag"><i class="fa fa-tag"></i> 唤醒词</a>
-              
+                <a href="/tags/%E5%94%A4%E9%86%92%E8%AF%8D/" rel="tag"><i class="fa fa-tag"></i> 唤醒词</a>
             </div>
-          
-
-          
             <div class="post-description" hidden>语音识别的基础知识讲解，包括传统方法和应用深度学习的方法。听声辩位的功能开发中使用到了简单的基于CNN的音频识别模型，为SharkTime自定义录屏功能扩展语音触发时，尝试了传统ASR方法。</div>
-          
 
         </div>
       </header>
-    
 
     
     
@@ -514,17 +278,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="原由："><a href="#原由：" class="headerlink" title="原由："></a><strong>原由</strong>：</h2><p>1、用户自定义 SharkTime 功能已经基本做好，但该功能的交互是基于悬浮球操作，手动触发不够便利自然，因而考虑是否能够增加唤醒词触发，这样交互方式更加自然有趣，玩法多样。<br>2、之前在 I19tService 中已有基于DNN的音频识别功能（听声辩位，识别枪声），已有音频处理的基本技术储备，但是识别率不高，效能较差。</p>
 <a id="more"></a>
 <hr>
 <h2 id="语音识别基础介绍"><a href="#语音识别基础介绍" class="headerlink" title="语音识别基础介绍"></a>语音识别基础介绍</h2><p>语音识别，ASR(Automatic Speech Recognition)<br>文中会出现很多专业词汇，其实我也只是把他们堆砌在这里，大致知道用来干什么的，原理却不熟悉。</p>
-<h3 id="音频信号"><a href="#音频信号" class="headerlink" title="音频信号"></a><strong>音频信号</strong></h3><p>原始音频信号如下图<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="WaveNet raw audio https://deepmind.com/blog/wavenet-generative-model-raw-audio/">[1]</span></a></sup>：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/WaveNet-BlogPost-Fig1-Anim-160908-r01.gif" alt="wavenet_gif"><br>可以看到，音频信号的信号量实际上是非常大的，直接拿原始数据pcm去做分析，极不划算。<br>信号中更有价值的是频域信号，为此，音频信号的分析，首先要做时域到频域的转换，也就是傅里叶变换。</p>
+<h3 id="音频信号"><a href="#音频信号" class="headerlink" title="音频信号"></a><strong>音频信号</strong></h3><p>原始音频信号如下图<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="WaveNet raw audio https://deepmind.com/blog/wavenet-generative-model-raw-audio/">[1]</span></a></sup>：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/WaveNet-BlogPost-Fig1-Anim-160908-r01.gif" alt="wavenet_gif"><br>可以看到，音频信号的信号量实际上是非常大的，直接拿原始数据pcm去做分析，极不划算。<br>信号中更有价值的是频域信号，为此，音频信号的分析，首先要做时域到频域的转换，也就是傅里叶变换。</p>
 <h3 id="频谱特征"><a href="#频谱特征" class="headerlink" title="频谱特征"></a><strong>频谱特征</strong></h3><p>傅里叶变换的原理及应用的讲解可以看<a href="https://www.youtube.com/watch?v=0LuyxzqI3Hk" target="_blank" rel="noopener">李永乐的视频</a>。</p>
-<p>通过在一小段时间上的音频信号，做傅里叶变换，我们能够得到类似下面的频谱图<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="知乎-语音信号处理中怎么理解分帧？https://www.zhihu.com/question/52093104/answer/225983811">[2]</span></a></sup>：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_img_from_zhihu.jpg" alt="spectrum_image"></p>
-<p>将一整段音频做分帧（每20~50ms取一小段，两帧间还要有窗口交叠（帧移），再对每帧加窗函数如汉明窗以平滑信号(加窗)）操作，对每一帧做傅里叶变换，可以得到如下频谱图：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_xiao_sha_tong_xue.png?x-oss-process=style/resize_400" alt="spectrum_2"></p>
+<p>通过在一小段时间上的音频信号，做傅里叶变换，我们能够得到类似下面的频谱图<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="知乎-语音信号处理中怎么理解分帧？https://www.zhihu.com/question/52093104/answer/225983811">[2]</span></a></sup>：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_img_from_zhihu.jpg" alt="spectrum_image"></p>
+<p>将一整段音频做分帧（每20~50ms取一小段，两帧间还要有窗口交叠（帧移），再对每帧加窗函数如汉明窗以平滑信号(加窗)）操作，对每一帧做傅里叶变换，可以得到如下频谱图：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/spectrum_xiao_sha_tong_xue.png?x-oss-process=style/resize_400" alt="spectrum_2"></p>
 <p>如果是进行语音识别，通常在频谱之后，会再经过一组Mel滤波器得到mel频谱，然后再进行倒频谱操作（取对数再逆傅里叶变换），最终得到梅尔频率倒谱系数，简称MFCC。<br>具体原理可以参考<a href="https://blog.csdn.net/zouxy09/article/details/9156785" target="_blank" rel="noopener">这里</a>，总结来说，就是Mel滤波器根据人耳听觉系统的特性对数据做了一轮变换，而倒谱变换用于进一步提取频谱特征，如共振峰等。所以对于语音识别类问题，一般MFCC特征提取就是系统的第一步了。而如果是处理与人耳听觉无关的音频的话，可以只用频谱图做特征。</p>
 <p>MFCC整个算法还是很复杂的，好在这个东西已经相当成熟，基本上语音相关的工具包里都已经实现好了，都是输入pcm就好，甚至分帧的参数都不用考虑太多，在下面具体实践的时候可以感受到。Tensorflow 中可以通过以下方式进行mfcc特征提取：</p>
 <ol>
@@ -533,12 +294,12 @@
 </ol>
 <p>OK，无论是普通的频谱图还是MFCC，我们已经将原始 PCM 数据转为一组按时序排列的特征向量，接下来正式使用模型进行识别。<br>我这里将识别方法简单分为传统方法和end-to-end方法。</p>
 <h2 id="End-to-End-方法"><a href="#End-to-End-方法" class="headerlink" title="End-to-End 方法"></a>End-to-End 方法</h2><p>我们前面已经得到了频谱图，既然是图，那么一个很简单的想法就是直接按照图像分类的套路，把频谱图经过几层卷积来做个分类。这种想法确实是可行的，实际上我们听声辩位中对枪声、车声等的识别分类，就是采用这种简单粗暴的方法。Google有一篇论文专门讲了这种方法《Convolutional Neural Networks for Small-footprint Keyword Spotting》，我们姑且叫他 DeepKWS 方法，这类架构可大致用下图表示：</p>
-<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/Paper_CNNKWS_Figure_1_Framework.png?x-oss-process=style/resize_600" alt="DeepKWS_Framework"><br>左侧是前面提到的特征提取过程，使用一个滑窗，每次将固定长的特征送入模型作计算；<br>中间是几个卷积block再接softmax做分类，一般两三层卷积就够用，输出的结果中，filler类别指代非目标类别，如背景音，其他的是关键词类别；<br>右边是输出的结果，每次识别得到一个类别结果，随着滑窗推进形成一个序列。</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/Paper_CNNKWS_Figure_1_Framework.png?x-oss-process=style/resize_600" alt="DeepKWS_Framework"><br>左侧是前面提到的特征提取过程，使用一个滑窗，每次将固定长的特征送入模型作计算；<br>中间是几个卷积block再接softmax做分类，一般两三层卷积就够用，输出的结果中，filler类别指代非目标类别，如背景音，其他的是关键词类别；<br>右边是输出的结果，每次识别得到一个类别结果，随着滑窗推进形成一个序列。</p>
 <p>从上图我们可以看出，虽然左边 “answer”、“call” 分别只出现了一次，但在右边序列图里，每个关键词都被连续激活很多次。这意味这种简单架构不能准确表征每个词出现了几次，它只适合于在一个时间点判断是否有某个关键词出现。由于得到的结果不能拼成句子，因此DeepKWS还不能直接做语音识别，后面其实还要接传统的语言模型、NLP等才能完成复杂功能。当然，这种架构对于一些简单的命令动作已经完全足够了，比如说“开灯”、“关灯”，就是要注意后续逻辑要处理好，避免重复触发。</p>
 <p>(Hidden Content)</p>
 
 <p>DeepKWS作为一个语音识别的端到端模型还不够格，因为它只能得到关键词的序列，一个端到端语音识别模型还要能做到直接输出一段准确匹配的文字。<br>假设从已有的 DeepKWS 架构扩展开去，那就需要能够直接处理一段音频序列，以及把原来 DeepKWS 右侧的序列结果中重复的部分给删掉，如此一来，输入输出都会变为不定长且不匹配。<br>由于整个输入变为不定长序列，所以一般用 RNN 的结构整个包起来。<br>而针对输入输出难以对齐的问题，我们引入 CTC loss 来驱动训练过程。<br>由于 CTC 相关的模型我也没有实际尝试训练过，本身算法也较复杂，这里就不细讲了，以免混淆视听，推荐两篇文章，<a href="https://distill.pub/2017/ctc/" target="_blank" rel="noopener">distill</a>和<a href="https://xiaodu.io/ctc-explained/" target="_blank" rel="noopener">blog</a></p>
-<p>百度的 DeepSpeech 就是一个典型的端到端的语音识别框架：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/baidu_deepspeech_lecture_ver.png?x-oss-process=style/resize_600" alt><br>$h_t^{(1)}$、$h_t^{(2)}$、$h_t^{(3)}$ 为三个全连接层，$h_t^{(f)}$ 和 $h_t^{(b)}$ 组成双向LSTM，再接全连接层和softmax后，使用CTC进行训练。</p>
+<p>百度的 DeepSpeech 就是一个典型的端到端的语音识别框架：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/baidu_deepspeech_lecture_ver.png?x-oss-process=style/resize_600" alt=""><br>$h_t^{(1)}$、$h_t^{(2)}$、$h_t^{(3)}$ 为三个全连接层，$h_t^{(f)}$ 和 $h_t^{(b)}$ 组成双向LSTM，再接全连接层和softmax后，使用CTC进行训练。</p>
 <p>在实际应用模型进行推演的时候，还要增加解码的过程，解码的过程就是在得到softmax各个 “word” 的输出概率后，结合语言规律和当前上下文，寻找可能性最高的一句话。我们在使用输入法或语音助手的语音识别功能的时候，往往会看到最后有个字不断跳动，在说一段话时，识别出新单词的同时前面的字也可能变化，这个就是解码过程的体现，解码器在不断寻找更合乎常理的一段话。</p>
 <p>解码过程更偏向于NLP领域，DeepSpeech 这里使用的是 <a href="https://github.com/PaddlePaddle/DeepSpeech#language-model-released" target="_blank" rel="noopener">ngram 模型</a><sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="自然语言处理中N-Gram模型介绍 https://zhuanlan.zhihu.com/p/32829048">[4]</span></a></sup>，关于语言模型，下面还会继续涉及。</p>
 <p>端到端的方法因为主体部分都是深度神经网络，近些年发展得很快，在数据充足的基础下，效果已经明显超过了传统方法，很多大厂已经将这类方法作为主要的语音识别手段。<br>这里举例的 DeepSpeech 已经发展到了第三代，而其他不同结构的端到端模型也是数不胜数，训练方法其实并不局限于CTC，据说也可以直接用seq2seq的思路，频谱特征提取也可能不再是必须，wavenet就已经直接把pcm作为输入。但就我目前所了解到的，它们似乎都还没能摆脱掉语言模型，也就是说，端到端如今仍是个相对的概念。<br>语音识别技术还在日新月异，或许未来终将会有更优美的模型来实现真正的端到端。</p>
@@ -558,15 +319,15 @@
 <h3 id="特征提取"><a href="#特征提取" class="headerlink" title="特征提取"></a><strong>特征提取</strong></h3><p>跟上面端到端方法中的特征提取是一样的，不再赘述。</p>
 <h3 id="声学模型"><a href="#声学模型" class="headerlink" title="声学模型"></a><strong>声学模型</strong></h3><p>从特征向量计算得到音素，一般采用 GMM-HMM 方法。<br>GMM(Gaussian Mixture Model)用来将声学特征进行一次聚类，使用多个高斯分布的拟合来表征声学似然度(acoustic likelihood)，GMM会将一帧声学特征计算得到状态观测概率(observation likelihoods)，可以粗略理解为GMM用来猜测大概会是哪类音素。GMM 是要对声学特征做一次聚类，聚类的话，就有很多替代方法，比如在GMM之前似乎是使用VQ(vector quantization)的，而在神经网络成熟后，现在GMM基本已经都替换成DNN了。</p>
 <p>HMM(Hidden Markov Model, 隐马尔科夫模型)用来建立声学特征的变化序列与音素甚至整个语言模型的网络关系，这个输入的序列信息就是GMM在每一帧上的结果，一个经典的 GMM-HMM 框架图如下图所示：</p>
-<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/hmm_in_asr.jpg" alt></p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/hmm_in_asr.jpg" alt=""></p>
 <p>HMM 是在马尔可夫链的基础上，再加一层假设。原来的状态不直接可见，但可以由其他可见的状态来体现，而原来的马尔可夫链是指满足马尔可夫假设的状态链模型，这个假设就是下一状态的概率分布只能由当前状态决定，与再往前的状态无关。HMM 的具体内容建议再参考别处，一般的统计学或机器学习的教材里应该都有，或者从这个<a href="https://www.zhihu.com/question/20962240" target="_blank" rel="noopener">知乎问题</a>的讨论里也可见一斑。</p>
 <p>HMM 不仅是传统声学模型的核心，也是整套传统方法的关键和难点，我花了好长好长时间才大致搞明白 HMM 具体在ASR系统里都是怎么算的。</p>
 <p>总之，我们需要知道，建立好的 HMM 模型将是一个巨大概率网络，在 ASR 推演时，使用 Viterbi 方法计算找到一条概率最大的路径，那条路径就是最符合的识别结果。到此为止，识别的结果还只是音素，而如果整个网络通过下面要讲的词典和语言模型继续扩充，最后搜索的结果将是整句话的识别结果。</p>
 <h3 id="发音词典"><a href="#发音词典" class="headerlink" title="发音词典"></a><strong>发音词典</strong></h3><p>发音词典用来建立起音素和单词的关系，PocketSphinx 里的字典数据如下图，每行第一个空格前是单词，后面是对应音素序列。</p>
-<p>中文：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sphinx_dict_zh_cn_example.png?x-oss-process=style/resize_600" alt="sphinx_dict_zh_cn_example"></p>
-<p>英文：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sphinx_dict_cmudict_example.png?x-oss-process=style/resize_600" alt="sphinx_dict_cmudict_example"></p>
+<p>中文：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sphinx_dict_zh_cn_example.png?x-oss-process=style/resize_600" alt="sphinx_dict_zh_cn_example"></p>
+<p>英文：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sphinx_dict_cmudict_example.png?x-oss-process=style/resize_600" alt="sphinx_dict_cmudict_example"></p>
 <h3 id="语言模型"><a href="#语言模型" class="headerlink" title="语言模型"></a><strong>语言模型</strong></h3><p>语言模型是用来计算一个句子出现的概率模型，通过限制输出序列，减少搜索空间，提高效率。对训练文本库进行语法、语义分析，经过基于统计模型训练得到语言模型。<br>最常用的语言模型是 n-gram ，包含单词序列的统计数据和有限状态语言模型。</p>
-<p>将上面几个步骤连接起来，整个流程可用下图表示：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/asr_train_and_infer_flow.png?x-oss-process=style/resize_600" alt="asr_train_and_infer_flow"><sup id="fnref:7"><a href="#fn:7" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="图源：https://stevenocean.github.io/2019/05/02/first-meet-asr-and-kaldi-install-use.html">[7]</span></a></sup></p>
+<p>将上面几个步骤连接起来，整个流程可用下图表示：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/asr_train_and_infer_flow.png?x-oss-process=style/resize_600" alt="asr_train_and_infer_flow"><sup id="fnref:7"><a href="#fn:7" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="图源：https://stevenocean.github.io/2019/05/02/first-meet-asr-and-kaldi-install-use.html">[7]</span></a></sup></p>
 <p>这样传统语音识别的几个步骤和他们的概念就基本讲完了，由于我们最开始也只准备训练一个唤醒词模型，而对准确率要求还没有特别高，因此实际上很多语料准备、声学语言模型的训练并不需要自己去做，我们即使作为语音识别的外行，也可以借助几个工具快速实现和移植一个唤醒词模型。</p>
 <p>接下来讲一下使用 PocketSphinx 生成 “小鲨同学” 唤醒词并在Android端运行的一次实战经验。</p>
 <hr>
@@ -583,32 +344,32 @@
 </tr>
 </thead>
 <tbody><tr>
-<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/keywords_for_lmtool_6412.png?x-oss-process=style/resize_600" alt="keywords_for_lmtool_6412"></td>
-<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/lmtool_6412_result_lm.png" alt="lmtool_6412_result_lm"></td>
+<td align="center"><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/keywords_for_lmtool_6412.png?x-oss-process=style/resize_600" alt="keywords_for_lmtool_6412"></td>
+<td align="center"><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/lmtool_6412_result_lm.png" alt="lmtool_6412_result_lm"></td>
 </tr>
 </tbody></table>
 <h3 id="3-修改声学模型以及词典。"><a href="#3-修改声学模型以及词典。" class="headerlink" title="3. 修改声学模型以及词典。"></a>3. <strong>修改声学模型以及词典</strong>。</h3><p>pocketsphinx 的 android demo 中默认的声学模型为 “cmudict-en-us”，我们由于都是中文唤醒词，建议改用中文声学模型，中文声学模型包括有声调和无声调两种，我这里使用的是中文有声调的资源包，<a href="https://sourceforge.net/projects/cmusphinx/files/Acoustic%20and%20Language%20Models/Mandarin/" target="_blank" rel="noopener">下载地址</a>。</p>
 <blockquote>
-<p>直接使用 “cmudict-en-us” 也不是不可以，因为这个模型本身已经自带了一些中文词汇，例如词典里可以找到如下图的部分，这些明显都是中文词汇：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/cmudict_chinese_words_exmaple.png?x-oss-process=style/resize_600" alt="cmudict_chinese_words_exmaple"><br>不过这个词典还是有很多中文字词没有收录，如“中”，好多词找起来也很麻烦。应该是有同时支持中英文的模型的，但我在sourceforge里没找到。<br>另外使用这类包括外文的声学模型时，前面 lmtool 转换的中文词也要记得对应换成拼音。</p>
+<p>直接使用 “cmudict-en-us” 也不是不可以，因为这个模型本身已经自带了一些中文词汇，例如词典里可以找到如下图的部分，这些明显都是中文词汇：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/cmudict_chinese_words_exmaple.png?x-oss-process=style/resize_600" alt="cmudict_chinese_words_exmaple"><br>不过这个词典还是有很多中文字词没有收录，如“中”，好多词找起来也很麻烦。应该是有同时支持中英文的模型的，但我在sourceforge里没找到。<br>另外使用这类包括外文的声学模型时，前面 lmtool 转换的中文词也要记得对应换成拼音。</p>
 </blockquote>
 <p>下载好的文件解压后，<code>zh_cn.cd_cont_5000</code> 目录里都是声学模型相关文件，将整个文件夹放到项目 assets/sync 目录中。然后还剩<code>zh_cn.dic</code>和<code>zh_cn.lm.bin</code>两个文件，看名字也知道，分别是词典和语言模型，如果直接配置使用这两个文件，那项目就已经实现了一个离线的中文语音识别系统，而我们这里要把识别目标变为特定的唤醒词，所以这两个文件就不直接用了，而是要替换为前面一步得到的模型文件。</p>
-<p>将上一步的从lmtool网站下载得到的 <code>.dic</code> 文件做以下处理：<br>从<code>zh_cn.dic</code>词典中找到每个目标词的对应音素表示方法，补充到 <code>.dic</code> 文件中每个词的后面。改完后变成类似下面这样：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/lmtool_6412_result_dict_phones_added.png?x-oss-process=style/resize_600" alt="lmtool_6412_result_dict_phones_added"></p>
+<p>将上一步的从lmtool网站下载得到的 <code>.dic</code> 文件做以下处理：<br>从<code>zh_cn.dic</code>词典中找到每个目标词的对应音素表示方法，补充到 <code>.dic</code> 文件中每个词的后面。改完后变成类似下面这样：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/lmtool_6412_result_dict_phones_added.png?x-oss-process=style/resize_600" alt="lmtool_6412_result_dict_phones_added"></p>
 <blockquote>
 <p>在韵母后的数字表示声调。中文词后面有括号表示多音词。</p>
 </blockquote>
 <p>通过这种方式，建立好了我们的自定义词汇和原有声学模型音素间的映射关系。<br>到目前为止，完成 ASR 引擎所需的声学模型、发音词典、语言模型都准备好了，让我们来使用 PocketSphinx 的 android demo 测试一下。</p>
 <h3 id="4-移植到手机测试。"><a href="#4-移植到手机测试。" class="headerlink" title="4. 移植到手机测试。"></a>4. <strong>移植到手机测试</strong>。</h3><p>将准备好的 <code>.dic</code> 和 <code>.lm</code> 文件拷贝到项目 assets/sync 文件夹中，项目代码中，<code>SpeechRecognizer</code>的启动代码做类似下面的修改。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">recognizer = defaultSetup()</span><br><span class="line">        .setAcousticModel(new File(assetsDir, &quot;zh_cn.cd_cont_5000&quot;)) //修改声学模型</span><br><span class="line">        .setDictionary(new File(assetsDir, &quot;my_kws.dic&quot;)) //修改词典</span><br><span class="line">        .setRawLogDir(assetsDir)</span><br><span class="line">        .setKeywordThreshold(1e-45f)</span><br><span class="line">        .setBoolean(&quot;-allphone_ci&quot;, true)</span><br><span class="line">        .getRecognizer();</span><br><span class="line">recognizer.addListener(this);</span><br><span class="line">recognizer.addNgramSearch(KWS_SEARCH, new File(assetsDir, &quot;my_kws.lm&quot;)); //增加ngram语言模型</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">recognizer &#x3D; defaultSetup()</span><br><span class="line">        .setAcousticModel(new File(assetsDir, &quot;zh_cn.cd_cont_5000&quot;)) &#x2F;&#x2F;修改声学模型</span><br><span class="line">        .setDictionary(new File(assetsDir, &quot;my_kws.dic&quot;)) &#x2F;&#x2F;修改词典</span><br><span class="line">        .setRawLogDir(assetsDir)</span><br><span class="line">        .setKeywordThreshold(1e-45f)</span><br><span class="line">        .setBoolean(&quot;-allphone_ci&quot;, true)</span><br><span class="line">        .getRecognizer();</span><br><span class="line">recognizer.addListener(this);</span><br><span class="line">recognizer.addNgramSearch(KWS_SEARCH, new File(assetsDir, &quot;my_kws.lm&quot;)); &#x2F;&#x2F;增加ngram语言模型</span><br></pre></td></tr></table></figure>
 
 <p>把其他无关的 search 项目注释掉，然后在手机上运行，应该就可以识别到目标词汇了。继续增加逻辑，如果最后识别的词汇能够拼成目标关键字“小鲨同学”和“小鲨录屏”，就认为唤醒了一次。</p>
 <p>经实际测试，我现有的这个模型，如果在嘈杂的环境里（办公室），“录” 和 “屏” 这两个字误识别的概率特别大，而且 recognizer 必须每过 一段时间后重启一下，否则会报类似以下错误，而此时识别引擎实际已经宕住了。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">W/cmusphinx: WARN: &quot;ngram_search.c&quot;, line 396: Word &apos;屏&apos; survived for 44080 frames, potential overpruning</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">W&#x2F;cmusphinx: WARN: &quot;ngram_search.c&quot;, line 396: Word &#39;屏&#39; survived for 44080 frames, potential overpruning</span><br></pre></td></tr></table></figure>
 
 <blockquote>
 <p>另外在一开始使用中文模型的时候，还报过以下问题：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">edu.cmu.sphinx.pocketsphinx E/cmusphinx: FATAL: &quot;fsg_lextree.c&quot;, line 718: #phones &gt; 128; increase FSG_PNODE_CTXT_BVSZ and recompile</span><br></pre></td></tr></table></figure>
-</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">edu.cmu.sphinx.pocketsphinx E&#x2F;cmusphinx: FATAL: &quot;fsg_lextree.c&quot;, line 718: #phones &gt; 128; increase FSG_PNODE_CTXT_BVSZ and recompile </span><br></pre></td></tr></table></figure>
 <p>这里的意思是说，由于 中文 phones 数目比英文多，运行时数值越界，需要将源代码中相关参数增大并重编译出 aar。</p>
+</blockquote>
 <blockquote>
 <p>参考<a href="https://cmusphinx.github.io/wiki/tutorialandroid/#building-pocketsphinx-android" target="_blank" rel="noopener">官方教程</a>配置好各依赖项并成功编译，把 <code>pocketsphinx-5prealpha\src\libpocketsphinx\fsg_lextree.c</code> 文件中的 <code>FSG_PNODE_CTXT_BVSZ</code> 参数从 4 改到 8。再重新 gradle build，把 buid/outputs/下的 aar 文件作为依赖导入到原 pocketsphinx-android-demo 中。</p>
 </blockquote>
@@ -621,8 +382,8 @@
 </tr>
 </thead>
 <tbody><tr>
-<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_noisy.png?x-oss-process=style/resize_400" alt="screenshot_asr_ps_model_6412_in_noisy"></td>
-<td align="center"><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_quite.png?x-oss-process=style/resize_400" alt="screenshot_asr_ps_model_6412_in_quite"></td>
+<td align="center"><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_noisy.png?x-oss-process=style/resize_400" alt="screenshot_asr_ps_model_6412_in_noisy"></td>
+<td align="center"><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/screenshot_asr_ps_model_6412_in_quite.png?x-oss-process=style/resize_400" alt="screenshot_asr_ps_model_6412_in_quite"></td>
 </tr>
 <tr>
 <td align="center"></td>
@@ -643,378 +404,204 @@
 
 <p><a href="https://ocw.mit.edu/courses/electrical-engineering-and-computer-science/6-345-automatic-speech-recognition-spring-2003/lecture-notes/" target="_blank" rel="noopener">MIT ASR</a><br><a href="http://www.cs.columbia.edu/~julia/courses/CS6998-2019/%5b09%5d%20Automatic%20Speech%20Recognition.pdf" target="_blank" rel="noopener">Columbia Julia CS6998-2019</a><br><a href="http://www.dsic.upv.es/docs/posgrado/20/RES/materialesDocentes/alejandroViewgraphs/htkbook.pdf" target="_blank" rel="noopener">HTK Book</a>（网上推荐，太长未看）</p>
 <div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">WaveNet raw audio https://deepmind.com/blog/wavenet-generative-model-raw-audio/<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">知乎-语音信号处理中怎么理解分帧？https://www.zhihu.com/question/52093104/answer/225983811<a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Seppo Fagerlund. 2007. Bird species recognition using support vector machines. EURASIP J. Adv. Signal Process 2007, 1 (January 2007), 64-64. DOI: https://doi.org/10.1155/2007/38637<a href="#fnref:3" rev="footnote"> ↩</a></span></li><li id="fn:4"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">4.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">自然语言处理中N-Gram模型介绍 https://zhuanlan.zhihu.com/p/32829048<a href="#fnref:4" rev="footnote"> ↩</a></span></li><li id="fn:5"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">5.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">KF Lee. Automatic speech recognition: the development of the SPHINX system. Springer Science &amp; Business Media<a href="#fnref:5" rev="footnote"> ↩</a></span></li><li id="fn:6"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">6.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">CMUdict: http://www.speech.cs.cmu.edu/cgi-bin/cmudict<a href="#fnref:6" rev="footnote"> ↩</a></span></li><li id="fn:7"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">7.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">图源：https://stevenocean.github.io/2019/05/02/first-meet-asr-and-kaldi-install-use.html<a href="#fnref:7" rev="footnote"> ↩</a></span></li></ol></div></div>
-      
     </div>
 
     
-
-    
-      
-    
-
     
     
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-
-      
         
-          
-        
-        <div class="post-tags">
-          
-            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-          
-            <a href="/tags/语音识别/" rel="tag"><i class="fa fa-tag"></i> 语音识别</a>
-          
-            <a href="/tags/音频处理/" rel="tag"><i class="fa fa-tag"></i> 音频处理</a>
-          
-            <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
-          
-            <a href="/tags/唤醒词/" rel="tag"><i class="fa fa-tag"></i> 唤醒词</a>
-          
-        </div>
-      
 
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017-11-27-推荐系统指北/" rel="next" title="推荐系统指北">
-                <i class="fa fa-chevron-left"></i> 推荐系统指北
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019-07-04-IconTransfer 图标生成技术预研/" rel="prev" title="IconTransfer 图标生成技术预研">
-                IconTransfer 图标生成技术预研 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-  </div>
-
-
-          </div>
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="disqus_thread">
-        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-      </div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
-            
-              <p class="site-author-name" itemprop="name">BenZ</p>
-              <div class="site-description motion-element" itemprop="description"></div>
-          </div>
-
-          
-            <nav class="site-state motion-element">
-              
-                <div class="site-state-item site-state-posts">
-                
-                  <a href="/archives/">
-                
-                    <span class="site-state-item-count">9</span>
-                    <span class="site-state-item-name">日志</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-categories">
-                  
-                    
-                      <a href="/categories/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">4</span>
-                    <span class="site-state-item-name">分类</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  
-                    
-                      <a href="/tags/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">24</span>
-                    <span class="site-state-item-name">标签</span>
-                  </a>
-                </div>
-              
-            </nav>
-          
-
-          
-
-          
-
-          
-            <div class="links-of-author motion-element">
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                </span>
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
-                </span>
-              
-            </div>
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </div>
-
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原由："><span class="nav-text">原由：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语音识别基础介绍"><span class="nav-text">语音识别基础介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#音频信号"><span class="nav-text">音频信号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#频谱特征"><span class="nav-text">频谱特征</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#End-to-End-方法"><span class="nav-text">End-to-End 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#传统方法"><span class="nav-text">传统方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特征提取"><span class="nav-text">特征提取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#声学模型"><span class="nav-text">声学模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发音词典"><span class="nav-text">发音词典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语言模型"><span class="nav-text">语言模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PocketSphinx-实战"><span class="nav-text">PocketSphinx 实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置准备："><span class="nav-text">前置准备：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-确定唤醒词。"><span class="nav-text">1.  确定唤醒词。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用-lmtool-生成词典和语言模型。"><span class="nav-text">2.  使用 lmtool 生成词典和语言模型。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-修改声学模型以及词典。"><span class="nav-text">3. 修改声学模型以及词典。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-移植到手机测试。"><span class="nav-text">4. 移植到手机测试。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后话："><span class="nav-text">后话：</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-  
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love" id="animate">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">BenZ</span>
-
-  
-
-  
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/" title="语音识别初探">https://benzblog.site/2019-06-25-语音识别初探/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
-
-
-
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+              <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" rel="tag"><i class="fa fa-tag"></i> 语音识别</a>
+              <a href="/tags/%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86/" rel="tag"><i class="fa fa-tag"></i> 音频处理</a>
+              <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
+              <a href="/tags/%E5%94%A4%E9%86%92%E8%AF%8D/" rel="tag"><i class="fa fa-tag"></i> 唤醒词</a>
+          </div>
 
         
 
 
-
-
-
-
-
-
         
-      </div>
-    </footer>
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/" rel="prev" title="推荐系统指北">
+      <i class="fa fa-chevron-left"></i> 推荐系统指北
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019-07-04-IconTransfer%20%E5%9B%BE%E6%A0%87%E7%94%9F%E6%88%90%E6%8A%80%E6%9C%AF%E9%A2%84%E7%A0%94/" rel="next" title="IconTransfer 图标生成技术预研">
+      IconTransfer 图标生成技术预研 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
 
-    
 
+          </div>
+          
     
-
-    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
   </div>
-
   
 
 <script>
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原由："><span class="nav-number">1.</span> <span class="nav-text">原由：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#语音识别基础介绍"><span class="nav-number">2.</span> <span class="nav-text">语音识别基础介绍</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#音频信号"><span class="nav-number">2.1.</span> <span class="nav-text">音频信号</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#频谱特征"><span class="nav-number">2.2.</span> <span class="nav-text">频谱特征</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#End-to-End-方法"><span class="nav-number">3.</span> <span class="nav-text">End-to-End 方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#传统方法"><span class="nav-number">3.1.</span> <span class="nav-text">传统方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特征提取"><span class="nav-number">3.2.</span> <span class="nav-text">特征提取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#声学模型"><span class="nav-number">3.3.</span> <span class="nav-text">声学模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#发音词典"><span class="nav-number">3.4.</span> <span class="nav-text">发音词典</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#语言模型"><span class="nav-number">3.5.</span> <span class="nav-text">语言模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#PocketSphinx-实战"><span class="nav-number">4.</span> <span class="nav-text">PocketSphinx 实战</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#前置准备："><span class="nav-number">4.1.</span> <span class="nav-text">前置准备：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-确定唤醒词。"><span class="nav-number">4.2.</span> <span class="nav-text">1.  确定唤醒词。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-使用-lmtool-生成词典和语言模型。"><span class="nav-number">4.3.</span> <span class="nav-text">2.  使用 lmtool 生成词典和语言模型。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-修改声学模型以及词典。"><span class="nav-number">4.4.</span> <span class="nav-text">3. 修改声学模型以及词典。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-移植到手机测试。"><span class="nav-number">4.5.</span> <span class="nav-text">4. 移植到手机测试。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#后话："><span class="nav-number">5.</span> <span class="nav-text">后话：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
 
 
 
@@ -1023,6 +610,27 @@
 
 
 
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -1039,62 +647,71 @@
 
 
 
-  
-  <script src="/lib/jquery/index.js?v=3.4.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
 
 
 
 
   
 
+  
+      
 
-  <script src="/js/utils.js?v=7.2.0"></script>
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
 
-  <script src="/js/motion.js?v=7.2.0"></script>
-
-
+    
 
   
-  
 
-
-  <script src="/js/affix.js?v=7.2.0"></script>
-
-  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
-
-
-
-  
-  <script src="/js/scrollspy.js?v=7.2.0"></script>
-<script src="/js/post-details.js?v=7.2.0"></script>
-
-
-
-  
-
-
-  <script src="/js/next-boot.js?v=7.2.0"></script>
-
-
-  
-
-  
-
-  
-
-  
-
-  
-  
 <script>
   function loadCount() {
     var d = document, s = d.createElement('script');
@@ -1105,114 +722,26 @@
   // defer loading until the whole page loading is completed
   window.addEventListener('load', loadCount, false);
 </script>
-
-
 <script>
   var disqus_config = function() {
-    this.page.url = "http://benzblog.site/2019-06-25-语音识别初探/";
+    this.page.url = "https://benzblog.site/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/";
     this.page.identifier = "2019-06-25-语音识别初探/";
-    this.page.title = '语音识别初探';
+    this.page.title = "语音识别初探";
     };
-  function loadComments() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://benzbloghexo.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', '' + +new Date());
-    (d.head || d.body).appendChild(s);
-  }
-  
-    window.addEventListener('load', loadComments, false);
-  
-</script>
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-  
-
-  
-
-  
-  
-
-  
-  
-
-  
-    
-      <script type="text/x-mathjax-config">
-  
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-      
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
-        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
-      }
-    });
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
     }
   });
 </script>
-<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    
-  
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-
-  
 
 </body>
 </html>

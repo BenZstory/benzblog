@@ -1,112 +1,33 @@
 <!DOCTYPE html>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.9.0">
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
-
-<link rel="stylesheet" href="/css/main.css?v=7.2.0">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
-
-
-
-
-
-
-
-<script id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    version: '7.2.0',
-    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
-    back2top: true,
-    back2top_sidebar: false,
-    fancybox: {
-      enable: true,
-      replace_from: /(\?x-oss-process=style\S+)/,
-      replace_to: '',
-      with_caption: false,
-    },
-    fastclick: false,
-    lazyload: false,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
 
   <meta name="description" content="DeepLab 是语义分割的STOA，我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。">
-<meta name="keywords" content="机器学习,深度学习,SemanticSegmentation,slim">
 <meta property="og:type" content="article">
 <meta property="og:title" content="使用 DeepLab 训练一个人脸语义分割模型">
-<meta property="og:url" content="http://benzblog.site/training_a_face_segmentation_model_with_deeplab/index.html">
+<meta property="og:url" content="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
 <meta property="og:description" content="DeepLab 是语义分割的STOA，我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。">
-<meta property="og:locale" content="zh-CN">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_structure.png?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_depthwise_conv.jpg?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_spatial_pyramid_pooling_aspp.jpg?x-oss-process=style/resize_600">
@@ -117,45 +38,40 @@
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_thump_0.png?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_gakki_0.png?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_boxer_0.png?x-oss-process=style/resize_600">
-<meta property="og:updated_time" content="2019-08-26T16:13:18.937Z">
+<meta property="article:published_time" content="2019-08-22T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-08-26T16:13:18.000Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="深度学习">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="SemanticSegmentation">
+<meta property="article:tag" content="slim">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用 DeepLab 训练一个人脸语义分割模型">
-<meta name="twitter:description" content="DeepLab 是语义分割的STOA，我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。">
 <meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_structure.png?x-oss-process=style/resize_600">
 
+<link rel="canonical" href="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/">
 
 
-
-
-  
-  
-  <link rel="canonical" href="http://benzblog.site/training_a_face_segmentation_model_with_deeplab/">
-
-
-
-<script id="page.configurations">
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
   <title>使用 DeepLab 训练一个人脸语义分割模型 | 奔哲明的博客</title>
   
-
-
-
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
-  <script>
-    var host = window.location.hostname;
-    if (host !== "localhost" || !true) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-101354718-1');
-    }
-  </script>
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
 
 
   <script>
@@ -171,12 +87,8 @@
 
 
 
-
-
-
   <noscript>
   <style>
-  .use-motion .motion-element,
   .use-motion .brand,
   .use-motion .menu-item,
   .sidebar-inner,
@@ -185,9 +97,8 @@
   .use-motion .comments,
   .use-motion .post-header,
   .use-motion .post-body,
-  .use-motion .collection-title { opacity: initial; }
+  .use-motion .collection-header { opacity: initial; }
 
-  .use-motion .logo,
   .use-motion .site-title,
   .use-motion .site-subtitle {
     opacity: initial;
@@ -199,139 +110,71 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-right page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">奔哲明的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-    
-    
   </div>
 
-  <div class="site-nav-toggle">
-    <button aria-label="切换导航栏">
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
   </div>
 </div>
 
 
 
+
 <nav class="site-nav">
-  
-    <ul id="menu" class="menu">
-      
-        
-        
-        
-          
-          <li class="menu-item menu-item-home">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-about">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-tags">
+        <li class="menu-item menu-item-tags">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-categories">
+        <li class="menu-item menu-item-categories">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-archives">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
-
-      
-      
-    </ul>
-  
-
-  
-
-  
+  </ul>
 </nav>
+
 
 
 
@@ -341,165 +184,86 @@
     
 
 
-    <main id="main" class="main">
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
           
+
+          <div class="content post posts-expand">
             
 
-          
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://benzblog.site/training_a_face_segmentation_model_with_deeplab/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="BenZ">
-      <meta itemprop="description" content>
       <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="奔哲明的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">使用 DeepLab 训练一个人脸语义分割模型
-
-              
-            
-          </h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          使用 DeepLab 训练一个人脸语义分割模型
+        </h1>
 
         <div class="post-meta">
-
-          
-          
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
+              <span class="post-meta-item-text">发表于</span>
 
               <time title="创建时间：2019-08-23 00:00:00" itemprop="dateCreated datePublished" datetime="2019-08-23T00:00:00+08:00">2019-08-23</time>
             </span>
-          
-
-          
-            
-
-            
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
+                  <i class="far fa-calendar-check"></i>
                 </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
+                <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2019-08-27 00:13:18" itemprop="dateModified" datetime="2019-08-27T00:13:18+08:00">2019-08-27</time>
               </span>
-            
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
+                <i class="far fa-folder"></i>
               </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
                 </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/training_a_face_segmentation_model_with_deeplab/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="training_a_face_segmentation_model_with_deeplab/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
             
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/training_a_face_segmentation_model_with_deeplab/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="training_a_face_segmentation_model_with_deeplab/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-            
-              
-            
-            <div class="post-tags">
-              
-                <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-              
-                <a href="/tags/深度学习/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
-              
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+                <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
                 <a href="/tags/SemanticSegmentation/" rel="tag"><i class="fa fa-tag"></i> SemanticSegmentation</a>
-              
                 <a href="/tags/slim/" rel="tag"><i class="fa fa-tag"></i> slim</a>
-              
             </div>
-          
-
-          
             <div class="post-description" hidden>DeepLab 是语义分割的STOA，我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。</div>
-          
 
         </div>
       </header>
-    
 
     
     
@@ -507,17 +271,14 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>DeepLab 是google 推出的用于语义分割的一系列论文，在语义分割领域取得 state of the art 表现。<br>在我的了解里，语义分割大概从 FCN<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="fully convolutional networks  https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf">[1]</span></a></sup> 开始转为用 DL 方法，Unet<sup id="fnref:2"><a href="#fn:2" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="U-Net: Convolutional Networks for Biomedical Image Segmentation   https://arxiv.org/abs/1505.04597">[2]</span></a></sup> 在医学图像分割大放异彩，然后 DeepLab 在相当时间统治了<a href="https://paperswithcode.com/task/semantic-segmentation" target="_blank" rel="noopener">语义分割排行榜</a>。</p>
 <p>我的项目需要把人脸抠图出来从而去除背景的干扰，适合使用语义分割的方法，由于用自己写的 unet 训练后效果很差，又自我感觉数据集没什么问题，因而决定用 DeepLab 再试试。</p>
-<h2 id="Deeplab-架构及要点"><a href="#Deeplab-架构及要点" class="headerlink" title="Deeplab 架构及要点"></a>Deeplab 架构及要点</h2><p>这里以 DeepLabV3+<sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation https://arxiv.org/abs/1802.02611">[3]</span></a></sup> 为准，架构如图：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_structure.png?x-oss-process=style/resize_600" alt="deeplab_structure"></p>
+<h2 id="Deeplab-架构及要点"><a href="#Deeplab-架构及要点" class="headerlink" title="Deeplab 架构及要点"></a>Deeplab 架构及要点</h2><p>这里以 DeepLabV3+<sup id="fnref:3"><a href="#fn:3" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation https://arxiv.org/abs/1802.02611">[3]</span></a></sup> 为准，架构如图：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_structure.png?x-oss-process=style/resize_600" alt="deeplab_structure"></p>
 <p>要点可以总结为三部分：</p>
 <ul>
-<li><p>左上 DCNN 即 feature extractor backbone，可选用 mobilenet_v2、resnet、xception等， 论文在这里贡献主要在于针对 xception 的改进，使其结构灵活化，尤其是通过 output_stride 设置，直接改变 encoder 向下潜的层数，方便使用者权衡 GPU 和网络效能。同时大量把空洞卷积应用在 seperable convolution 的 depthwize_conv 上，提高了效能并增大感受野，如下图：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_depthwise_conv.jpg?x-oss-process=style/resize_600" alt="atrous_depthwise_conv"></p>
+<li><p>左上 DCNN 即 feature extractor backbone，可选用 mobilenet_v2、resnet、xception等， 论文在这里贡献主要在于针对 xception 的改进，使其结构灵活化，尤其是通过 output_stride 设置，直接改变 encoder 向下潜的层数，方便使用者权衡 GPU 和网络效能。同时大量把空洞卷积应用在 seperable convolution 的 depthwize_conv 上，提高了效能并增大感受野，如下图：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_depthwise_conv.jpg?x-oss-process=style/resize_600" alt="atrous_depthwise_conv"></p>
 </li>
-<li><p>Encoder 后半部分 ASPP(Atrous Spatial Pyramid Pooling)，结合了 SPP 的多尺度特性和空洞卷积的低参特性：<br>backbone + aspp 接在一起组成 encoder:<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_spatial_pyramid_pooling_aspp.jpg?x-oss-process=style/resize_600" alt="atrous_spatial_pyramid_pooling_aspp"><sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="图源：[Review: DeepLabv3 — Atrous Convolution (Semantic Segmentation)](https://towardsdatascience.com/review-deeplabv3-atrous-convolution-semantic-segmentation-6d818bfd1d74) 推荐阅读">[4]</span></a></sup></p>
+<li><p>Encoder 后半部分 ASPP(Atrous Spatial Pyramid Pooling)，结合了 SPP 的多尺度特性和空洞卷积的低参特性：<br>backbone + aspp 接在一起组成 encoder:<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/atrous_spatial_pyramid_pooling_aspp.jpg?x-oss-process=style/resize_600" alt="atrous_spatial_pyramid_pooling_aspp"><sup id="fnref:4"><a href="#fn:4" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="图源：[Review: DeepLabv3 — Atrous Convolution (Semantic Segmentation)](https://towardsdatascience.com/review-deeplabv3-atrous-convolution-semantic-segmentation-6d818bfd1d74) 推荐阅读">[4]</span></a></sup></p>
 </li>
 <li><p>Decoder 不是多层上采样，而是很简单暴力的只有两层快速上采样，这点让我比较意外。backbone 输出的 low-level feature 与 ASPP 的结果 concat 一起，而在 concat 前，使用 point_conv 来调整两者 channel 及比例，这个是比较影响结果的 trick，论文中有更多详细例证。</p>
 </li>
@@ -535,415 +296,240 @@
 <p>我这里实测，在自己的单张 rtx2080 显卡上（win10），使用 mobilenet_v2， crop_size 513， batch_size 可以到 8，再大似乎就不行了。<br>xception_65 的 batch_size 则大概只能到2。batch_size 太低是不行的，bn性能会急剧下降<sup id="fnref:7"><a href="#fn:7" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="What's wrong with BN  https://zhuanlan.zhihu.com/p/35005794">[7]</span></a></sup>，因而我这里还是暂时选用了 mobilenet_v2 模型来训练，后面会再试下改变 crop_size。</p>
 <p>在单张 rtx2080ti 显卡上，使用 xception_65，不断压榨参数，最终能够在 449,449 crop_size 时用 batch_size=6 时跑起来，但是loss下降很慢，感觉就是因为 bn 没法充分训练，训练一晚，miou 还不到 0.7。 使用 mobilenet_v2，能够 batch_size=16 跑起来。</p>
 <p>使用 mobilenet_v2 架构训练时，官方备注要把 atrous_stride 设为 None，但其实不必的，mobilenet_v2 也只是作为 backbone，设置了 ASPP 可以正常生效，官方是为了速度才不建议用<sup id="fnref:8"><a href="#fn:8" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="Issue-[Question over atrous rate for mobilenet](https://github.com/tensorflow/models/issues/5919)">[8]</span></a></sup>。在我看来，不用 ASPP 未免完全抛弃了 deeplab 的精华，还是用了这个参数。</p>
-<h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><h3 id="使用-CelebAMaskHQ-数据集"><a href="#使用-CelebAMaskHQ-数据集" class="headerlink" title="使用 CelebAMaskHQ 数据集"></a>使用 CelebAMaskHQ 数据集</h3><p><a href="https://github.com/switchablenorms/CelebAMask-HQ" target="_blank" rel="noopener">CelebAMaskHQ</a> 提供了一个非常高质量的人脸图像数据库，由 CelebA 筛选而来，共 30000 个样本，图像分辨率为 1024x1024，语义分割标注分辨率 512x512，标注19个类别如眼睛、眼镜、鼻子等等。<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CelebAMaskHQ_mask_anno_example.jpg?x-oss-process=style/resize_600" alt="CelebAMaskHQ_mask_anno_example"></p>
+<h2 id="准备数据"><a href="#准备数据" class="headerlink" title="准备数据"></a>准备数据</h2><h3 id="使用-CelebAMaskHQ-数据集"><a href="#使用-CelebAMaskHQ-数据集" class="headerlink" title="使用 CelebAMaskHQ 数据集"></a>使用 CelebAMaskHQ 数据集</h3><p><a href="https://github.com/switchablenorms/CelebAMask-HQ" target="_blank" rel="noopener">CelebAMaskHQ</a> 提供了一个非常高质量的人脸图像数据库，由 CelebA 筛选而来，共 30000 个样本，图像分辨率为 1024x1024，语义分割标注分辨率 512x512，标注19个类别如眼睛、眼镜、鼻子等等。<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/CelebAMaskHQ_mask_anno_example.jpg?x-oss-process=style/resize_600" alt="CelebAMaskHQ_mask_anno_example"></p>
 <p>由于我们的目的是去掉人像的背景，只要把整个人像标注为一个类而其他标注为背景就可以了，所以这些类别我们在实际使用时都会被看作一个类。原数据集标注数据是按照每个类别分别生成掩码的，我们需要预处理把他们汇总在一起，做个mask叠加的动作。<br>这部分mask预处理部分，可以使用原项目的<a href="https://github.com/switchablenorms/CelebAMask-HQ/blob/master/face_parsing/Data_preprocessing/g_mask.py" target="_blank" rel="noopener">预处理代码</a>，或者参考下面我的脚本。（以下代码生成汇总mask(19分类)、人像mask(2分类)以及去掉背景的人像图）</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">import</span> cv2</span><br><span class="line"><span class="keyword">import</span> glob</span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> threading</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">from</span> tqdm <span class="keyword">import</span> tqdm_notebook,tnrange</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">touch_dir</span><span class="params">(dir)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> os.path.exists(dir):</span><br><span class="line">        print(<span class="string">'making dir : '</span>, dir)</span><br><span class="line">        os.makedirs(dir)</span><br><span class="line">        </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">clean_and_touch_dir</span><span class="params">(dir)</span>:</span></span><br><span class="line">    <span class="keyword">if</span> os.path.exists(dir):</span><br><span class="line">        shutil.rmtree(dir)</span><br><span class="line">    os.makedirs(dir)</span><br><span class="line">    </span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">work_on_imgs</span><span class="params">(num_from, num_to)</span>:</span></span><br><span class="line">    <span class="keyword">for</span> k <span class="keyword">in</span> tnrange(num_from, num_to, desc=<span class="string">'img &#123;:d&#125; to &#123;:d&#125;'</span>.format(num_from, num_to)):</span><br><span class="line">        folder_num = int(k / <span class="number">2000</span>)</span><br><span class="line">        num_str = <span class="string">'&#123;:05d&#125;'</span>.format(k)</span><br><span class="line"></span><br><span class="line">        img_path = os.path.join(img_dir, str(k) + <span class="string">'.jpg'</span>)</span><br><span class="line">        image = cv2.imread(img_path)</span><br><span class="line">        image = cv2.resize(image, (<span class="number">512</span>, <span class="number">512</span>), interpolation=cv2.INTER_CUBIC)</span><br><span class="line"></span><br><span class="line">        mask = np.zeros((<span class="number">512</span>, <span class="number">512</span>), dtype=<span class="string">'uint8'</span>)</span><br><span class="line">        <span class="keyword">for</span> idx, label <span class="keyword">in</span> enumerate(label_list):</span><br><span class="line">            filename = os.path.join(mask_dir, str(folder_num), num_str + <span class="string">'_'</span> + label + <span class="string">'.png'</span>)</span><br><span class="line">            <span class="keyword">if</span> (os.path.exists(filename)):</span><br><span class="line">                im=cv2.imread(filename)</span><br><span class="line">                im = im[:, :, <span class="number">0</span>]</span><br><span class="line">                <span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">512</span>):</span><br><span class="line">                    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">512</span>):</span><br><span class="line">                        <span class="keyword">if</span> im[i][j] != <span class="number">0</span>:</span><br><span class="line">                            mask[i][j] = (idx + <span class="number">1</span>)</span><br><span class="line"></span><br><span class="line">        total_mask_path = os.path.join(total_mask_dir, str(k) + <span class="string">'.png'</span>)</span><br><span class="line">        cv2.imwrite(total_mask_path, mask)</span><br><span class="line"></span><br><span class="line">        one_mask = np.uint8(mask&gt;<span class="number">0</span>)</span><br><span class="line">        inverse_mask = <span class="number">1</span>-one_mask</span><br><span class="line"></span><br><span class="line">        bg = np.ones((<span class="number">512</span>, <span class="number">512</span>, <span class="number">3</span>), dtype=<span class="string">'uint8'</span>) * <span class="number">255</span></span><br><span class="line"></span><br><span class="line">        masked = cv2.bitwise_and(image, image, mask=one_mask)</span><br><span class="line">        bg_masked = cv2.bitwise_and(bg, bg, mask = inverse_mask)</span><br><span class="line">        composed = cv2.add(masked, bg_masked)</span><br><span class="line"></span><br><span class="line">        target_path = os.path.join(target_dir, <span class="string">'masked_'</span> + num_str + <span class="string">'.png'</span>)</span><br><span class="line">        cv2.imwrite(target_path, composed)</span><br><span class="line">        </span><br><span class="line">        </span><br><span class="line"><span class="keyword">import</span> math</span><br><span class="line"></span><br><span class="line">label_list = [<span class="string">'skin'</span>, <span class="string">'nose'</span>, <span class="string">'eye_g'</span>, <span class="string">'l_eye'</span>, <span class="string">'r_eye'</span>, <span class="string">'l_brow'</span>, <span class="string">'r_brow'</span>, <span class="string">'l_ear'</span>, <span class="string">'r_ear'</span>, <span class="string">'mouth'</span>, <span class="string">'u_lip'</span>, <span class="string">'l_lip'</span>, <span class="string">'hair'</span>, <span class="string">'hat'</span>, <span class="string">'ear_r'</span>, <span class="string">'neck_l'</span>, <span class="string">'neck'</span>, <span class="string">'cloth'</span>]</span><br><span class="line"></span><br><span class="line">data_root = os.path.join(<span class="string">'path_to_project'</span>, <span class="string">'CelebAMask-HQ'</span>) <span class="comment"># modify your dataset path here</span></span><br><span class="line">example_num = <span class="number">30000</span></span><br><span class="line">img_dir = os.path.join(data_root, <span class="string">'CelebA-HQ-img'</span>)</span><br><span class="line">mask_dir = os.path.join(data_root, <span class="string">'CelebAMask-HQ-mask-anno'</span>)</span><br><span class="line">total_mask_dir = os.path.join(data_root, <span class="string">'CelebAMask-total-mask'</span>)</span><br><span class="line">target_dir = os.path.join(data_root, <span class="string">'CelebAMask-target'</span>)</span><br><span class="line"></span><br><span class="line">clean_and_touch_dir(total_mask_dir)</span><br><span class="line">clean_and_touch_dir(target_dir)</span><br><span class="line"></span><br><span class="line">parallel_num = <span class="number">20</span></span><br><span class="line">batch_num = math.ceil(example_num / parallel_num)</span><br><span class="line">threadings = []</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(parallel_num):</span><br><span class="line">    start = batch_num * i</span><br><span class="line">    end = min(batch_num*(i+<span class="number">1</span>), example_num)</span><br><span class="line">    print(<span class="string">"pending batch examples from &#123;&#125; to &#123;&#125;"</span>.format(start, end))</span><br><span class="line">    t = threading.Thread(target=work_on_imgs, args=(start,end, ))</span><br><span class="line">    threadings.append(t)</span><br><span class="line">    t.start()</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> t <span class="keyword">in</span> threadings:</span><br><span class="line">    t.join()</span><br></pre></td></tr></table></figure>
+
 
 <h3 id="使用脚本转为-tfrecords"><a href="#使用脚本转为-tfrecords" class="headerlink" title="使用脚本转为 tfrecords"></a>使用脚本转为 tfrecords</h3><p>或许可以将文件按照 Pascal VOC 的组织方式整理下，然后用 deeplab 的脚本转成训练数据。不过，由于我这里已经有一套自己用得比较熟悉的 tfrecords 生成脚本，改下 file_path 到 feature 的转换函数就行。我的 tfrecords 生成工具脚本在这里：</p>
 <p><a href="https://gist.github.com/ec14e54f8b9ee5ce7e4b96e3f39d9302#file-parallel_tfrecords-py" target="_blank" rel="noopener">https://gist.github.com/ec14e54f8b9ee5ce7e4b96e3f39d9302#file-parallel_tfrecords-py</a></p>
 <p>针对本数据集，更换 parser 如下:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">#deeplab 使用 decode_jpeg 或 decode_png operator 解析图像数据，因此生成 feature 的时候，要注意传入 png 编码过的数据。</span><br><span class="line"></span><br><span class="line">import io</span><br><span class="line">def parse_example_deeplab_style(file_path):</span><br><span class="line">    filename = os.path.basename(file_path)</span><br><span class="line">    img_format = filename.split(&apos;.&apos;)[-1]</span><br><span class="line">    </span><br><span class="line">    image = Image.open(file_path)</span><br><span class="line">    image = image.convert(&apos;RGB&apos;)</span><br><span class="line">    image = image.resize((TARGET_SIZE, TARGET_SIZE))</span><br><span class="line">    </span><br><span class="line">    imgByteArr = io.BytesIO()</span><br><span class="line">    image.save(imgByteArr, format=&apos;PNG&apos;)</span><br><span class="line">    image_data = imgByteArr.getvalue()</span><br><span class="line">    </span><br><span class="line">    index = os.path.splitext(filename)[0]</span><br><span class="line">    mask_path = os.path.join(mask_dir, index + &apos;.png&apos;) </span><br><span class="line">#     seg_data = tf.gfile.FastGFile(mask_path, &apos;rb&apos;).read() # the masks are already in (512, 512) size</span><br><span class="line">    </span><br><span class="line">    mask_img = Image.open(mask_path)</span><br><span class="line">    mask_img = mask_img.resize((TARGET_SIZE, TARGET_SIZE))</span><br><span class="line">    mask_np = np.uint8(np.array(mask_img))</span><br><span class="line">    </span><br><span class="line">    portrait_mask_np = np.uint8(mask_np&gt;0)  # get portrait mask, which only cares about face or background</span><br><span class="line">    portrait_mask_image = Image.fromarray(portrait_mask_np) # convert back to PIL Image</span><br><span class="line">    </span><br><span class="line">    maskByteArr = io.BytesIO()</span><br><span class="line">    portrait_mask_image.save(maskByteArr, format=&apos;PNG&apos;)</span><br><span class="line">    portrait_mask_data = maskByteArr.getvalue()  # save to BytesIO and get encoded values without disk writingg</span><br><span class="line">    </span><br><span class="line">    tf_example = tf.train.Example(features=tf.train.Features(feature=&#123;</span><br><span class="line">      &apos;image/encoded&apos;: _bytes_list_feature(image_data),</span><br><span class="line">      &apos;image/filename&apos;: _bytes_list_feature(filename),</span><br><span class="line">      &apos;image/format&apos;: _bytes_list_feature(_IMAGE_FORMAT_MAP[img_format]),</span><br><span class="line">      &apos;image/height&apos;: _int64_list_feature(TARGET_SIZE),</span><br><span class="line">      &apos;image/width&apos;: _int64_list_feature(TARGET_SIZE),</span><br><span class="line">      &apos;image/channels&apos;: _int64_list_feature(3),</span><br><span class="line">      &apos;image/segmentation/class/encoded&apos;: (_bytes_list_feature(portrait_mask_data)),</span><br><span class="line">      &apos;image/segmentation/class/format&apos;: _bytes_list_feature(&apos;png&apos;),</span><br><span class="line">    &#125;))</span><br><span class="line">    </span><br><span class="line">    return tf_example</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">#deeplab 使用 decode_jpeg 或 decode_png operator 解析图像数据，因此生成 feature 的时候，要注意传入 png 编码过的数据。</span><br><span class="line"></span><br><span class="line">import io</span><br><span class="line">def parse_example_deeplab_style(file_path):</span><br><span class="line">    filename &#x3D; os.path.basename(file_path)</span><br><span class="line">    img_format &#x3D; filename.split(&#39;.&#39;)[-1]</span><br><span class="line">    </span><br><span class="line">    image &#x3D; Image.open(file_path)</span><br><span class="line">    image &#x3D; image.convert(&#39;RGB&#39;)</span><br><span class="line">    image &#x3D; image.resize((TARGET_SIZE, TARGET_SIZE))</span><br><span class="line">    </span><br><span class="line">    imgByteArr &#x3D; io.BytesIO()</span><br><span class="line">    image.save(imgByteArr, format&#x3D;&#39;PNG&#39;)</span><br><span class="line">    image_data &#x3D; imgByteArr.getvalue()</span><br><span class="line">    </span><br><span class="line">    index &#x3D; os.path.splitext(filename)[0]</span><br><span class="line">    mask_path &#x3D; os.path.join(mask_dir, index + &#39;.png&#39;) </span><br><span class="line">#     seg_data &#x3D; tf.gfile.FastGFile(mask_path, &#39;rb&#39;).read() # the masks are already in (512, 512) size</span><br><span class="line">    </span><br><span class="line">    mask_img &#x3D; Image.open(mask_path)</span><br><span class="line">    mask_img &#x3D; mask_img.resize((TARGET_SIZE, TARGET_SIZE))</span><br><span class="line">    mask_np &#x3D; np.uint8(np.array(mask_img))</span><br><span class="line">    </span><br><span class="line">    portrait_mask_np &#x3D; np.uint8(mask_np&gt;0)  # get portrait mask, which only cares about face or background</span><br><span class="line">    portrait_mask_image &#x3D; Image.fromarray(portrait_mask_np) # convert back to PIL Image</span><br><span class="line">    </span><br><span class="line">    maskByteArr &#x3D; io.BytesIO()</span><br><span class="line">    portrait_mask_image.save(maskByteArr, format&#x3D;&#39;PNG&#39;)</span><br><span class="line">    portrait_mask_data &#x3D; maskByteArr.getvalue()  # save to BytesIO and get encoded values without disk writingg</span><br><span class="line">    </span><br><span class="line">    tf_example &#x3D; tf.train.Example(features&#x3D;tf.train.Features(feature&#x3D;&#123;</span><br><span class="line">      &#39;image&#x2F;encoded&#39;: _bytes_list_feature(image_data),</span><br><span class="line">      &#39;image&#x2F;filename&#39;: _bytes_list_feature(filename),</span><br><span class="line">      &#39;image&#x2F;format&#39;: _bytes_list_feature(_IMAGE_FORMAT_MAP[img_format]),</span><br><span class="line">      &#39;image&#x2F;height&#39;: _int64_list_feature(TARGET_SIZE),</span><br><span class="line">      &#39;image&#x2F;width&#39;: _int64_list_feature(TARGET_SIZE),</span><br><span class="line">      &#39;image&#x2F;channels&#39;: _int64_list_feature(3),</span><br><span class="line">      &#39;image&#x2F;segmentation&#x2F;class&#x2F;encoded&#39;: (_bytes_list_feature(portrait_mask_data)),</span><br><span class="line">      &#39;image&#x2F;segmentation&#x2F;class&#x2F;format&#39;: _bytes_list_feature(&#39;png&#39;),</span><br><span class="line">    &#125;))</span><br><span class="line">    </span><br><span class="line">    return tf_example</span><br></pre></td></tr></table></figure>
 
 <h2 id="训练以及验证"><a href="#训练以及验证" class="headerlink" title="训练以及验证"></a>训练以及验证</h2><p>首先要针对自己的数据集修改 dataset_generator.py 中的代码，增加数据集参数，主要是 num_classes 及 train/eval 样本个数。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_CELEBAMASK_FACIAL_SEG_INFORMATION = DatasetDescriptor(</span><br><span class="line">    splits_to_sizes=&#123;</span><br><span class="line">        &apos;train&apos;: 28480,</span><br><span class="line">        &apos;val&apos;: 1498,</span><br><span class="line">    &#125;,</span><br><span class="line">    num_classes=2,</span><br><span class="line">    ignore_label=255,</span><br><span class="line">)</span><br><span class="line">_DATASETS_INFORMATION = &#123;</span><br><span class="line">    &apos;cityscapes&apos;: _CITYSCAPES_INFORMATION,</span><br><span class="line">    &apos;pascal_voc_seg&apos;: _PASCAL_VOC_SEG_INFORMATION,</span><br><span class="line">    &apos;ade20k&apos;: _ADE20K_INFORMATION,</span><br><span class="line">    &apos;celebamask_facial_seg&apos;: _CELEBAMASK_FACIAL_SEG_INFORMATION,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">_CELEBAMASK_FACIAL_SEG_INFORMATION &#x3D; DatasetDescriptor(</span><br><span class="line">    splits_to_sizes&#x3D;&#123;</span><br><span class="line">        &#39;train&#39;: 28480,</span><br><span class="line">        &#39;val&#39;: 1498,</span><br><span class="line">    &#125;,</span><br><span class="line">    num_classes&#x3D;2,</span><br><span class="line">    ignore_label&#x3D;255,</span><br><span class="line">)</span><br><span class="line">_DATASETS_INFORMATION &#x3D; &#123;</span><br><span class="line">    &#39;cityscapes&#39;: _CITYSCAPES_INFORMATION,</span><br><span class="line">    &#39;pascal_voc_seg&#39;: _PASCAL_VOC_SEG_INFORMATION,</span><br><span class="line">    &#39;ade20k&#39;: _ADE20K_INFORMATION,</span><br><span class="line">    &#39;celebamask_facial_seg&#39;: _CELEBAMASK_FACIAL_SEG_INFORMATION,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<h3 id="Train-训练"><a href="#Train-训练" class="headerlink" title="Train 训练"></a>Train 训练</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">python deeplab/train.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--training_number_of_steps=300000 \</span><br><span class="line">--train_split=&quot;train&quot; \</span><br><span class="line">--model_variant=&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates=6 \</span><br><span class="line">--atrous_rates=12 \</span><br><span class="line">--atrous_rates=18 \</span><br><span class="line">--output_stride=16 \</span><br><span class="line">--decoder_output_stride=4 \</span><br><span class="line">--train_crop_size=&quot;513,513&quot; \</span><br><span class="line">--train_batch_size=16 \</span><br><span class="line">--dataset=&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--train_logdir=path_to_proj_portrait2anime/train_log_deeplab/celebamask_facial_seg_mobilenetv2_513_bs_16_08221853 \</span><br><span class="line">--dataset_dir=path_to_proj_portrait2anime/CelebAMask-HQ/facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
+<h3 id="Train-训练"><a href="#Train-训练" class="headerlink" title="Train 训练"></a>Train 训练</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">python deeplab&#x2F;train.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--training_number_of_steps&#x3D;300000 \</span><br><span class="line">--train_split&#x3D;&quot;train&quot; \</span><br><span class="line">--model_variant&#x3D;&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates&#x3D;6 \</span><br><span class="line">--atrous_rates&#x3D;12 \</span><br><span class="line">--atrous_rates&#x3D;18 \</span><br><span class="line">--output_stride&#x3D;16 \</span><br><span class="line">--decoder_output_stride&#x3D;4 \</span><br><span class="line">--train_crop_size&#x3D;&quot;513,513&quot; \</span><br><span class="line">--train_batch_size&#x3D;16 \</span><br><span class="line">--dataset&#x3D;&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--train_logdir&#x3D;path_to_proj_portrait2anime&#x2F;train_log_deeplab&#x2F;celebamask_facial_seg_mobilenetv2_513_bs_16_08221853 \</span><br><span class="line">--dataset_dir&#x3D;path_to_proj_portrait2anime&#x2F;CelebAMask-HQ&#x2F;facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
 
 <p>在我测试下来，对于我这里的人脸分割任务，大概要至少1小时后才能有一定结果。<br>一般来说，Eval 也在训练时一直跑着比较好，每次有新 ckpt 时执行一次验证能清楚看到 miou 变化。</p>
-<h3 id="Eval-验证"><a href="#Eval-验证" class="headerlink" title="Eval 验证"></a>Eval 验证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">python deeplab/eval.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--eval_split=&quot;val&quot; \</span><br><span class="line">--model_variant=&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates=12 \</span><br><span class="line">--atrous_rates=24 \</span><br><span class="line">--atrous_rates=36 \</span><br><span class="line">--output_stride=8 \</span><br><span class="line">--decoder_output_stride=4 \</span><br><span class="line">--eval_crop_size=&quot;513,513&quot; \</span><br><span class="line">--train_batch_size=8 \</span><br><span class="line">--dataset=&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--checkpoint_dir=path_to_proj_portrait2anime/deeplab_train_log/celebamask_facial_seg_mobilenetv2_513_8_08181604 \</span><br><span class="line">--eval_logdir=path_to_proj_portrait2anime/deeplab_train_log/eval_0818_131910 \</span><br><span class="line">--dataset_dir=path_to_proj_portrait2anime/CelebAMask-HQ/facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
+<h3 id="Eval-验证"><a href="#Eval-验证" class="headerlink" title="Eval 验证"></a>Eval 验证</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">python deeplab&#x2F;eval.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--eval_split&#x3D;&quot;val&quot; \</span><br><span class="line">--model_variant&#x3D;&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates&#x3D;12 \</span><br><span class="line">--atrous_rates&#x3D;24 \</span><br><span class="line">--atrous_rates&#x3D;36 \</span><br><span class="line">--output_stride&#x3D;8 \</span><br><span class="line">--decoder_output_stride&#x3D;4 \</span><br><span class="line">--eval_crop_size&#x3D;&quot;513,513&quot; \</span><br><span class="line">--train_batch_size&#x3D;8 \</span><br><span class="line">--dataset&#x3D;&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--checkpoint_dir&#x3D;path_to_proj_portrait2anime&#x2F;deeplab_train_log&#x2F;celebamask_facial_seg_mobilenetv2_513_8_08181604 \</span><br><span class="line">--eval_logdir&#x3D;path_to_proj_portrait2anime&#x2F;deeplab_train_log&#x2F;eval_0818_131910 \</span><br><span class="line">--dataset_dir&#x3D;path_to_proj_portrait2anime&#x2F;CelebAMask-HQ&#x2F;facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
 
 <p>Eval 里各参数基本与 train 时一直，但 train_crop_size 要改为 eval_crop_size。另外我在某次实验时，训练的 train_crop_size 调低到 449，验证时 eval_crop_size 还用这个值会报错，调到 513 后正常。<a href="https://github.com/tensorflow/models/issues/3939" target="_blank" rel="noopener">这里有解释</a>，验证时用全图大小就行，似乎不用顾虑显存/模型大小，只是我暂时还没完全理解。</p>
 <p>另外稍提下，Eval 是启动进程不断跟踪 eval_logdir 下的 ckpt 并持续验证，所以不会直接打印结果，需要进入 tensorboard 中看 miou 结果。</p>
-<h3 id="Vis-可视化"><a href="#Vis-可视化" class="headerlink" title="Vis 可视化"></a>Vis 可视化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">python deeplab/vis.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--vis_split=&quot;val&quot; \</span><br><span class="line">--model_variant=&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates=12 \</span><br><span class="line">--atrous_rates=24 \</span><br><span class="line">--atrous_rates=36 \</span><br><span class="line">--output_stride=8 \</span><br><span class="line">--decoder_output_stride=4 \</span><br><span class="line">--vis_crop_size=&quot;513,513&quot; \</span><br><span class="line">--dataset=&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--checkpoint_dir=path_to_proj_portrait2anime/deeplab_train_log/celebamask_facial_seg_mobilenetv2_513_8_08181604 \</span><br><span class="line">--vis_logdir=path_to_proj_portrait2anime/deeplab_train_log/vis_0818_131910 \</span><br><span class="line">--dataset_dir=path_to_proj_portrait2anime/CelebAMask-HQ/facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
-
-<p>结果类似下图（训练时间短）：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_on_celebamask_facial_seg_vis_0.png?x-oss-process=style/resize_600" alt="deeplab_on_celebamask_facial_seg_vis_0"></p>
+<h3 id="Vis-可视化"><a href="#Vis-可视化" class="headerlink" title="Vis 可视化"></a>Vis 可视化</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">python deeplab&#x2F;vis.py \</span><br><span class="line">--logtostderr \</span><br><span class="line">--vis_split&#x3D;&quot;val&quot; \</span><br><span class="line">--model_variant&#x3D;&quot;mobilenet_v2&quot; \</span><br><span class="line">--atrous_rates&#x3D;12 \</span><br><span class="line">--atrous_rates&#x3D;24 \</span><br><span class="line">--atrous_rates&#x3D;36 \</span><br><span class="line">--output_stride&#x3D;8 \</span><br><span class="line">--decoder_output_stride&#x3D;4 \</span><br><span class="line">--vis_crop_size&#x3D;&quot;513,513&quot; \</span><br><span class="line">--dataset&#x3D;&quot;celebamask_facial_seg&quot; \</span><br><span class="line">--checkpoint_dir&#x3D;path_to_proj_portrait2anime&#x2F;deeplab_train_log&#x2F;celebamask_facial_seg_mobilenetv2_513_8_08181604 \</span><br><span class="line">--vis_logdir&#x3D;path_to_proj_portrait2anime&#x2F;deeplab_train_log&#x2F;vis_0818_131910 \</span><br><span class="line">--dataset_dir&#x3D;path_to_proj_portrait2anime&#x2F;CelebAMask-HQ&#x2F;facial_segmentation_tfrecords_for_deeplab_0818_131910</span><br></pre></td></tr></table></figure>
+<p>结果类似下图（训练时间短）：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/deeplab_on_celebamask_facial_seg_vis_0.png?x-oss-process=style/resize_600" alt="deeplab_on_celebamask_facial_seg_vis_0"></p>
 <h3 id="Export-部署-pb-and-SavedModel"><a href="#Export-部署-pb-and-SavedModel" class="headerlink" title="Export 部署 .pb and SavedModel"></a>Export 部署 .pb and SavedModel</h3><p>deeplab 项目中也提供了 export_model 代码，用于固化成 <code>.pb</code> 模型。模型固化前后节点信息变化不少，固化前输入输出节点难找，因此这里为了得到 <code>SavedModel</code> 干脆先转 <code>.pb</code> 固化模型，代码里比较明确地给出了输入输出节点名，这样直接拿来用会方便很多：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_INPUT_NAME = &apos;ImageTensor&apos;</span><br><span class="line">_OUTPUT_NAME = &apos;SemanticPredictions&apos;</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">_INPUT_NAME &#x3D; &#39;ImageTensor&#39;</span><br><span class="line">_OUTPUT_NAME &#x3D; &#39;SemanticPredictions&#39;</span><br></pre></td></tr></table></figure>
 <p>不过这个 export_model.py 的参数与之前有些差距，容易踩坑，先上正确的例子：</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">python deeplab/export_model.py \</span><br><span class="line">--model_variant=&quot;mobilenet_v2&quot; \</span><br><span class="line">--crop_size=513 \</span><br><span class="line">--crop_size=513 \</span><br><span class="line">--atrous_rates=6 \</span><br><span class="line">--atrous_rates=12 \</span><br><span class="line">--atrous_rates=18 \</span><br><span class="line">--output_stride=16 \</span><br><span class="line">--num_classes=2 \</span><br><span class="line">--decoder_output_stride=4 \</span><br><span class="line">--checkpoint_path=path_to_proj_portrait2anime/train_log_deeplab/celebamask_facial_seg_mobilenetv2_513_8_08181604/model.ckpt-15016 \</span><br><span class="line">--export_path=path_to_proj_portrait2anime/train_log_deeplab/frozen/frozen_inference_graph_mobilenetv2_test233.pb</span><br></pre></td></tr></table></figure>
-
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">python deeplab&#x2F;export_model.py \</span><br><span class="line">--model_variant&#x3D;&quot;mobilenet_v2&quot; \</span><br><span class="line">--crop_size&#x3D;513 \</span><br><span class="line">--crop_size&#x3D;513 \</span><br><span class="line">--atrous_rates&#x3D;6 \</span><br><span class="line">--atrous_rates&#x3D;12 \</span><br><span class="line">--atrous_rates&#x3D;18 \</span><br><span class="line">--output_stride&#x3D;16 \</span><br><span class="line">--num_classes&#x3D;2 \</span><br><span class="line">--decoder_output_stride&#x3D;4 \</span><br><span class="line">--checkpoint_path&#x3D;path_to_proj_portrait2anime&#x2F;train_log_deeplab&#x2F;celebamask_facial_seg_mobilenetv2_513_8_08181604&#x2F;model.ckpt-15016 \</span><br><span class="line">--export_path&#x3D;path_to_proj_portrait2anime&#x2F;train_log_deeplab&#x2F;frozen&#x2F;frozen_inference_graph_mobilenetv2_test233.pb</span><br></pre></td></tr></table></figure>
 <p>以上面命令来讲，虽然使用了 mobilenet_v2 backbone，但是训练的时候如果设置了 atrous_rates，export时注意别漏掉；之前训练时要指定 <code>--dataset</code>，这里改用 <code>--num_classes</code> 来确定模型输出结构；<code>crop_size</code> 在 <code>export_model.py</code> 里定义为 <code>DEFINE_multi_integer</code>，所以要像这样改用多次列出的格式。</p>
 <h2 id="最终效果样例"><a href="#最终效果样例" class="headerlink" title="最终效果样例"></a>最终效果样例</h2><p>使用 mobilenet_v2、 output_stride=16、batch_size=16 训练一晚达到 step-88170，loss在约0.4，难以下降，验证 miou 只有 0.83。<br>在 val 数据上进行可视化，结果如下：</p>
-<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_deeplab_on_facial_seg_vis_val_0823.png?x-oss-process=style/resize_600" alt="result_deeplab_on_facial_seg_vis_val_0823"></p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_deeplab_on_facial_seg_vis_val_0823.png?x-oss-process=style/resize_600" alt="result_deeplab_on_facial_seg_vis_val_0823"></p>
 <p>loss 过程如下：</p>
-<p><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_deeplab_on_facial_seg_loss_scalars_0823.png?x-oss-process=style/resize_600" alt="result_deeplab_on_facial_seg_loss_scalars_0823"></p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_deeplab_on_facial_seg_loss_scalars_0823.png?x-oss-process=style/resize_600" alt="result_deeplab_on_facial_seg_loss_scalars_0823"></p>
 <p>实际用在项目中，部分典型结果如下：</p>
-<p>跟训练数据集相似的：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_thump_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_thump_0"></p>
-<p>边缘清晰，侧脸：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_gakki_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_gakki_0"></p>
-<p>比较难的：<br><img src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_boxer_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_boxer_0"></p>
+<p>跟训练数据集相似的：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_thump_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_thump_0"></p>
+<p>边缘清晰，侧脸：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_gakki_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_gakki_0"></p>
+<p>比较难的：<br><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/result_portrait2anime_v0_boxer_0.png?x-oss-process=style/resize_600" alt="result_portrait2anime_v0_boxer_0"></p>
 <p>一言难尽，miou 明显不够，实际结果也确实难以达到要求。<br>可能还是得用 xception，另外图像分割的边缘需要做类似羽化拟合的操作，必须增加后处理来去掉毛刺。</p>
 <div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">fully convolutional networks  https://people.eecs.berkeley.edu/~jonlong/long_shelhamer_fcn.pdf<a href="#fnref:1" rev="footnote"> ↩</a></span></li><li id="fn:2"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">2.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">U-Net: Convolutional Networks for Biomedical Image Segmentation   https://arxiv.org/abs/1505.04597<a href="#fnref:2" rev="footnote"> ↩</a></span></li><li id="fn:3"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">3.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Encoder-Decoder with Atrous Separable Convolution for Semantic Image Segmentation https://arxiv.org/abs/1802.02611<a href="#fnref:3" rev="footnote"> ↩</a></span></li><li id="fn:4"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">4.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">图源：<a href="https://towardsdatascience.com/review-deeplabv3-atrous-convolution-semantic-segmentation-6d818bfd1d74" target="_blank" rel="noopener">Review: DeepLabv3 — Atrous Convolution (Semantic Segmentation)</a> 推荐阅读<a href="#fnref:4" rev="footnote"> ↩</a></span></li><li id="fn:5"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">5.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">https://blog.csdn.net/weixin_41713230/article/details/81937763<a href="#fnref:5" rev="footnote"> ↩</a></span></li><li id="fn:6"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">6.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">output_stride-&gt; the ratio of input image spatial resolution to the final output resolution<a href="#fnref:6" rev="footnote"> ↩</a></span></li><li id="fn:7"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">7.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">What's wrong with BN  https://zhuanlan.zhihu.com/p/35005794<a href="#fnref:7" rev="footnote"> ↩</a></span></li><li id="fn:8"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">8.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Issue-<a href="https://github.com/tensorflow/models/issues/5919" target="_blank" rel="noopener">Question over atrous rate for mobilenet</a><a href="#fnref:8" rev="footnote"> ↩</a></span></li></ol></div></div>
-      
     </div>
 
     
-
-    
-      
-    
-
     
     
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-
-      
         
-          
-        
-        <div class="post-tags">
-          
-            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-          
-            <a href="/tags/深度学习/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
-          
-            <a href="/tags/SemanticSegmentation/" rel="tag"><i class="fa fa-tag"></i> SemanticSegmentation</a>
-          
-            <a href="/tags/slim/" rel="tag"><i class="fa fa-tag"></i> slim</a>
-          
-        </div>
-      
 
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/GMIS 2019 精华梳理及收获/" rel="next" title="GMIS 2019 精华梳理及收获">
-                <i class="fa fa-chevron-left"></i> GMIS 2019 精华梳理及收获
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/how_to_use_tf_serving_model/" rel="prev" title="Tensorflow Serving 要点 ">
-                Tensorflow Serving 要点  <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-  </div>
-
-
-          </div>
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="disqus_thread">
-        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-      </div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
-            
-              <p class="site-author-name" itemprop="name">BenZ</p>
-              <div class="site-description motion-element" itemprop="description"></div>
-          </div>
-
-          
-            <nav class="site-state motion-element">
-              
-                <div class="site-state-item site-state-posts">
-                
-                  <a href="/archives/">
-                
-                    <span class="site-state-item-count">9</span>
-                    <span class="site-state-item-name">日志</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-categories">
-                  
-                    
-                      <a href="/categories/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">4</span>
-                    <span class="site-state-item-name">分类</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  
-                    
-                      <a href="/tags/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">24</span>
-                    <span class="site-state-item-name">标签</span>
-                  </a>
-                </div>
-              
-            </nav>
-          
-
-          
-
-          
-
-          
-            <div class="links-of-author motion-element">
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                </span>
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
-                </span>
-              
-            </div>
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </div>
-
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deeplab-架构及要点"><span class="nav-text">Deeplab 架构及要点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置环境，跑通-deeplab-库的样例数据和模型。"><span class="nav-text">配置环境，跑通 deeplab 库的样例数据和模型。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DeepLab-训练参数设置"><span class="nav-text">DeepLab 训练参数设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备数据"><span class="nav-text">准备数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-CelebAMaskHQ-数据集"><span class="nav-text">使用 CelebAMaskHQ 数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用脚本转为-tfrecords"><span class="nav-text">使用脚本转为 tfrecords</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练以及验证"><span class="nav-text">训练以及验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Train-训练"><span class="nav-text">Train 训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Eval-验证"><span class="nav-text">Eval 验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vis-可视化"><span class="nav-text">Vis 可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Export-部署-pb-and-SavedModel"><span class="nav-text">Export 部署 .pb and SavedModel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终效果样例"><span class="nav-text">最终效果样例</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
-
-      
-
-    </div>
-  </aside>
-  
-
-
-        
-      </div>
-    </main>
-
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love" id="animate">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">BenZ</span>
-
-  
-
-  
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/" title="使用 DeepLab 训练一个人脸语义分割模型">https://benzblog.site/training_a_face_segmentation_model_with_deeplab/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
-
-
-
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 深度学习</a>
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+              <a href="/tags/SemanticSegmentation/" rel="tag"><i class="fa fa-tag"></i> SemanticSegmentation</a>
+              <a href="/tags/slim/" rel="tag"><i class="fa fa-tag"></i> slim</a>
+          </div>
 
         
 
 
-
-
-
-
-
-
         
-      </div>
-    </footer>
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/" rel="prev" title="GMIS 2019 精华梳理及收获">
+      <i class="fa fa-chevron-left"></i> GMIS 2019 精华梳理及收获
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/how_to_use_tf_serving_model/" rel="next" title="Tensorflow Serving 要点 ">
+      Tensorflow Serving 要点  <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
 
-    
 
+          </div>
+          
     
-
-    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
   </div>
-
   
 
 <script>
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Deeplab-架构及要点"><span class="nav-number">1.</span> <span class="nav-text">Deeplab 架构及要点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#配置环境，跑通-deeplab-库的样例数据和模型。"><span class="nav-number">2.</span> <span class="nav-text">配置环境，跑通 deeplab 库的样例数据和模型。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DeepLab-训练参数设置"><span class="nav-number">3.</span> <span class="nav-text">DeepLab 训练参数设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#准备数据"><span class="nav-number">4.</span> <span class="nav-text">准备数据</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-CelebAMaskHQ-数据集"><span class="nav-number">4.1.</span> <span class="nav-text">使用 CelebAMaskHQ 数据集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用脚本转为-tfrecords"><span class="nav-number">4.2.</span> <span class="nav-text">使用脚本转为 tfrecords</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#训练以及验证"><span class="nav-number">5.</span> <span class="nav-text">训练以及验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Train-训练"><span class="nav-number">5.1.</span> <span class="nav-text">Train 训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Eval-验证"><span class="nav-number">5.2.</span> <span class="nav-text">Eval 验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Vis-可视化"><span class="nav-number">5.3.</span> <span class="nav-text">Vis 可视化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Export-部署-pb-and-SavedModel"><span class="nav-number">5.4.</span> <span class="nav-text">Export 部署 .pb and SavedModel</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最终效果样例"><span class="nav-number">6.</span> <span class="nav-text">最终效果样例</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
 
 
 
@@ -952,6 +538,27 @@
 
 
 
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -968,62 +575,71 @@
 
 
 
-  
-  <script src="/lib/jquery/index.js?v=3.4.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
 
 
 
 
   
 
+  
+      
 
-  <script src="/js/utils.js?v=7.2.0"></script>
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
 
-  <script src="/js/motion.js?v=7.2.0"></script>
-
-
+    
 
   
-  
 
-
-  <script src="/js/affix.js?v=7.2.0"></script>
-
-  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
-
-
-
-  
-  <script src="/js/scrollspy.js?v=7.2.0"></script>
-<script src="/js/post-details.js?v=7.2.0"></script>
-
-
-
-  
-
-
-  <script src="/js/next-boot.js?v=7.2.0"></script>
-
-
-  
-
-  
-
-  
-
-  
-
-  
-  
 <script>
   function loadCount() {
     var d = document, s = d.createElement('script');
@@ -1034,114 +650,26 @@
   // defer loading until the whole page loading is completed
   window.addEventListener('load', loadCount, false);
 </script>
-
-
 <script>
   var disqus_config = function() {
-    this.page.url = "http://benzblog.site/training_a_face_segmentation_model_with_deeplab/";
+    this.page.url = "https://benzblog.site/training_a_face_segmentation_model_with_deeplab/";
     this.page.identifier = "training_a_face_segmentation_model_with_deeplab/";
-    this.page.title = '使用 DeepLab 训练一个人脸语义分割模型';
+    this.page.title = "使用 DeepLab 训练一个人脸语义分割模型";
     };
-  function loadComments() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://benzbloghexo.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', '' + +new Date());
-    (d.head || d.body).appendChild(s);
-  }
-  
-    window.addEventListener('load', loadComments, false);
-  
-</script>
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-  
-
-  
-
-  
-  
-
-  
-  
-
-  
-    
-      <script type="text/x-mathjax-config">
-  
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-      
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
-        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
-      }
-    });
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
     }
   });
 </script>
-<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    
-  
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-
-  
 
 </body>
 </html>

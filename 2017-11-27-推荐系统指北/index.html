@@ -1,112 +1,33 @@
 <!DOCTYPE html>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-<html class="theme-next pisces use-motion" lang="zh-CN">
-<head><meta name="generator" content="Hexo 3.9.0">
+<html lang="zh-CN">
+<head>
   <meta charset="UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
 <meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
 
 
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
-  
-  <link rel="stylesheet" href="/lib/fancybox/source/jquery.fancybox.css">
-
-
-
-
-
-
-
-<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
-
-<link rel="stylesheet" href="/css/main.css?v=7.2.0">
-
-
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico?v=7.2.0">
-
-
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico?v=7.2.0">
-
-
-  <link rel="mask-icon" href="/images/logo.svg?v=7.2.0" color="#222">
-
-
-
-
-
-
-
-<script id="hexo.configurations">
-  var NexT = window.NexT || {};
-  var CONFIG = {
-    root: '/',
-    scheme: 'Pisces',
-    version: '7.2.0',
-    sidebar: {"position":"right","display":"post","offset":12,"onmobile":false,"dimmer":false},
-    back2top: true,
-    back2top_sidebar: false,
-    fancybox: {
-      enable: true,
-      replace_from: /(\?x-oss-process=style\S+)/,
-      replace_to: '',
-      with_caption: false,
-    },
-    fastclick: false,
-    lazyload: false,
-    tabs: true,
-    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
-    algolia: {
-      applicationID: '',
-      apiKey: '',
-      indexName: '',
-      hits: {"per_page":10},
-      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
-    }
-  };
-</script>
-
-
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
 
   <meta name="description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
-<meta name="keywords" content="推荐系统,机器学习">
 <meta property="og:type" content="article">
 <meta property="og:title" content="推荐系统指北">
-<meta property="og:url" content="http://benzblog.site/2017-11-27-推荐系统指北/index.html">
+<meta property="og:url" content="https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
 <meta property="og:description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
-<meta property="og:locale" content="zh-CN">
+<meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png">
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/va75klwtrtkrw914s6iafrrb/image_1bvlu1trbk191e42c2n1gh415ph9.png">
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/6enbzj5ym2hw8v1q85vymnaw/image_1bvm90stlrf6c67vdu28f88a16.png">
@@ -114,45 +35,38 @@
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/chtgrtxfq3i3mtux3evfcohp/image_1bvm93s00ksqgnt3dm1el110b02d.png">
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/niotszydyyhzrqe9n5rixlgi/image_1bvm9i6qe76e3ideo3c9o1j5q2q.png">
 <meta property="og:image" content="http://static.zybuluo.com/benzwaltzing/1kz13nlj3vpp84aozvscvd7o/image_1bvmdv7dom0qhc5lb21ldaok937.png">
-<meta property="og:updated_time" content="2019-07-08T16:07:37.389Z">
+<meta property="article:published_time" content="2017-11-26T16:00:00.000Z">
+<meta property="article:modified_time" content="2019-07-08T16:07:37.000Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="机器学习">
+<meta property="article:tag" content="推荐系统">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="推荐系统指北">
-<meta name="twitter:description" content="简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点">
 <meta name="twitter:image" content="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png">
 
+<link rel="canonical" href="https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/">
 
 
-
-
-  
-  
-  <link rel="canonical" href="http://benzblog.site/2017-11-27-推荐系统指北/">
-
-
-
-<script id="page.configurations">
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
   };
 </script>
 
   <title>推荐系统指北 | 奔哲明的博客</title>
   
-
-
-
-
-  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
-  <script>
-    var host = window.location.hostname;
-    if (host !== "localhost" || !true) {
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'UA-101354718-1');
-    }
-  </script>
-
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
 
 
   <script>
@@ -168,12 +82,8 @@
 
 
 
-
-
-
   <noscript>
   <style>
-  .use-motion .motion-element,
   .use-motion .brand,
   .use-motion .menu-item,
   .sidebar-inner,
@@ -182,9 +92,8 @@
   .use-motion .comments,
   .use-motion .post-header,
   .use-motion .post-body,
-  .use-motion .collection-title { opacity: initial; }
+  .use-motion .collection-header { opacity: initial; }
 
-  .use-motion .logo,
   .use-motion .site-title,
   .use-motion .site-subtitle {
     opacity: initial;
@@ -196,139 +105,71 @@
   </style>
 </noscript>
 
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
 </head>
 
-<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
-
-  
-  
-    
-  
-
-  <div class="container sidebar-position-right page-post-detail">
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
     <div class="headband"></div>
 
-    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
-      <div class="header-inner"><div class="site-brand-wrapper">
-  <div class="site-meta">
-    
-
-    <div class="custom-logo-site-title">
-      <a href="/" class="brand" rel="start">
-        <span class="logo-line-before"><i></i></span>
-        <span class="site-title">奔哲明的博客</span>
-        <span class="logo-line-after"><i></i></span>
-      </a>
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
     </div>
-    
-    
   </div>
 
-  <div class="site-nav-toggle">
-    <button aria-label="切换导航栏">
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-      <span class="btn-bar"></span>
-    </button>
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
   </div>
 </div>
 
 
 
+
 <nav class="site-nav">
-  
-    <ul id="menu" class="menu">
-      
-        
-        
-        
-          
-          <li class="menu-item menu-item-home">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-about">
+        <li class="menu-item menu-item-about">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-tags">
+        <li class="menu-item menu-item-tags">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-categories">
+        <li class="menu-item menu-item-categories">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
 
   </li>
-        
-        
-        
-          
-          <li class="menu-item menu-item-archives">
+        <li class="menu-item menu-item-archives">
 
-    
-    
-      
-    
-
-    
-
-    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
 
   </li>
-
-      
-      
-    </ul>
-  
-
-  
-
-  
+  </ul>
 </nav>
+
 
 
 
@@ -338,161 +179,84 @@
     
 
 
-    <main id="main" class="main">
+    <main class="main">
       <div class="main-inner">
         <div class="content-wrap">
           
+
+          <div class="content post posts-expand">
             
 
-          
-          <div id="content" class="content">
-            
-
-  <div id="posts" class="posts-expand">
     
-
-  
-
   
   
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://benzblog.site/2017-11-27-推荐系统指北/">
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="BenZ">
-      <meta itemprop="description" content>
       <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
       <meta itemprop="name" content="奔哲明的博客">
     </span>
-
-    
       <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">推荐系统指北
-
-              
-            
-          </h1>
-        
+        <h1 class="post-title" itemprop="name headline">
+          推荐系统指北
+        </h1>
 
         <div class="post-meta">
-
-          
-          
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
+                <i class="far fa-calendar"></i>
               </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
+              <span class="post-meta-item-text">发表于</span>
 
               <time title="创建时间：2017-11-27 00:00:00" itemprop="dateCreated datePublished" datetime="2017-11-27T00:00:00+08:00">2017-11-27</time>
             </span>
-          
-
-          
-            
-
-            
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
+                  <i class="far fa-calendar-check"></i>
                 </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
+                <span class="post-meta-item-text">更新于</span>
                 <time title="修改时间：2019-07-09 00:07:37" itemprop="dateModified" datetime="2019-07-09T00:07:37+08:00">2019-07-09</time>
               </span>
-            
-          
-
-          
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
+                <i class="far fa-folder"></i>
               </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-              
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-comment-o"></i>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
                 </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017-11-27-推荐系统指北/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
             
-                <span class="post-meta-item-text">评论数：</span>
-                <a href="/2017-11-27-推荐系统指北/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2017-11-27-推荐系统指北/" itemprop="commentCount"></span>
-                </a>
-              </span>
-            
-          
-
-          
-          
-
-          
-
-          
-
-          <br>
-          
-
-          
-
-          
-            
-              
-            
-            <div class="post-tags">
-              
-                <a href="/tags/推荐系统/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
-              
-                <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-              
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+                <a href="/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
             </div>
-          
-
-          
             <div class="post-description" hidden>简单理顺推荐系统的几类方法，包括 协同过滤、content-based、model-based方法 等要点</div>
-          
 
         </div>
       </header>
-    
 
     
     
@@ -500,28 +264,25 @@
     <div class="post-body" itemprop="articleBody">
 
       
-      
-
-      
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h1 id="算法分类"><a href="#算法分类" class="headerlink" title="算法分类"></a>算法分类</h1><h2 id="1-memory-based"><a href="#1-memory-based" class="headerlink" title="1. memory-based :"></a>1. memory-based :</h2><p>协同过滤 collaborative filtering</p>
 <ul>
-<li><p><strong>基于用户的协同过滤：</strong><br>找到相似用户（计算用户相似度），再推荐别人喜欢而自己未接触过的。<br>用户A和用户B对相同物品集合有兴趣（阅读/点赞/购买），则A和B之间有一定的相似度。简单点的例子，用户A对物品{a, b, d}有过行为，用户B对物品{a, c}有过行为，利用余弦相似度公式计算A和B的相似度为：<br><img src="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" alt="image_1bvk4coj0mhrr3i91tngc1eovp.png-7.5kB"><br>假设要对A做推荐，而B是相似度最高的用户，则可以向A推荐物品c。</p>
-<p>详细点的例子见下图<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<li><p><strong>基于用户的协同过滤：</strong><br>找到相似用户（计算用户相似度），再推荐别人喜欢而自己未接触过的。<br>用户A和用户B对相同物品集合有兴趣（阅读/点赞/购买），则A和B之间有一定的相似度。简单点的例子，用户A对物品{a, b, d}有过行为，用户B对物品{a, c}有过行为，利用余弦相似度公式计算A和B的相似度为：<br><img data-src="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" alt="image_1bvk4coj0mhrr3i91tngc1eovp.png-7.5kB"><br>假设要对A做推荐，而B是相似度最高的用户，则可以向A推荐物品c。</p>
+<p>详细点的例子见下图<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</p>
 </li>
 </ul>
 <p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
 <p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
-<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a> :<br><img src="http://static.zybuluo.com/benzwaltzing/va75klwtrtkrw914s6iafrrb/image_1bvlu1trbk191e42c2n1gh415ph9.png" alt="image_1bvlu1trbk191e42c2n1gh415ph9.png-75.4kB"><br>假设在已有左图用户-物品评分矩阵的情况下，对用户a做物品推荐。</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a></span></a></sup> :<br><img data-src="http://static.zybuluo.com/benzwaltzing/va75klwtrtkrw914s6iafrrb/image_1bvlu1trbk191e42c2n1gh415ph9.png" alt="image_1bvlu1trbk191e42c2n1gh415ph9.png-75.4kB"><br>假设在已有左图用户-物品评分矩阵的情况下，对用户a做物品推荐。</p>
 <p>  首先通过一定算法，计算用户a与其他用户v的相似度S(a, v)，选择前k个相似度最高的用户，则这些用户大多都喜欢的而目标用户a却没有做评价的物品，就是值得推荐的物品。怎么衡量“大多”呢：将相似度S(a, v)作为权重，乘上用户v对每个物品的评分序列，遍历k个用户，对加过权的评分求和，然后就得到比较可靠的用户a对物品的感兴趣程度，去掉用户已经评分过的物品，做次排序即可作为推荐列表。</p>
 <p>  上述的选择k个最相近用户做参考依据来推荐物品的过程，又被称为k近邻方法。<br>  对于相似度的计算，通常有下面几种方法：</p>
 <ul>
-<li><p>Pearson相似度<br><img src="http://static.zybuluo.com/benzwaltzing/6enbzj5ym2hw8v1q85vymnaw/image_1bvm90stlrf6c67vdu28f88a16.png" alt="pearson_sim"></p>
+<li><p>Pearson相似度<br><img data-src="http://static.zybuluo.com/benzwaltzing/6enbzj5ym2hw8v1q85vymnaw/image_1bvm90stlrf6c67vdu28f88a16.png" alt="pearson_sim"></p>
 </li>
-<li><p>Cosine相似度<br><img src="http://static.zybuluo.com/benzwaltzing/piup56tylc0ylrb242kfm761/image_1bvm92sr71dmmnjmkrfjdfkh520.png" alt="cosine_sim"></p>
+<li><p>Cosine相似度<br><img data-src="http://static.zybuluo.com/benzwaltzing/piup56tylc0ylrb242kfm761/image_1bvm92sr71dmmnjmkrfjdfkh520.png" alt="cosine_sim"></p>
 </li>
-<li><p>Jaccard 相似度<br><img src="http://static.zybuluo.com/benzwaltzing/chtgrtxfq3i3mtux3evfcohp/image_1bvm93s00ksqgnt3dm1el110b02d.png" alt="jaccard_sim"></p>
+<li><p>Jaccard 相似度<br><img data-src="http://static.zybuluo.com/benzwaltzing/chtgrtxfq3i3mtux3evfcohp/image_1bvm93s00ksqgnt3dm1el110b02d.png" alt="jaccard_sim"></p>
 </li>
-<li><p>Log-Likelihood Ratio<br><img src="http://static.zybuluo.com/benzwaltzing/niotszydyyhzrqe9n5rixlgi/image_1bvm9i6qe76e3ideo3c9o1j5q2q.png" alt="log-likelihood"><br>参考： <a href="https://tech.meituan.com/mt-recommend-practice.html" target="_blank" rel="noopener">https://tech.meituan.com/mt-recommend-practice.html</a></p>
+<li><p>Log-Likelihood Ratio<br><img data-src="http://static.zybuluo.com/benzwaltzing/niotszydyyhzrqe9n5rixlgi/image_1bvm9i6qe76e3ideo3c9o1j5q2q.png" alt="log-likelihood"><br>参考： <a href="https://tech.meituan.com/mt-recommend-practice.html" target="_blank" rel="noopener">https://tech.meituan.com/mt-recommend-practice.html</a></p>
 <p>相似度算法的选择没有定论，甚至于完全可以根据一些特征，设定自己的相似度方法。现在我使用的都是余弦相似度。</p>
 </li>
 </ul>
@@ -531,20 +292,20 @@
 </li>
 </ul>
 <p>协同过滤是推荐系统里最基础也最常用的方法，推荐的结果有迹可循能够在UI上做出推荐原因的解释（如跟某某物品相似，某某用户也喜欢该物品），是绝大多数电商推荐系统的基础算法。<br>但缺点也很明显：<br>由于强依赖于用户-物品行为矩阵，当矩阵稀疏时，效果会比较差，<br>同理，当出现新物品/新用户时候，由于还没有在矩阵中建立起联系，无法通过简单的协同过滤算法给出推荐，这也就是常说的“冷启动”问题。对于冷启动问题，下文另有解释。</p>
-<p>协同过滤还可以增加许多优化，例如考虑到用户兴趣会随时间变化，将时间信息纳入相似度的计算；还可以对过于热门的物品或行为过多的用户增加惩罚系数，避免被带偏；以及对评分矩阵作归一化<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>协同过滤还可以增加许多优化，例如考虑到用户兴趣会随时间变化，将时间信息纳入相似度的计算；还可以对过于热门的物品或行为过多的用户增加惩罚系数，避免被带偏；以及对评分矩阵作归一化<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</p>
 <p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
 <p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
-<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>处理。<br>尝试过引入前两种优化，实现起来也并不难，这里就不细讲了，可以参考《推荐系统实践》的相关章节。</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a></span></a></sup>处理。<br>尝试过引入前两种优化，实现起来也并不难，这里就不细讲了，可以参考《推荐系统实践》的相关章节。</p>
 <h2 id="2-content-based"><a href="#2-content-based" class="headerlink" title="2. content-based :"></a>2. content-based :</h2><p>提取物品特征，把用户的行为映射到物品特征</p>
-<p>基于标签的推荐系统是典型content-based推荐系统。如果纯粹以标签为纽带，可以得到以下一种简单的算法<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>基于标签的推荐系统是典型content-based推荐系统。如果纯粹以标签为纽带，可以得到以下一种简单的算法<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</p>
 <p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
 <p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
-<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>：</p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a></span></a></sup>：</p>
 <p> （1）统计每个用户最常用的标签。<br> （2）对于每个标签，统计被打过这个标签次数最多的物品。<br> （3）对于一个用户，首先找到他常用的标签，然后找到具有这些标签的最热门物品推荐给这<br>个用户。</p>
-<p>另一种思路<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</a></sup></p>
+<p>另一种思路<sup id="fnref:1"><a href="#fn:1" rel="footnote">&lt;span class=”hint–top hint–error hint–medium hint–rounded hint–bounce” aria-label=”Recommender Systems From Content to Latent Factor Analysis, IDA SMU</p>
 <p>[^normalization]: 面向程序员的数据挖掘指南 https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</p>
 <p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
-<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a>是将标签作为用户属性寻找物品间的相似性：<br><img src="http://static.zybuluo.com/benzwaltzing/1kz13nlj3vpp84aozvscvd7o/image_1bvmdv7dom0qhc5lb21ldaok937.png" alt="content_based"></p>
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html”&gt;<a href="http://static.zybuluo.com/benzwaltzing/wvra0ojq3f0d38l7kn33qswd/image_1bvk4coj0mhrr3i91tngc1eovp.png" target="_blank" rel="noopener">1</a></span></a></sup>是将标签作为用户属性寻找物品间的相似性：<br><img data-src="http://static.zybuluo.com/benzwaltzing/1kz13nlj3vpp84aozvscvd7o/image_1bvmdv7dom0qhc5lb21ldaok937.png" alt="content_based"></p>
 <p>在我们现有的推荐系统里，使用了前者进行推荐。<br>由于当前数据集里标签信息相对较多，且含有大量LDA算法信息，标签质量较高，在几种算法里获得了相对更好的效果。</p>
 <p>基于标签的数据集： hetrec2011-lastfm-2k</p>
 <h2 id="3-model-based"><a href="#3-model-based" class="headerlink" title="3. model-based"></a>3. model-based</h2><p>偏数学的方法，把推荐问题抽象为预测矩阵里未填值的问题，即预测评分问题。<br>电影推荐是典型的评分预测再做推荐的问题，如movieLens数据集，Netflix推荐系统比赛</p>
@@ -570,377 +331,206 @@
 <p>面向程序员的数据挖掘指南<br><a href="https://wizardforcel.gitbooks.io/guide-to-data-mining/content/2.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/guide-to-data-mining/content/2.html</a></p>
 <p>推荐系统工程比赛（预测点击率）：<br><a href="https://www.kaggle.com/c/avazu-ctr-prediction" target="_blank" rel="noopener">https://www.kaggle.com/c/avazu-ctr-prediction</a></p>
 <p>数据集：movieLens, hetrec2011-lastfm-2k,<br>    KKBox’s Music Recommendation Challenge（Kaggle）</p>
-<p>  [8]: <a href="http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png" target="_blank" rel="noopener">http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Recommender Systems From Content to Latent Factor Analysis, IDA SMU</span></li></ol></div></div></p>
+<p>  [8]: <a href="http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png" target="_blank" rel="noopener">http://static.zybuluo.com/benzwaltzing/d0mkwmrzkkhcpk6y13w30s6t/image_1bvmm29qc1pftr2h1s0j1fj3q839.png</a><div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">Recommender Systems From Content to Latent Factor Analysis, IDA SMU</p>
 <p>[^normalization]: 面向程序员的数据挖掘指南 <a href="https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html" target="_blank" rel="noopener">https://wizardforcel.gitbooks.io/guide-to-data-mining/content/3.html</a></p>
 <p>[^tag_based]: 《推荐系统时间》#4.3.2 P106 利用用户标签数据</p>
-<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 <a href="https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html</a><a href="#fnref:1" rev="footnote"> ↩</a></p>
-
-      
-    </div>
-
-    
-
-    
-      
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-
-      
-        
-          
-        
-        <div class="post-tags">
-          
-            <a href="/tags/推荐系统/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
-          
-            <a href="/tags/机器学习/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
-          
-        </div>
-      
-
-      
-      
-      
-
-      
-        <div class="post-nav">
-          <div class="post-nav-next post-nav-item">
-            
-              <a href="/2017-06-19-all-about-rotations/" rel="next" title="Android屏幕旋转源码探索及应用实践">
-                <i class="fa fa-chevron-left"></i> Android屏幕旋转源码探索及应用实践
-              </a>
-            
-          </div>
-
-          <span class="post-nav-divider"></span>
-
-          <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2019-06-25-语音识别初探/" rel="prev" title="语音识别初探">
-                语音识别初探 <i class="fa fa-chevron-right"></i>
-              </a>
-            
-          </div>
-        </div>
-      
-
-      
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-  </div>
-
-
-          </div>
-          
-
-  
-    <div class="comments" id="comments">
-      <div id="disqus_thread">
-        <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
-      </div>
-    </div>
-
-  
-
-
-
-        </div>
-        
-          
-  
-  <div class="sidebar-toggle">
-    <div class="sidebar-toggle-line-wrap">
-      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
-      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
-    </div>
-  </div>
-
-  <aside id="sidebar" class="sidebar">
-    <div class="sidebar-inner">
-
-      
-
-      
-        <ul class="sidebar-nav motion-element">
-          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
-            文章目录
-          </li>
-          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
-            站点概览
-          </li>
-        </ul>
-      
-
-      <div class="site-overview-wrap sidebar-panel">
-        <div class="site-overview">
-          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
-            
-              <img class="site-author-image" itemprop="image" src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png" alt="BenZ">
-            
-              <p class="site-author-name" itemprop="name">BenZ</p>
-              <div class="site-description motion-element" itemprop="description"></div>
-          </div>
-
-          
-            <nav class="site-state motion-element">
-              
-                <div class="site-state-item site-state-posts">
-                
-                  <a href="/archives/">
-                
-                    <span class="site-state-item-count">9</span>
-                    <span class="site-state-item-name">日志</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-categories">
-                  
-                    
-                      <a href="/categories/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">4</span>
-                    <span class="site-state-item-name">分类</span>
-                  </a>
-                </div>
-              
-
-              
-                
-                
-                <div class="site-state-item site-state-tags">
-                  
-                    
-                      <a href="/tags/">
-                    
-                  
-                    
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                      
-                    
-                    <span class="site-state-item-count">24</span>
-                    <span class="site-state-item-name">标签</span>
-                  </a>
-                </div>
-              
-            </nav>
-          
-
-          
-
-          
-
-          
-            <div class="links-of-author motion-element">
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="https://github.com/BenZstory" title="GitHub &rarr; https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
-                </span>
-              
-                <span class="links-of-author-item">
-                  
-                  
-                    
-                  
-                  
-                    
-                  
-                  <a href="mailto:zhengbin0320@gmail.com" title="E-Mail &rarr; mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
-                </span>
-              
-            </div>
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </div>
-
-      
-      <!--noindex-->
-        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
-          <div class="post-toc">
-
-            
-            
-            
-            
-
-            
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法分类"><span class="nav-text">算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-memory-based"><span class="nav-text">1. memory-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-content-based"><span class="nav-text">2. content-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-model-based"><span class="nav-text">3. model-based</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#推荐指标："><span class="nav-text">推荐指标：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三大难点："><span class="nav-text">三大难点：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他推荐资料："><span class="nav-text">其他推荐资料：</span></a></li></ol></div>
-            
-
-          </div>
-        </div>
-      <!--/noindex-->
-      
-
-      
+<p>[^ibm_rec_guide]: 探索推荐引擎内部的秘密 <a href="https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html" target="_blank" rel="noopener">https://www.ibm.com/developerworks/cn/web/1103_zhaoct_recommstudy2/index.html</a><a href="#fnref:1" rev="footnote"> ↩</a></span></li></ol></div></div></p>
 
     </div>
-  </aside>
-  
 
-
+    
+    
+    
         
-      </div>
-    </main>
 
-    <footer id="footer" class="footer">
-      <div class="footer-inner">
-        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
-  <span class="with-love" id="animate">
-    <i class="fa fa-user"></i>
-  </span>
-  <span class="author" itemprop="copyrightHolder">BenZ</span>
-
-  
-
-  
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/" title="推荐系统指北">https://benzblog.site/2017-11-27-推荐系统指北/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-NC</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
 
-  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
-
-
-
-  <span class="post-meta-divider">|</span>
-
-
-
-  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v7.2.0</div>
-
-
-
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"><i class="fa fa-tag"></i> 机器学习</a>
+              <a href="/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" rel="tag"><i class="fa fa-tag"></i> 推荐系统</a>
+          </div>
 
         
 
 
-
-
-
-
-
-
         
-      </div>
-    </footer>
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2017-06-19-all-about-rotations/" rel="prev" title="Android屏幕旋转源码探索及应用实践">
+      <i class="fa fa-chevron-left"></i> Android屏幕旋转源码探索及应用实践
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019-06-25-%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB%E5%88%9D%E6%8E%A2/" rel="next" title="语音识别初探">
+      语音识别初探 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
 
-    
-      <div class="back-to-top">
-        <i class="fa fa-arrow-up"></i>
-        
-      </div>
-    
 
-    
 
+          </div>
+          
     
-
-    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
   </div>
-
   
 
 <script>
-  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
-    window.Promise = null;
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
   }
 </script>
 
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#算法分类"><span class="nav-number">1.</span> <span class="nav-text">算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-memory-based"><span class="nav-number">1.1.</span> <span class="nav-text">1. memory-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-content-based"><span class="nav-number">1.2.</span> <span class="nav-text">2. content-based :</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-model-based"><span class="nav-number">1.3.</span> <span class="nav-text">3. model-based</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#推荐指标："><span class="nav-number">2.</span> <span class="nav-text">推荐指标：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#三大难点："><span class="nav-number">3.</span> <span class="nav-text">三大难点：</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#其他推荐资料："><span class="nav-number">4.</span> <span class="nav-text">其他推荐资料：</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">10</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">25</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc/4.0/zh-CN" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
 
 
 
@@ -949,6 +539,27 @@
 
 
 
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
 
 
 
@@ -965,62 +576,71 @@
 
 
 
-  
-  <script src="/lib/jquery/index.js?v=3.4.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
-
-  
-  <script src="/lib/fancybox/source/jquery.fancybox.pack.js"></script>
 
 
 
 
   
 
+  
+      
 
-  <script src="/js/utils.js?v=7.2.0"></script>
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
 
-  <script src="/js/motion.js?v=7.2.0"></script>
-
-
+    
 
   
-  
 
-
-  <script src="/js/affix.js?v=7.2.0"></script>
-
-  <script src="/js/schemes/pisces.js?v=7.2.0"></script>
-
-
-
-  
-  <script src="/js/scrollspy.js?v=7.2.0"></script>
-<script src="/js/post-details.js?v=7.2.0"></script>
-
-
-
-  
-
-
-  <script src="/js/next-boot.js?v=7.2.0"></script>
-
-
-  
-
-  
-
-  
-
-  
-
-  
-  
 <script>
   function loadCount() {
     var d = document, s = d.createElement('script');
@@ -1031,114 +651,26 @@
   // defer loading until the whole page loading is completed
   window.addEventListener('load', loadCount, false);
 </script>
-
-
 <script>
   var disqus_config = function() {
-    this.page.url = "http://benzblog.site/2017-11-27-推荐系统指北/";
+    this.page.url = "https://benzblog.site/2017-11-27-%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F%E6%8C%87%E5%8C%97/";
     this.page.identifier = "2017-11-27-推荐系统指北/";
-    this.page.title = '推荐系统指北';
+    this.page.title = "推荐系统指北";
     };
-  function loadComments() {
-    var d = document, s = d.createElement('script');
-    s.src = 'https://benzbloghexo.disqus.com/embed.js';
-    s.setAttribute('data-timestamp', '' + +new Date());
-    (d.head || d.body).appendChild(s);
-  }
-  
-    window.addEventListener('load', loadComments, false);
-  
-</script>
-
-
-
-
-
-  
-
-
-  
-
-
-
-
-  
-
-  
-
-  
-  
-
-  
-  
-
-  
-    
-      <script type="text/x-mathjax-config">
-  
-
-  MathJax.Hub.Config({
-    tex2jax: {
-      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
-      processEscapes: true,
-      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
-    },
-    TeX: {
-      
-      equationNumbers: {
-        autoNumber: 'AMS'
-      }
-    }
-  });
-  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
-    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
-      if (data.display) {
-        var next = data.script.nextSibling;
-        while (next && next.nodeName.toLowerCase() === '#text') { next = next.nextSibling }
-        if (next && next.nodeName.toLowerCase() === 'br') { next.parentNode.removeChild(next) }
-      }
-    });
-  });
-</script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Queue(function() {
-    var all = MathJax.Hub.getAllJax(), i;
-    for (i = 0; i < all.length; i += 1) {
-      document.getElementById(all[i].inputID + '-Frame').parentNode.className += ' has-jax';
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
     }
   });
 </script>
-<script src="//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-
-    
-  
-
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-  
-
-
-  
 
 </body>
 </html>
