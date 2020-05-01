@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://benzblog.site/"/>
-  <updated>2020-04-25T08:17:36.892Z</updated>
+  <updated>2020-05-01T07:18:31.598Z</updated>
   <id>https://benzblog.site/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Docker 基本使用技巧</title>
+    <link href="https://benzblog.site/2020-04-25-docker_basic_skills/"/>
+    <id>https://benzblog.site/2020-04-25-docker_basic_skills/</id>
+    <published>2020-04-24T16:00:00.000Z</published>
+    <updated>2020-05-01T07:18:31.598Z</updated>
+    
+    <summary type="html">
+    
+      最近在很多场景用到了 docker，太方便了，相见恨晚。在此极力推荐给每位同学，不分前后端，不分工作背景，都推荐学习。这里简单总结了常见命令和技巧，备忘。
+    
+    </summary>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/categories/skill/"/>
+    
+    
+      <category term="skill" scheme="https://benzblog.site/tags/skill/"/>
+    
+      <category term="software" scheme="https://benzblog.site/tags/software/"/>
+    
+      <category term="docker" scheme="https://benzblog.site/tags/docker/"/>
+    
+  </entry>
   
   <entry>
     <title>cmder 软件使用技巧</title>
@@ -36,6 +61,31 @@
       <category term="skill" scheme="https://benzblog.site/tags/skill/"/>
     
       <category term="software" scheme="https://benzblog.site/tags/software/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Kaldi 模型在 Android 端的运行</title>
+    <link href="https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/"/>
+    <id>https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/</id>
+    <published>2020-04-23T16:00:00.000Z</published>
+    <updated>2020-05-01T07:23:46.301Z</updated>
+    
+    <summary type="html">
+    
+      前文已经成功使用 kaldi 将模型训练好并解码测试，现在我们借助 vosk-api 来让模型在 Android 手机上跑起来吧!
+    
+    </summary>
+    
+    
+      <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
+    
+    
+      <category term="ASR" scheme="https://benzblog.site/tags/ASR/"/>
+    
+      <category term="kaldi" scheme="https://benzblog.site/tags/kaldi/"/>
+    
+      <category term="android" scheme="https://benzblog.site/tags/android/"/>
     
   </entry>
   
@@ -64,8 +114,8 @@
   
   <entry>
     <title>Tensorflow Serving 要点 </title>
-    <link href="https://benzblog.site/how_to_use_tf_serving_model/"/>
-    <id>https://benzblog.site/how_to_use_tf_serving_model/</id>
+    <link href="https://benzblog.site/2019-08-27-how_to_use_tf_serving_model/"/>
+    <id>https://benzblog.site/2019-08-27-how_to_use_tf_serving_model/</id>
     <published>2019-08-26T16:00:00.000Z</published>
     <updated>2019-11-28T15:11:10.000Z</updated>
     
@@ -89,8 +139,8 @@
   
   <entry>
     <title>使用 DeepLab 训练一个人脸语义分割模型</title>
-    <link href="https://benzblog.site/training_a_face_segmentation_model_with_deeplab/"/>
-    <id>https://benzblog.site/training_a_face_segmentation_model_with_deeplab/</id>
+    <link href="https://benzblog.site/2019-08-23-training_a_face_segmentation_model_with_deeplab/"/>
+    <id>https://benzblog.site/2019-08-23-training_a_face_segmentation_model_with_deeplab/</id>
     <published>2019-08-22T16:00:00.000Z</published>
     <updated>2019-08-26T16:13:18.000Z</updated>
     
@@ -104,11 +154,11 @@
       <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
     
     
-      <category term="深度学习" scheme="https://benzblog.site/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
-    
       <category term="机器学习" scheme="https://benzblog.site/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/"/>
     
       <category term="SemanticSegmentation" scheme="https://benzblog.site/tags/SemanticSegmentation/"/>
+    
+      <category term="深度学习" scheme="https://benzblog.site/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
     
       <category term="slim" scheme="https://benzblog.site/tags/slim/"/>
     
@@ -116,8 +166,8 @@
   
   <entry>
     <title>GMIS 2019 精华梳理及收获</title>
-    <link href="https://benzblog.site/GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/"/>
-    <id>https://benzblog.site/GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/</id>
+    <link href="https://benzblog.site/2019-07-24-GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/"/>
+    <id>https://benzblog.site/2019-07-24-GMIS%202019%20%E7%B2%BE%E5%8D%8E%E6%A2%B3%E7%90%86%E5%8F%8A%E6%94%B6%E8%8E%B7/</id>
     <published>2019-07-23T16:00:00.000Z</published>
     <updated>2019-07-24T13:01:03.000Z</updated>
     
@@ -181,9 +231,9 @@
       <category term="MachineLearning" scheme="https://benzblog.site/categories/MachineLearning/"/>
     
     
-      <category term="GAN" scheme="https://benzblog.site/tags/GAN/"/>
-    
       <category term="深度学习" scheme="https://benzblog.site/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/"/>
+    
+      <category term="GAN" scheme="https://benzblog.site/tags/GAN/"/>
     
       <category term="StyleTransfer" scheme="https://benzblog.site/tags/StyleTransfer/"/>
     

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="最近在很多场景用到了 docker，太方便了，相见恨晚。在此极力推荐给每位同学，不分前后端，不分工作背景，都推荐学习。这里简单总结了常见命令和技巧，备忘。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker 基本使用技巧">
+<meta property="og:url" content="https://benzblog.site/2020-04-25-docker_basic_skills/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="最近在很多场景用到了 docker，太方便了，相见恨晚。在此极力推荐给每位同学，不分前后端，不分工作背景，都推荐学习。这里简单总结了常见命令和技巧，备忘。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2020-04-24T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-01T07:18:31.598Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="skill">
+<meta property="article:tag" content="software">
+<meta property="article:tag" content="docker">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://benzblog.site/2020-04-25-docker_basic_skills/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Docker 基本使用技巧 | 奔哲明的博客</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?311511b30756494577b67a167866028f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2020-04-25-docker_basic_skills/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Docker 基本使用技巧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-25 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-25T00:00:00+08:00">2020-04-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 15:18:31" itemprop="dateModified" datetime="2020-05-01T15:18:31+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/skill/" itemprop="url" rel="index"><span itemprop="name">skill</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020-04-25-docker_basic_skills/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020-04-25-docker_basic_skills/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/skill/" rel="tag"><i class="fa fa-tag"></i> skill</a>
+                <a href="/tags/software/" rel="tag"><i class="fa fa-tag"></i> software</a>
+                <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+            </div>
+            <div class="post-description" hidden>最近在很多场景用到了 docker，太方便了，相见恨晚。在此极力推荐给每位同学，不分前后端，不分工作背景，都推荐学习。这里简单总结了常见命令和技巧，备忘。</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>最近在很多场景用到了 docker，太方便了，相见恨晚。之前 tensorflow-serving 时虽然也用到了，但懵懵懂懂地只是照葫芦画瓢改参数，现在自己尝试构建 docker 镜像过后，才真正算是体会到 docker 的便利，在此极力推荐给每位同学，不分前后端，不分工作背景，都推荐学习。这里简单总结了常见命令和技巧，备忘。</p>
+<h2 id="Docker-用武之地"><a href="#Docker-用武之地" class="headerlink" title="Docker 用武之地"></a>Docker 用武之地</h2><p>对我个人来说，最大的好处就是部署服务时免去了环境配置的繁琐。</p>
+<h3 id="当我作为-docker-提供方，交付极快。"><a href="#当我作为-docker-提供方，交付极快。" class="headerlink" title="当我作为 docker 提供方，交付极快。"></a>当我作为 docker 提供方，交付极快。</h3><p>比如说，做好了一个项目原型，给到其他同学体验和部署时。一个 docker image 和 参数文档 就够了，而如果把 源码、Dockerfile 也一并给过去，相当于 工作原理、服务架构、部署方法 全都一股脑铺在了面前，没理由还跑不起来。</p>
+<h3 id="当我作为-docker-使用方，不仅部署和启动快，调整魔改也方便。"><a href="#当我作为-docker-使用方，不仅部署和启动快，调整魔改也方便。" class="headerlink" title="当我作为 docker 使用方，不仅部署和启动快，调整魔改也方便。"></a>当我作为 docker 使用方，不仅部署和启动快，调整魔改也方便。</h3><p>比如说，最近入手了群晖NAS，使用 docker 部署了不下十个五花八门的工具，而这些东西如果都要脱离docker一个一个手动部署，那是不可想象的。Docker 虽然说是跑在 container 盒子里，但是这个盒子是开放的，可以方便地 mount 路径，也可以替换和修改内部文件以符合自己使用要求，甚至可以在启动前修改环境变量，自由度极大。</p>
+<h2 id="Docker学习参考资料"><a href="#Docker学习参考资料" class="headerlink" title="Docker学习参考资料"></a>Docker学习参考资料</h2><p><a href="https://www.runoob.com/docker/docker-tutorial.html" target="_blank" rel="noopener">RUNOOB-Docker教程</a></p>
+<p><a href="https://www.ruanyifeng.com/blog/2018/02/docker-tutorial.html" target="_blank" rel="noopener">阮一峰-Docker入门教程</a></p>
+<p><a href="https://docs.docker.com/" target="_blank" rel="noopener">Docker Documentation</a></p>
+<h2 id="Docker-的一些基本概念"><a href="#Docker-的一些基本概念" class="headerlink" title="Docker 的一些基本概念"></a>Docker 的一些基本概念</h2><p>为了隔离运行、规避环境配置的麻烦，以前使用 虚拟机，但是 虚拟机 启动慢、资源占用多，Docker 跟 虚拟机 相似，但它是基于 linux 容器的一种实现，隔离程度没有那么强，与宿主机的联系更多。Docker 的使用首先要启动 docker 服务，即dockerd，多个docker是共同托管在这个 dockerd 上，每个docker运行时又各自在其 container 内来实现隔离。</p>
+<p>使用docker最好了解镜像、容器的概念，<a href="https://juejin.im/post/5b260ec26fb9a00e8e4b031a#heading-17" target="_blank" rel="noopener">这篇</a>写的不错。</p>
+<h2 id="Docker-安装及常见命令"><a href="#Docker-安装及常见命令" class="headerlink" title="Docker 安装及常见命令"></a>Docker 安装及常见命令</h2><p>使用 Docker 首先要在本机安装并启动 docker 服务，一般安装 docker-ce 版本（社区版）即可，安装的源需要自己设定，请按照<a href="https://docs.docker.com/engine/install/ubuntu/" target="_blank" rel="noopener">官方文档</a>一步步来。 <a href="https://www.runoob.com/docker/ubuntu-docker-install.html" target="_blank" rel="noopener">这里</a>下方的笔记里写得相对简略些，可以参考。</p>
+<p>如果是要在 windows 上使用，则需要安装一个 <code>Docker Desktop for Windows</code> 应用，步骤参考<a href="https://docs.docker.com/docker-for-windows/install/" target="_blank" rel="noopener">官方文档</a>。在 windows 上使用时，要手动启动 Hyper-V 功能，印象里好像还得“以管理员身份运行”，否则 <code>mount</code> 路径时会无效。</p>
+<h2 id="Docker-获得镜像并部署运行"><a href="#Docker-获得镜像并部署运行" class="headerlink" title="Docker 获得镜像并部署运行"></a>Docker 获得镜像并部署运行</h2><p>通常我们会用到的 Docker 都会在 <a href="https://hub.docker.com/" target="_blank" rel="noopener">Docker hub</a> 仓库被托管，这时候使用 <code>docker pull</code> 可以从仓库把对应 docker 下载下来，然后使用 <code>docker run</code> 来启动。</p>
+<p>例如，假设我打算部署一个 RSSHub 服务<sup id="fnref:1"><a href="#fn:1" rel="footnote"><span class="hint--top hint--error hint--medium hint--rounded hint--bounce" aria-label="万物皆可RSS，一个开源易用的RSS生成器，推荐使用，https://docs.rsshub.app/">[1]</span></a></sup>，先到 docker hub 搜索，或使用下面命令搜索:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker search rsshub</span><br></pre></td></tr></table></figure>
+
+<p>会返回多个结果，获得对应 docker 的全名： <code>diygod/rsshub</code></p>
+<p>下载镜像：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull diygod&#x2F;rsshub</span><br></pre></td></tr></table></figure>
+
+<p>下载完毕后，查看本地查看镜像列表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker images</span><br></pre></td></tr></table></figure>
+
+<p>运行镜像(参考对应项目的文档说明)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 1200:1200 diygod&#x2F;rsshub</span><br></pre></td></tr></table></figure>
+
+<p>总体上来说，部署启动一个 docker 服务就是这么简单。</p>
+<p>在国内的话，使用 docker hub 源可能速度有些慢，可以通过修改 hub 镜像地址来改善，<a href="https://gist.github.com/y0ngb1n/7e8f16af3242c7815e7ca2f0833d3ea6" target="_blank" rel="noopener">参考这里</a>。</p>
+<h2 id="Docker-基本用法及命令"><a href="#Docker-基本用法及命令" class="headerlink" title="Docker 基本用法及命令"></a>Docker 基本用法及命令</h2><h3 id="去掉-sudo-权限的要求"><a href="#去掉-sudo-权限的要求" class="headerlink" title="去掉 sudo 权限的要求"></a>去掉 sudo 权限的要求</h3><p>通过将自己加入 docker 用户组，避免每次 docker 命令都需要在前面加 sudo ：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 可以看到自己是否在 docker 组里面</span><br><span class="line">cat &#x2F;etc&#x2F;group | grep &#39;docker&#39;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 将自己加入 docker 用户组里面</span><br><span class="line">sudo usermod -a -G docker $your_username</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 重启 docker 服务</span><br><span class="line">sudo service docker restart</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 切换用户组(或者重新登录)</span><br><span class="line">newgrp docker</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="本地镜像常见操作："><a href="#本地镜像常见操作：" class="headerlink" title="本地镜像常见操作："></a>本地镜像常见操作：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 列出本地镜像</span><br><span class="line">docker images</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 删掉本地镜像</span><br><span class="line">docker rmi $IMAGE_ID</span><br><span class="line"> </span><br><span class="line">&#x2F;&#x2F; 导出镜像为一个 tar 文件</span><br><span class="line">docker save --output backup.tar $IMAGE_ID</span><br><span class="line"> </span><br><span class="line">&#x2F;&#x2F; 导入一个镜像</span><br><span class="line">docker load --input backup.tar</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="本地容器常见操作："><a href="#本地容器常见操作：" class="headerlink" title="本地容器常见操作："></a>本地容器常见操作：</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 列出正在运行的 docker 容器列表</span><br><span class="line">docker ps</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F; 结束运行中的 docker</span><br><span class="line">docker kill $CONTAINER</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="映射端口，-使用-p-参数："><a href="#映射端口，-使用-p-参数：" class="headerlink" title="映射端口， 使用 -p 参数："></a>映射端口， 使用 <code>-p</code> 参数：</h3><p>例如，如下命令 <a name="jump_tf_serving">Tensorflow-serving</a> 中，容器映射了 8500-8500， 8501-8501 两对端口，<code>:</code> 前为宿主机端口，<code>:</code> 后为容器内端口。宿主机端口可以自己设定，容器内端口则要按照文档使用，Dockerfile 构建时候的 <code>EXPOSE</code> 已经指定好该端口值了 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sudo docker run -p 8500:8500 -p 8501:8501 \</span><br><span class="line">--mount type&#x3D;bind,source&#x3D;path_to_serving_folder&#x2F;twingan_latent_encoder,target&#x3D;&#x2F;models&#x2F;twingan_latent_encoder \</span><br><span class="line">--mount type&#x3D;bind,source&#x3D;path_to_serving_folder&#x2F;latent_search_model,target&#x3D;&#x2F;models&#x2F;latent_search_model \</span><br><span class="line">-t tensorflow&#x2F;serving \</span><br><span class="line">--model_config_file&#x3D;&#x2F;models&#x2F;serving_models.config</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="映射文件，挂载路径"><a href="#映射文件，挂载路径" class="headerlink" title="映射文件，挂载路径"></a>映射文件，挂载路径</h3><p>使用 <code>-v</code> 或 <code>--mount</code> 参数，详见下面 [Docker 文件相关](#Docker 文件相关)一节的说明。</p>
+<p>上面命令中也有使用到 <code>--mount</code> 参数。</p>
+<h3 id="启动容器后，执行命令并附带参数"><a href="#启动容器后，执行命令并附带参数" class="headerlink" title="启动容器后，执行命令并附带参数"></a>启动容器后，执行命令并附带参数</h3><p>可使用 <code>ENTRYPOINT</code> 或 <code>CMD</code> 两种方式，需要在使用 Dockerfile 构建时配置，详见本文下面 [Docker 镜像生成](#Docker 镜像生成)一节。</p>
+<p>上面命令中最后一行，即通过 <code>ENTRYPOINT</code> 的方式向容器传递运行时临时参数。</p>
+<h3 id="容器运行时及-attach、detach-操作"><a href="#容器运行时及-attach、detach-操作" class="headerlink" title="容器运行时及 attach、detach 操作"></a>容器运行时及 attach、detach 操作</h3><h4 id="运行容器时，希望进入容器内命令行继续操作："><a href="#运行容器时，希望进入容器内命令行继续操作：" class="headerlink" title="运行容器时，希望进入容器内命令行继续操作："></a>运行容器时，希望进入容器内命令行继续操作：</h4><ul>
+<li><code>docker run</code> 时增加 <code>-it</code> 参数， 即 <code>docker run -it $IMAGE_NAME</code> </li>
+<li><code>docker start</code> 时增加 <code>-ai</code> 参数。</li>
+</ul>
+<h4 id="已经在容器内，想脱离-detach-容器而保持容器运行："><a href="#已经在容器内，想脱离-detach-容器而保持容器运行：" class="headerlink" title="已经在容器内，想脱离(detach)容器而保持容器运行："></a>已经在容器内，想脱离(detach)容器而保持容器运行：</h4><p>先按<code>Ctrl+P</code> 再按 <code>Ctrl+Q</code>，或者三个键一起按。<a href="https://stackoverflow.com/a/19689048" target="_blank" rel="noopener">参考这里</a></p>
+<h4 id="容器已经在运行，想要进入容器的命令行："><a href="#容器已经在运行，想要进入容器的命令行：" class="headerlink" title="容器已经在运行，想要进入容器的命令行："></a>容器已经在运行，想要进入容器的命令行：</h4><ul>
+<li><p><code>docker attach $CONTAINER</code> 命令进入</p>
+</li>
+<li><p>如果 docker 启动时已经使用 <code>CMD</code> 之类的执行了 daemon 服务，现在想要进入修改下再跑起来，这个时候需要进入 container 的同时覆盖 <code>CMD</code> 命令（否则这个 docker 只会在 stopped 和 执行 CMD 两个状态里摇摆）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it $CONTAINER bash</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h2 id="Docker-container-清理"><a href="#Docker-container-清理" class="headerlink" title="Docker container 清理"></a>Docker container 清理</h2><p>使用 <code>docker run</code> 启动的服务在执行完毕后，虽然会自动跳出回到宿主环境，但是 container 其实还是存在的(stopped状态)，可以通过 <code>docker container ls --all</code> 或 <code>docker ps -a</code>  来确认所有的 container。</p>
+<p>使用 <code>docker run $IMAGE_NAME</code> 命令启动 docker 时，每次总会从 image 创建一个新的 container 然后再在其中运行，而每个 container 还要占用另外一份文件空间， 如果操作不当，就会积累大量冗余数据占用硬盘。</p>
+<p>选用下面的方法正确处理好 container 空间占用的问题：</p>
+<ul>
+<li>使用 <code>docker container rm $CONTAINER_ID</code> 命令删掉对应 container。</li>
+<li>使用 <code>docker container prune</code> 命令快速删掉所有没在运行的 container，还有不少其他方便的 prune 的命令，参考官方文档 <a href="https://docs.docker.com/config/pruning/" target="_blank" rel="noopener">Prune unused Docker objects</a>，要谨慎使用。</li>
+<li>使用 <code>docker container start $CONTAINER_ID</code> 来重新启动结束中的 container，而不是每次新建一个。</li>
+<li>使用 <code>docker run --rm $IMAGE_NAME</code> 来从镜像启动docker，增加 <code>--rm</code> 参数后，容器在运行结束后会被自动删掉(Automatically remove the container when it exits)，适合于调试阶段或容器中运行时数据无价值的情况。 </li>
+</ul>
+<h2 id="Docker-文件相关"><a href="#Docker-文件相关" class="headerlink" title="Docker 文件相关"></a>Docker 文件相关</h2><h3 id="Docker-挂载路径-Bind-mounts"><a href="#Docker-挂载路径-Bind-mounts" class="headerlink" title="Docker 挂载路径 - Bind mounts"></a>Docker 挂载路径 - Bind mounts</h3><p>可以用 <code>-v</code> 或 <code>--mount</code> 两套方法来实现。前者实现较早，用的时候敲得字少；后者更清晰，似乎功能更强。</p>
+<p>两者需要关注的区别：用 <code>-v</code> 的时候会帮忙自动建路径，无论是容器内还是宿主机，而<code>--mount</code>检查路径发现没有时会报错。这里以 <code>-v</code> 为例子。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d \</span><br><span class="line">  -it \</span><br><span class="line">  --name devtest \</span><br><span class="line">  -v &quot;$(pwd)&quot;&#x2F;target:&#x2F;app \</span><br><span class="line">  nginx:latest</span><br></pre></td></tr></table></figure>
+
+<p><code>-v</code> 命令以 <code>:</code> 为分隔符，分隔符前面为 Host 路径，分隔符后面为 Container 中的路径。</p>
+<p>挂载路径当然会有读写权限问题、谁主谁次的问题，因此也有一套权限标识符，好像比较复杂，我这只试过留白默认的，即 <code>rprivate</code>，实际用下来已经足够实用。</p>
+<p>简单来说，挂载路径是后生效的，且静默完成，宿主机的现有文件会覆盖 container 里文件。也就是说，可以轻松替换 docker 中一整个文件夹的内容，这点对于机器学习部署的服务替换新的模型非常方便。</p>
+<p><code>-v</code> 命令也可以重复多个，实现多个路径的挂载。</p>
+<h3 id="Docker-container-内外拷贝文件"><a href="#Docker-container-内外拷贝文件" class="headerlink" title="Docker container 内外拷贝文件"></a>Docker container 内外拷贝文件</h3><p>跟 shell 中 cp 命令使用类似，命令名为 <code>docker ps</code> ，container 路径要以 <code>$CONTAINER:</code> 开头</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 使用 docker ps 获得 docker container id, 假设为 da0bbe00f49b</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;从 docker container 内向宿主机拷贝文件</span><br><span class="line">docker cp da0bbe00f49b:&#x2F;tmp&#x2F;test.txt test_renamed.txt</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;从宿主机向 docker container 拷贝文件</span><br><span class="line">docker cp test.txt da0bbe00f49b:&#x2F;tmp&#x2F;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>官方文档: <a href="https://docs.docker.com/engine/reference/commandline/cp/" target="_blank" rel="noopener">docker cp</a></p>
+</blockquote>
+<h2 id="Docker-镜像生成"><a href="#Docker-镜像生成" class="headerlink" title="Docker 镜像生成"></a>Docker 镜像生成</h2><p>Docker 的镜像需要通过准备一个 <code>Dockerfile</code> 文件来生成。写好 <code>Dockerfile</code> 文件后，在与该文件同级的目录下，使用下面命令生成 docker 镜像：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker build -t $IMAGE_NAME .</span><br></pre></td></tr></table></figure>
+
+<p>Dockerfile 的写法可以通过这篇文章-<a href="https://yeasy.gitbooks.io/docker_practice/image/build.html" target="_blank" rel="noopener">Dockerfile 定制镜像</a>来快速了解下。Dockerfile 的指令比较多，这里还是主张”实践出真知”，自己尝试封装一个docker服务，现学现用要高效得多。我们在此通过简单 review 一下 <a href="https://github.com/DIYgod/RSSHub" target="_blank" rel="noopener">RSSHub</a> 的 Dockerfile 来学习下。</p>
+<h3 id="Review-RSSHub-Dockerfile"><a href="#Review-RSSHub-Dockerfile" class="headerlink" title="Review RSSHub Dockerfile"></a>Review RSSHub Dockerfile</h3><p>进入 Github 项目根目录即可以看到一个 Dockerfile 文件，如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">FROM node:10-slim</span><br><span class="line"></span><br><span class="line">LABEL MAINTAINER https:&#x2F;&#x2F;github.com&#x2F;DIYgod&#x2F;RSSHub&#x2F;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">ENV NODE_ENV production</span><br><span class="line">ENV TZ Asia&#x2F;Shanghai</span><br><span class="line"></span><br><span class="line">ARG USE_CHINA_NPM_REGISTRY&#x3D;0;</span><br><span class="line">ARG PUPPETEER_SKIP_CHROMIUM_DOWNLOAD&#x3D;1;</span><br><span class="line"></span><br><span class="line">RUN ln -sf &#x2F;bin&#x2F;bash &#x2F;bin&#x2F;sh</span><br><span class="line"></span><br><span class="line">RUN apt-get update &amp;&amp; apt-get install -yq libgconf-2-4 apt-transport-https git dumb-init --no-install-recommends &amp;&amp; apt-get clean \</span><br><span class="line">  &amp;&amp; rm -rf &#x2F;var&#x2F;lib&#x2F;apt&#x2F;lists&#x2F;*</span><br><span class="line"></span><br><span class="line">WORKDIR &#x2F;app</span><br><span class="line"></span><br><span class="line">COPY package.json clean-nm.sh &#x2F;app&#x2F;</span><br><span class="line"></span><br><span class="line">RUN if [ &quot;$USE_CHINA_NPM_REGISTRY&quot; &#x3D; 1 ]; then \</span><br><span class="line">  echo &#39;use npm mirror&#39;; npm config set registry https:&#x2F;&#x2F;registry.npm.taobao.org; \</span><br><span class="line">  fi;</span><br><span class="line"></span><br><span class="line">RUN if [ &quot;$PUPPETEER_SKIP_CHROMIUM_DOWNLOAD&quot; &#x3D; 0 ]; then \</span><br><span class="line">  echo &#39;pass&#39;</span><br><span class="line">  fi;</span><br><span class="line"></span><br><span class="line">COPY . &#x2F;app</span><br><span class="line"></span><br><span class="line">EXPOSE 1200</span><br><span class="line">ENTRYPOINT [&quot;dumb-init&quot;, &quot;--&quot;]</span><br><span class="line"></span><br><span class="line">CMD [&quot;npm&quot;, &quot;run&quot;, &quot;start&quot;]</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>FROM</code> 指定了基础镜像，<code>node:10-slim</code> 中， <code>:</code> 后的内容制定了具体 tag， 可以用 <code>:latest</code> 来表明使用最新编译出来的版本。跟 <code>docker pull</code> 都是一样用法，可以从 docker hub 查到对应镜像。</p>
+<p><code>ENV</code> 用来设置 docker 中的环境变量，和 Shell 下的行为是一致，例如 python 中  <code>os.environ</code> 获得的值会与这里一致。 在本例中，使用 <code>ENV TZ Asia/Shanghai</code> 设置了时区，调整显示的时间，尤其是日志时间。 <code>docker run</code> 时候增加 <code>--env</code> 参数可以覆盖环境变量的设置。</p>
+<p><code>ARG</code> 和 <code>ENV</code> 一样也是设置 docker 中的环境变量，但只在构建阶段生效，所以在本例中，把它用来作为构建阶段的选项，当参数不同时，构建步骤会有些不同，即后面 <code>RUN if</code> 代码块部分。</p>
+<p><code>RUN</code> 命令，就相当于在构建 docker 阶段使用 Shell 脚本执行动作。这里需要注意的是，要尽量把多个 shell 命令压缩在一次 <code>RUN</code> 命令中一起执行，像这个 dockerfile 中一样， apt-get 的 update、install、clean 以及 <code>rm -rf</code> 都使用 <code>&amp;&amp;</code> 联在了一起，使用一条 <code>RUN</code> 命令一并执行。这是因为 Dockerfile 中的每一条命令都会产生一次 <code>docker commit</code>, 而每次 <code>commit</code>都会固化一层镜像，如果把命令拆开成多个 <code>RUN</code> 命令的话，最终镜像将会很臃肿，层数多且占存储空间较大。也可以参考下 <a href="https://github.com/kaldi-asr/kaldi/blob/master/docker/debian9.8-cpu/Dockerfile" target="_blank" rel="noopener">kaldi 的 docker</a>是怎样竭尽所能把各个命令压缩在一起执行的。</p>
+<p>由于每次 <code>docker commit</code> 后，镜像会固化一层，所以删除文件的动作要在 commit 之前执行，否则后面就删不掉了。因此，我们可以从上面的 Dockerfile 里看到，为了删除 <code>apt-get</code>安装时下载的临时文件，使用 <code>rm -rf</code> 的动作是与 <code>apt-get</code> 在同一个 <code>RUN</code> 命令中完成的。</p>
+<p><code>WORKDIR</code> 命令用于指定 docker 的默认目录，也可以在 build 阶段切换当前目录，docker 启动后的目录会自动跳到最后一次 <code>WORKDIR</code> 指定的目录。如果在编译阶段需要切换目录后再执行动作，要么通过 <code>WORKDIR</code> 先切换目录，要么把 <code>cd</code> 命令和要进行的动作放在一起执行，否则在下次 <code>RUN</code> 时，目录会切回到 <code>WORKDIR</code> 的目录。</p>
+<p><code>COPY</code> 用于从构建上下文目录中向镜像内复制文件。</p>
+<p><code>EXPOSE</code> 用于声明将暴露的端口。</p>
+<p><code>ENTRYPOINT</code> 和 <code>CMD</code> 都是用来指定容器启动程序及参数。前者格式是在 container 启动完毕后，会执行两者，</p>
+<p>两者可以独立的使用，在一起使用的时候，<code>ENTRYPOINT</code> 和 <code>CMD</code> 会拼在一起作为一条命令执行。两者都可以在 <code>docker run</code> 的时候重新被覆盖掉，前置要在 <code>-t $IMAGE_NAME</code> 前通过 <code>--entrypoint</code> 参数来覆盖，后者是 <code>-t $IMAGE_NAME</code> 后的内容都会被解析为 <code>CMD</code> 。具体区别和用法可以再看看这篇 <a href="https://aws.amazon.com/cn/blogs/china/demystifying-entrypoint-cmd-docker/" target="_blank" rel="noopener">Docker 的 ENTRYPOINT 和 CMD 参数探秘</a>，总结下最佳实践方案：</p>
+<p>如果可提供的参数比较少的话，用 <code>CMD</code> 就好了，<code>docker run</code> 需要修改的时候，一整句替代掉，易于理解。</p>
+<p>而如果提供的可修改参数较多的话，可以在 Docker 中用 <code>ENTRYPOINT</code> 启动，在 <code>run docker</code> 时用覆盖 <code>CMD</code> 的方式传递参数(参考 <a href="https://github.com/tensorflow/serving/blob/master/tensorflow_serving/tools/docker/Dockerfile" target="_blank" rel="noopener">tensorflow/serving 的 Dockerfile</a>  以及上文中启动 <a href="#jump_tf_serving">Tensorflow-serving</a> 的用法)。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>docker 还有非常多的其他用法，这里就不再细讲了，以后碰到再补充。</p>
+<p>Docker 毕竟只是个工具，常用常新，有应用场景、实践过才能感受到它的实用、强大，还没试过的话，不妨考虑按这篇<a href="http://www.ruanyifeng.com/blog/2018/02/docker-wordpress-tutorial.html" target="_blank" rel="noopener">《Docker 微服务教程》</a>来搭个网站体验一下。</p>
+<div id="footnotes"><hr><div id="footnotelist"><ol style="list-style: none; padding-left: 0; margin-left: 40px"><li id="fn:1"><span style="display: inline-block; vertical-align: top; padding-right: 10px; margin-left: -40px">1.</span><span style="display: inline-block; vertical-align: top; margin-left: 10px;">万物皆可RSS，一个开源易用的RSS生成器，推荐使用，https://docs.rsshub.app/<a href="#fnref:1" rev="footnote"> ↩</a></span></li></ol></div></div>
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2020-04-25-docker_basic_skills/" title="Docker 基本使用技巧">https://benzblog.site/2020-04-25-docker_basic_skills/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/skill/" rel="tag"><i class="fa fa-tag"></i> skill</a>
+              <a href="/tags/software/" rel="tag"><i class="fa fa-tag"></i> software</a>
+              <a href="/tags/docker/" rel="tag"><i class="fa fa-tag"></i> docker</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-04-24-Cmder%20%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="prev" title="cmder 软件使用技巧">
+      <i class="fa fa-chevron-left"></i> cmder 软件使用技巧
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-用武之地"><span class="nav-number">2.</span> <span class="nav-text">Docker 用武之地</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#当我作为-docker-提供方，交付极快。"><span class="nav-number">2.1.</span> <span class="nav-text">当我作为 docker 提供方，交付极快。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#当我作为-docker-使用方，不仅部署和启动快，调整魔改也方便。"><span class="nav-number">2.2.</span> <span class="nav-text">当我作为 docker 使用方，不仅部署和启动快，调整魔改也方便。</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker学习参考资料"><span class="nav-number">3.</span> <span class="nav-text">Docker学习参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-的一些基本概念"><span class="nav-number">4.</span> <span class="nav-text">Docker 的一些基本概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-安装及常见命令"><span class="nav-number">5.</span> <span class="nav-text">Docker 安装及常见命令</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-获得镜像并部署运行"><span class="nav-number">6.</span> <span class="nav-text">Docker 获得镜像并部署运行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-基本用法及命令"><span class="nav-number">7.</span> <span class="nav-text">Docker 基本用法及命令</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#去掉-sudo-权限的要求"><span class="nav-number">7.1.</span> <span class="nav-text">去掉 sudo 权限的要求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地镜像常见操作："><span class="nav-number">7.2.</span> <span class="nav-text">本地镜像常见操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#本地容器常见操作："><span class="nav-number">7.3.</span> <span class="nav-text">本地容器常见操作：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#映射端口，-使用-p-参数："><span class="nav-number">7.4.</span> <span class="nav-text">映射端口， 使用 -p 参数：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#映射文件，挂载路径"><span class="nav-number">7.5.</span> <span class="nav-text">映射文件，挂载路径</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#启动容器后，执行命令并附带参数"><span class="nav-number">7.6.</span> <span class="nav-text">启动容器后，执行命令并附带参数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#容器运行时及-attach、detach-操作"><span class="nav-number">7.7.</span> <span class="nav-text">容器运行时及 attach、detach 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#运行容器时，希望进入容器内命令行继续操作："><span class="nav-number">7.7.1.</span> <span class="nav-text">运行容器时，希望进入容器内命令行继续操作：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#已经在容器内，想脱离-detach-容器而保持容器运行："><span class="nav-number">7.7.2.</span> <span class="nav-text">已经在容器内，想脱离(detach)容器而保持容器运行：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#容器已经在运行，想要进入容器的命令行："><span class="nav-number">7.7.3.</span> <span class="nav-text">容器已经在运行，想要进入容器的命令行：</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-container-清理"><span class="nav-number">8.</span> <span class="nav-text">Docker container 清理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-文件相关"><span class="nav-number">9.</span> <span class="nav-text">Docker 文件相关</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-挂载路径-Bind-mounts"><span class="nav-number">9.1.</span> <span class="nav-text">Docker 挂载路径 - Bind mounts</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Docker-container-内外拷贝文件"><span class="nav-number">9.2.</span> <span class="nav-text">Docker container 内外拷贝文件</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Docker-镜像生成"><span class="nav-number">10.</span> <span class="nav-text">Docker 镜像生成</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Review-RSSHub-Dockerfile"><span class="nav-number">10.1.</span> <span class="nav-text">Review RSSHub Dockerfile</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结语"><span class="nav-number">11.</span> <span class="nav-text">结语</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">28</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://benzblog.site/2020-04-25-docker_basic_skills/";
+    this.page.identifier = "2020-04-25-docker_basic_skills/";
+    this.page.title = "Docker 基本使用技巧";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>

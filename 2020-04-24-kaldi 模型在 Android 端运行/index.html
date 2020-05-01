@@ -21,17 +21,22 @@
     var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="标签">
-<meta property="og:url" content="https://benzblog.site/tags/index.html">
+  <meta name="description" content="前文已经成功使用 kaldi 将模型训练好并解码测试，现在我们借助 vosk-api 来让模型在 Android 手机上跑起来吧!">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kaldi 模型在 Android 端的运行">
+<meta property="og:url" content="https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/index.html">
 <meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="前文已经成功使用 kaldi 将模型训练好并解码测试，现在我们借助 vosk-api 来让模型在 Android 手机上跑起来吧!">
 <meta property="og:locale" content="zh_CN">
-<meta property="article:published_time" content="2019-07-04T14:17:19.000Z">
-<meta property="article:modified_time" content="2019-07-10T17:00:50.249Z">
+<meta property="article:published_time" content="2020-04-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-05-01T07:23:46.301Z">
 <meta property="article:author" content="BenZ">
+<meta property="article:tag" content="ASR">
+<meta property="article:tag" content="kaldi">
+<meta property="article:tag" content="android">
 <meta name="twitter:card" content="summary">
 
-<link rel="canonical" href="https://benzblog.site/tags/">
+<link rel="canonical" href="https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/">
 
 
 <script id="page-configurations">
@@ -39,13 +44,12 @@
   CONFIG.page = {
     sidebar: "",
     isHome : false,
-    isPost : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>标签 | 奔哲明的博客
-</title>
+  <title>Kaldi 模型在 Android 端的运行 | 奔哲明的博客</title>
   
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
     <script>
@@ -172,51 +176,169 @@
       <div class="main-inner">
         <div class="content-wrap">
           
-  
-  
 
-          <div class="content page posts-expand">
+          <div class="content post posts-expand">
             
 
     
-    
-    
-    <div class="post-block" lang="zh-CN">
-      <header class="post-header">
-
-<h1 class="post-title" itemprop="name headline">标签
-</h1>
-
-<div class="post-meta">
   
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/">
 
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Kaldi 模型在 Android 端的运行
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-04-24 00:00:00" itemprop="dateCreated datePublished" datetime="2020-04-24T00:00:00+08:00">2020-04-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-05-01 15:23:46" itemprop="dateModified" datetime="2020-05-01T15:23:46+08:00">2020-05-01</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020-04-24-kaldi 模型在 Android 端运行/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
+                <a href="/tags/kaldi/" rel="tag"><i class="fa fa-tag"></i> kaldi</a>
+                <a href="/tags/android/" rel="tag"><i class="fa fa-tag"></i> android</a>
+            </div>
+            <div class="post-description" hidden>前文已经成功使用 kaldi 将模型训练好并解码测试，现在我们借助 vosk-api 来让模型在 Android 手机上跑起来吧!</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>前文已经成功使用 kaldi 将模型训练好并解码测试，现在我们借助 vosk-api 来让模型在 Android 手机上跑起来吧!</p>
+<h2 id="所用项目"><a href="#所用项目" class="headerlink" title="所用项目"></a>所用项目</h2><p><a href="https://github.com/alphacep/kaldi-android-demo" target="_blank" rel="noopener">kaldi-android-demo</a>，一个 kaldi 模型在 android 运行的 demo，作者还提供了些预训练的模型，如果不需要使用自己训练的模型的话，或者没有太多修改的话，借鉴这个 demo 足以使大多 kaldi 模型在 android 上运行测试起来。</p>
+<p>由于我们需要使用自己训练的模型，所以我们必须对 aar 做些定制化，也就需要修改 <a href="https://github.com/alphacep/vosk-api" target="_blank" rel="noopener">vosk-api</a> 项目，它会帮助我们将 kaldi 编译成 aar 使之能在 arm 平台上运行。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>首先将 vosk-api 项目 pull 下来，对于 android 平台 aar 的生成，只需要进入项目 <code>android</code> 目录然后使用 gradle 编译即可。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">cd android</span><br><span class="line">gradle build</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p> 如果有缺少 <code>ANDROID_SDK_HOME</code> 、<code>ANDROID_NDK_HOME</code>  环境之类的报错，还请根据报错信息配置后再重试。</p>
+</blockquote>
+<p>这个编译过程会非常的耗时，因为编译命令首先会执行 <code>android/build-kaldi.sh</code> 脚本，而这个脚本会把整个 kaldi 下载下来并编译。每次编译 aar 都会重复相同步骤，未免浪费资源，可以将 <code>android/build-kaldi.sh</code> 脚本中每个步骤做分割，按 kaldi 项目的风格，增加 stage 控制，之后再编译时，先手动修改 stage， 越过不需要执行的步骤。如果后面修改了 kaldi 源码，也一般只需要额外编译所属模块即可。像这样：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if [ $stage -le 7 ]; then</span><br><span class="line">    cd $WORKDIR&#x2F;kaldi&#x2F;src</span><br><span class="line"></span><br><span class="line">    CXX&#x3D;$CXX CXXFLAGS&#x3D;&quot;$ARCHFLAGS -O3 -DFST_NO_DYNAMIC_LINKING&quot; .&#x2F;configure --use-cuda&#x3D;no \</span><br><span class="line">        --mathlib&#x3D;OPENBLAS --shared \</span><br><span class="line">        --android-incdir&#x3D;$&#123;ANDROID_TOOLCHAIN_PATH&#125;&#x2F;sysroot&#x2F;usr&#x2F;include \</span><br><span class="line">        --host&#x3D;$HOST --openblas-root&#x3D;$&#123;WORKDIR&#125;&#x2F;local \</span><br><span class="line">        --fst-root&#x3D;$&#123;WORKDIR&#125;&#x2F;local --fst-version&#x3D;$&#123;OPENFST_VERSION&#125;</span><br><span class="line"></span><br><span class="line">    make -j $nj nnet3;</span><br><span class="line">fi</span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>build-kaldi.sh</code> 执行完后，gradle 会执行 task swig，使用 swig 工具将 <code>src</code> 目录下的文件转为 java 并生成 JNI。所以，如果要想对模型和逻辑做些定制化，就要从 src 目录下的这几个文件入手:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">json.h  kaldi_recognizer.cc  kaldi_recognizer.h  model.cc  model.h  spk_model.cc  spk_model.h  vosk.i</span><br></pre></td></tr></table></figure>
+
+<p>这里我只是稍微改了下 model.cc，修改 <code>feature_info_.use_ivectors</code> 使之能够运行没有 ivector 特征的模型。</p>
+<p><a href="https://github.com/alphacep/kaldi-android-demo" target="_blank" rel="noopener">kaldi-android-demo</a>所提供的模型 fst 是 <code>LookAhead decoding fst</code>  ，其实代码里也支持普通的 HCLG.fst：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hclg_fst_rxfilename_ &#x3D; model_path_str + &quot;&#x2F;HCLG.fst&quot;;</span><br><span class="line">hcl_fst_rxfilename_ &#x3D; model_path_str + &quot;&#x2F;HCLr.fst&quot;;</span><br><span class="line">g_fst_rxfilename_ &#x3D; model_path_str + &quot;&#x2F;Gr.fst&quot;;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>其他琐碎经验：</strong></p>
+<ul>
+<li>如果你像我一样不需要使用项目中的 SpeechRecognizer 而是想要完全定制 AudioRecord 输入源，可以将 build.gradle 中， <code>java.srcDirs</code> 部分的 <code>src/main/java</code> 注释掉。</li>
+</ul>
+<h2 id="解码测试"><a href="#解码测试" class="headerlink" title="解码测试"></a>解码测试</h2><p>在你的项目中加入编译生成的 aar 以及之前的模型文件（哪些模型文件是必要的可以参考 <code>src/model.cc</code> 代码中 各个 <code>_rxfilename</code>后缀变量），使用整个模型文件的目录构建 <code>org.kaldi.Model</code> 和 <code>org.kaldi.KaldiRecognizer</code> ，然后就可以不断向 KaldiRecognizer 喂音频数据并得到结果了，具体实现参考 <a href="https://github.com/alphacep/vosk-api" target="_blank" rel="noopener">vosk-api</a> 项目中的 <code>android\src\main\java\org\kaldi\SpeechRecognizer.java</code> 以及 <a href="https://github.com/alphacep/kaldi-android-demo" target="_blank" rel="noopener">kaldi-android-demo</a> 的实现细节。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/" title="Kaldi 模型在 Android 端的运行">https://benzblog.site/2020-04-24-kaldi 模型在 Android 端运行/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
 </div>
 
-</header>
 
-      
-      
-      
-      <div class="post-body">
-          <div class="tag-cloud">
-            <div class="tag-cloud-title">
-              目前共计 28 个标签
-            </div>
-            <div class="tag-cloud-tags">
-              <a href="/tags/AI/" style="font-size: 12px; color: #ccc">AI</a> <a href="/tags/AMS/" style="font-size: 12px; color: #ccc">AMS</a> <a href="/tags/ASR/" style="font-size: 24px; color: #4f4f4f">ASR</a> <a href="/tags/Android/" style="font-size: 18px; color: #8e8e8e">Android</a> <a href="/tags/Frameworks/" style="font-size: 18px; color: #8e8e8e">Frameworks</a> <a href="/tags/GAN/" style="font-size: 12px; color: #ccc">GAN</a> <a href="/tags/SemanticSegmentation/" style="font-size: 12px; color: #ccc">SemanticSegmentation</a> <a href="/tags/StyleTransfer/" style="font-size: 12px; color: #ccc">StyleTransfer</a> <a href="/tags/Tensorflow/" style="font-size: 12px; color: #ccc">Tensorflow</a> <a href="/tags/WMS/" style="font-size: 12px; color: #ccc">WMS</a> <a href="/tags/android/" style="font-size: 12px; color: #ccc">android</a> <a href="/tags/docker/" style="font-size: 12px; color: #ccc">docker</a> <a href="/tags/js/" style="font-size: 12px; color: #ccc">js</a> <a href="/tags/kaldi/" style="font-size: 18px; color: #8e8e8e">kaldi</a> <a href="/tags/skill/" style="font-size: 24px; color: #4f4f4f">skill</a> <a href="/tags/slim/" style="font-size: 12px; color: #ccc">slim</a> <a href="/tags/software/" style="font-size: 18px; color: #8e8e8e">software</a> <a href="/tags/tf-serving/" style="font-size: 12px; color: #ccc">tf-serving</a> <a href="/tags/web/" style="font-size: 12px; color: #ccc">web</a> <a href="/tags/%E4%BC%9A%E8%AE%AE%E5%88%86%E4%BA%AB/" style="font-size: 12px; color: #ccc">会议分享</a> <a href="/tags/%E5%94%A4%E9%86%92%E8%AF%8D/" style="font-size: 12px; color: #ccc">唤醒词</a> <a href="/tags/%E5%9B%BE%E5%83%8F%E7%94%9F%E6%88%90/" style="font-size: 12px; color: #ccc">图像生成</a> <a href="/tags/%E6%8E%A8%E8%8D%90%E7%B3%BB%E7%BB%9F/" style="font-size: 12px; color: #ccc">推荐系统</a> <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" style="font-size: 30px; color: #111">机器学习</a> <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/" style="font-size: 18px; color: #8e8e8e">深度学习</a> <a href="/tags/%E8%AF%AD%E9%9F%B3%E8%AF%86%E5%88%AB/" style="font-size: 12px; color: #ccc">语音识别</a> <a href="/tags/%E9%9F%B3%E9%A2%91%E5%A4%84%E7%90%86/" style="font-size: 12px; color: #ccc">音频处理</a> <a href="/tags/%E9%A2%84%E7%A0%94/" style="font-size: 12px; color: #ccc">预研</a>
-            </div>
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/ASR/" rel="tag"><i class="fa fa-tag"></i> ASR</a>
+              <a href="/tags/kaldi/" rel="tag"><i class="fa fa-tag"></i> kaldi</a>
+              <a href="/tags/android/" rel="tag"><i class="fa fa-tag"></i> android</a>
           </div>
-        
-      </div>
-      
-      
-      
-    </div>
-    
 
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-04-15-Kaldi%20%E8%AE%AD%E7%BB%83%E5%A3%B0%E5%AD%A6%E6%A8%A1%E5%9E%8B/" rel="prev" title="Kaldi 训练声学模型">
+      <i class="fa fa-chevron-left"></i> Kaldi 训练声学模型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020-04-24-Cmder%20%E4%BD%BF%E7%94%A8%E6%8A%80%E5%B7%A7/" rel="next" title="cmder 软件使用技巧">
+      cmder 软件使用技巧 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
     
-    
-    
+  </article>
+  
+  
+  
+
 
 
           </div>
@@ -274,6 +396,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#所用项目"><span class="nav-number">1.</span> <span class="nav-text">所用项目</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#解码测试"><span class="nav-number">3.</span> <span class="nav-text">解码测试</span></a></li></ol></div>
       </div>
       <!--/noindex-->
 
@@ -482,9 +605,9 @@
 </script>
 <script>
   var disqus_config = function() {
-    this.page.url = "https://benzblog.site/tags/index.html";
-    this.page.identifier = "tags/index.html";
-    this.page.title = "标签";
+    this.page.url = "https://benzblog.site/2020-04-24-kaldi%20%E6%A8%A1%E5%9E%8B%E5%9C%A8%20Android%20%E7%AB%AF%E8%BF%90%E8%A1%8C/";
+    this.page.identifier = "2020-04-24-kaldi 模型在 Android 端运行/";
+    this.page.title = "Kaldi 模型在 Android 端的运行";
     };
   NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
     if (window.DISQUS) {
