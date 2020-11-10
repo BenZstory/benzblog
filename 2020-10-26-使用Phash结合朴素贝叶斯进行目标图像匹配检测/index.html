@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon.ico">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon_16x16.ico">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5/css/all.min.css">
+  <link rel="stylesheet" href="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"benzblog.site","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"right","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":true,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":{"enable":true,"replace_from":"(\\?x-oss-process=style\\S+)","replace_to":"","with_caption":false},"mediumzoom":false,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":true,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="把 phash 和 朴素贝叶斯 朴素地结合起来使用，实现固定区域图像匹配">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Phash结合朴素贝叶斯进行目标图像匹配检测">
+<meta property="og:url" content="https://benzblog.site/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/index.html">
+<meta property="og:site_name" content="奔哲明的博客">
+<meta property="og:description" content="把 phash 和 朴素贝叶斯 朴素地结合起来使用，实现固定区域图像匹配">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154719346.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154847812.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/clip_image001.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026153743078.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026153747113.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154139041.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154239654.png?x-oss-process=style/resize_600">
+<meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154446133.png?x-oss-process=style/resize_600">
+<meta property="article:published_time" content="2020-10-25T16:00:00.000Z">
+<meta property="article:modified_time" content="2020-11-10T14:32:08.018Z">
+<meta property="article:author" content="BenZ">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="CV">
+<meta property="article:tag" content="OCR">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154719346.png?x-oss-process=style/resize_600">
+
+<link rel="canonical" href="https://benzblog.site/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>使用Phash结合朴素贝叶斯进行目标图像匹配检测 | 奔哲明的博客</title>
+  
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-101354718-1"></script>
+    <script>
+      if (CONFIG.hostname === location.hostname) {
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'UA-101354718-1');
+      }
+    </script>
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?311511b30756494577b67a167866028f";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+<link rel="alternate" href="/atom.xml" title="奔哲明的博客" type="application/atom+xml">
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">奔哲明的博客</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://benzblog.site/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+      <meta itemprop="name" content="BenZ">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="奔哲明的博客">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          使用Phash结合朴素贝叶斯进行目标图像匹配检测
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-10-26 00:00:00" itemprop="dateCreated datePublished" datetime="2020-10-26T00:00:00+08:00">2020-10-26</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-11-10 22:32:08" itemprop="dateModified" datetime="2020-11-10T22:32:08+08:00">2020-11-10</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/MachineLearning/" itemprop="url" rel="index"><span itemprop="name">MachineLearning</span></a>
+                </span>
+            </span>
+
+          
+  
+  <span class="post-meta-item">
+    
+      <span class="post-meta-item-icon">
+        <i class="far fa-comment"></i>
+      </span>
+      <span class="post-meta-item-text">Disqus：</span>
+    
+    <a title="disqus" href="/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/#disqus_thread" itemprop="discussionUrl">
+      <span class="post-comments-count disqus-comment-count" data-disqus-identifier="2020-10-26-使用Phash结合朴素贝叶斯进行目标图像匹配检测/" itemprop="commentCount"></span>
+    </a>
+  </span>
+  
+  
+            
+            <div class="post-tags" style="margin:5px">
+                <a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> python</a>
+                <a href="/tags/CV/" rel="tag"><i class="fa fa-tag"></i> CV</a>
+                <a href="/tags/OCR/" rel="tag"><i class="fa fa-tag"></i> OCR</a>
+            </div>
+            <div class="post-description" hidden>把 phash 和 朴素贝叶斯 朴素地结合起来使用，实现固定区域图像匹配</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>我们通常会有这样的一类图像识别问题：并不是要将图像进行多分类，而是在确定的区域，检测有没有目标图像出现，例如，在手机上一些界面，检测点击按钮是否出现，开屏动画时，检测右上角固定区域是否出现了叉号，这里是个图像匹配问题。</p>
+<h2 id="phash-原理"><a href="#phash-原理" class="headerlink" title="phash 原理"></a>phash 原理</h2><p>图像匹配问题是个二分类问题，即两者相像或不同。图像相似度方法主要有 指纹比较、ahash、phash、SIFT 等方法，我们这里折中选择了 phash 算法。</p>
+<p>具体到我们的使用中，有以下几个步骤：</p>
+<p>1、对图像统一缩放到某一大小，如 32 * 32</p>
+<p>2、对图像通道降维，转换为灰色或提取某一通道的数据</p>
+<p>3、进行 DCT 变换</p>
+<p>4、裁剪 DCT 特征 （图像信息主要集中在左上角低频频谱上）</p>
+<p>5、计算 DCT 均值</p>
+<p>6、遍历特征值，小偶遇均值的记为0，大于均值的记为1，得到图像指纹。</p>
+<p>代码参考如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">def get_hash(img, resize_to&#x3D;None, channel_id&#x3D;1, hash_type&#x3D;&#39;pHash&#39;, principle&#x3D;(12, 6)): # principle stored in order x, y</span><br><span class="line">    if resize_to is not None:</span><br><span class="line">        img &#x3D; cv2.resize(img, resize_to)</span><br><span class="line">    </span><br><span class="line">    if channel_id &lt;&#x3D; 2: # extract single channel</span><br><span class="line">        img_single_channel &#x3D; np.zeros(img.shape[:-1], dtype&#x3D;np.uint8)</span><br><span class="line">        cv2.mixChannels([img], [img_single_channel], [channel_id, 0])</span><br><span class="line">        img &#x3D; img_single_channel</span><br><span class="line">    </span><br><span class="line">    img &#x3D; img.astype(&quot;float32&quot;)</span><br><span class="line">    </span><br><span class="line">    if hash_type &#x3D;&#x3D; &#39;pHash&#39;:</span><br><span class="line">        dct &#x3D; cv2.dct(img)</span><br><span class="line">        dct_roi &#x3D; dct[0:principle[1], 0:principle[0]]</span><br><span class="line">        img_list &#x3D; dct_roi.flatten()</span><br><span class="line">        ave &#x3D; cv2.mean(img_list)[0]</span><br><span class="line">        ret &#x3D; np.array([0.0 if i&lt;ave else 1.0 for i in img_list])</span><br><span class="line">    </span><br><span class="line">    elif hash_type &#x3D;&#x3D; &#39;aHash&#39;:</span><br><span class="line">        img_list &#x3D; img.flatten()</span><br><span class="line">        ave &#x3D; cv2.mean(img_list)[0]</span><br><span class="line">        ret &#x3D; np.array([0.0 if i&lt;ave else 1.0 for i in img_list])</span><br><span class="line">    </span><br><span class="line">    return ret</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="朴素贝叶斯原理"><a href="#朴素贝叶斯原理" class="headerlink" title="朴素贝叶斯原理"></a>朴素贝叶斯原理</h2><p>得到 hash 之后，我们一般可以使用曼哈顿距离进行两张图片相似度的比较。但是实际使用中，要匹配的对象其实可能因为背景变化的关系，指纹也会有细微的变化，如果运气不好选作模板的指纹刚好是概率较低的那个，会造成后续无法正常识别匹配，又需要重新选择模板。</p>
+<p>为此，我们需要考虑一种方法，使得指纹模板能够覆盖更多样本的分布，于是想到了用朴素贝叶斯的方法。</p>
+<p>有关朴素贝叶斯算法的理解，建议参考<a href="https://juejin.im/post/6844904048009674760" target="_blank" rel="noopener">这篇文章</a>。</p>
+<p>简单来说，就是考虑每个特征在某一事件下出现概率的联合概率越大，则事件发生的概率越大。</p>
+<p>所以，给定同一目标$Y_j$的多个样本作为模板，我们将他们作同样的特征处理，特征共有$N$维，统计得到特征 $x_i=1$的概率$a_{ij})$ (则特征为$x_i=0$ 的概率为 $1-a_{ij}$) ，在对新样本$X=(x_1, x_2, … x_n)$判断是否与模板$Y_i$相同时，则用以下公式：</p>
+<p>$$<br>log(P(Y_j|X)) = logP(Y_j) + \sum_{i=0}^N(1-x_i)logP(x_1=0|Y_i) + \sum_{i=0}^NlogP(x_1=1|Y_i)<br>$$<br>将统计得到的概率值代入，即：<br>$$<br>log(P(Y_j|X)) = logP(Y_j) + \sum_{i=0}^N (1-x_i)log(1-a_{ij}) + \sum_{i=0}^Nlog(a_{ij})<br>$$<br>假定各个类别的先验概率都是一样的，最终问题变为计算等式右边后两项，形式上跟交叉熵很像，当值小于预设的阈值时，我们就认为属于对应分类。 </p>
+<p>代码参考如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def cmpHashDiff(template, target):</span><br><span class="line">    t &#x3D; template.copy()</span><br><span class="line">    </span><br><span class="line">    epsilon &#x3D; 0.0000001</span><br><span class="line">    t[t&#x3D;&#x3D;1] &#x3D; 1-epsilon</span><br><span class="line">    t[t&#x3D;&#x3D;0] &#x3D; epsilon</span><br><span class="line">    </span><br><span class="line">    t_log_positive &#x3D; np.log(t)</span><br><span class="line">    t_log_negative &#x3D; np.log(1-t)</span><br><span class="line">    ret_matrice &#x3D; (1-target)*t_log_negative + target*t_log_positive</span><br><span class="line">    ret &#x3D; np.sum(ret_matrice)</span><br><span class="line">    return ret</span><br></pre></td></tr></table></figure>
+
+
+
+<blockquote>
+<p> 1、在实际使用中，如果统计样本本身特征之间 variance 比较大，则可以适当调大阈值，从而在验证时，在特征变化稍大的情况也能正常匹配成功。当然，这 variance 太大时也说明样本本身变化较大或不可靠，这时候就要考虑其他算法了。</p>
+<p> 2、我们在计算对数时，引入了一个 epsilon，避免当趋于0时算得的值过小，平滑特征的响应。</p>
+</blockquote>
+<h2 id="对应工具的一般使用方法"><a href="#对应工具的一般使用方法" class="headerlink" title="对应工具的一般使用方法"></a>对应工具的一般使用方法</h2><p>(Hidden Content)</p>
+
+<h3 id="准备视频文件和对应标注"><a href="#准备视频文件和对应标注" class="headerlink" title="准备视频文件和对应标注"></a>准备视频文件和对应标注</h3><p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154719346.png?x-oss-process=style/resize_600" alt="image-20201026154719346"></p>
+<h3 id="切分得到-iframe，并整理样本集"><a href="#切分得到-iframe，并整理样本集" class="headerlink" title="切分得到 iframe，并整理样本集"></a>切分得到 iframe，并整理样本集</h3><p>使用 split_video_to_frames 或其他脚本切分出截图，然后根据 stage 类别将所需样本分类到不同文件夹内。</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154847812.png?x-oss-process=style/resize_600" alt="image-20201026154847812"></p>
+<h3 id="手动裁剪得到关心区域的截图，并整理文件组织结构"><a href="#手动裁剪得到关心区域的截图，并整理文件组织结构" class="headerlink" title="手动裁剪得到关心区域的截图，并整理文件组织结构"></a>手动裁剪得到关心区域的截图，并整理文件组织结构</h3><p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/clip_image001.png?x-oss-process=style/resize_600" alt="计算机生成了可选文字: ax: -23.0  xv. -0.664  : 253863  Shift + X  Ta b  Pause  Alt+C  Alt+M  Alt* Enter  Ctrl+W  a 30203  4209.  _uap  11.11ijß%-jHü  a 15588  Size. 0.03  *SCC) "></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">crops_1026_mobius&#x2F;rois_template$ tree -L 2</span><br><span class="line">.</span><br><span class="line">├── stage_buxipai</span><br><span class="line">│   ├── title_blueiconjingdianpai.jpeg</span><br><span class="line">│   └── title_putong.jpeg</span><br><span class="line">├── stage_jingdianpai</span><br><span class="line">│   ├── title_blueiconbuxipai.jpeg</span><br><span class="line">│   └── title_putong.jpeg</span><br><span class="line">├── stage_moshixuanze</span><br><span class="line">│   └── title_jingdian.jpeg</span><br><span class="line">└── stage_wanfaxuanze</span><br><span class="line">    └── title_dianwan.jpeg</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026153743078.png?x-oss-process=style/resize_600" alt="image-20201026153743078"></p>
+<h3 id="使用-phash-helper-在样本集上自动切出目标区域"><a href="#使用-phash-helper-在样本集上自动切出目标区域" class="headerlink" title="使用 phash_helper 在样本集上自动切出目标区域"></a>使用 phash_helper 在样本集上自动切出目标区域</h3><p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026153747113.png?x-oss-process=style/resize_600" alt="image-20201026153747113"></p>
+<p>设置好 iframes 文件夹、目标区域模板文件夹、保存目录等参数，执行代码段中的 get_roi_rect_info_and_crops 方法。 该方法内部会继而调用 find_roi_target 方法，通过 cv2.matchTemplate 找到大图中最匹配的坐标位置及框选大小，随后会遍历 iframes 文件夹，把每张大图都切出相同区域，保存到目标目录。这个时候可以停下来，到具体目录看切下来的图片是否符合预期、是否与给的模板小图一致。</p>
+<h3 id="使用-phash-helper-生成目标样本的-phash-数据"><a href="#使用-phash-helper-生成目标样本的-phash-数据" class="headerlink" title="使用 phash_helper 生成目标样本的 phash 数据"></a>使用 phash_helper 生成目标样本的 phash 数据</h3><p>执行代码段中的 update_roi_hash 方法，将会进行各个类别样本在其内的统计分布，此时已完成 phash 数据的生成，保存在 roi_infos 数据结构中。</p>
+<p>在生成过程中，会打印以下信息：</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154139041.png?x-oss-process=style/resize_600" alt="image-20201026154139041"></p>
+<p>我们需要关注 variance 的大小，如果样本方差较大，则很可能类别内样本差异较大，需要手动进行数据清洗或者重选ROI区域。</p>
+<h3 id="清洗数据优化-ROI-参数"><a href="#清洗数据优化-ROI-参数" class="headerlink" title="清洗数据优化 ROI 参数"></a>清洗数据优化 ROI 参数</h3><p>例如下个例子中，该类别的 variance 大于 1，是因为有如下框出来的错位的样本，我们把它手动删掉。</p>
+<p><img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154239654.png?x-oss-process=style/resize_600" alt="image-20201026154239654"></p>
+<p>最终 variance 越小越好，先验分布集中，后验时概率较尖锐，这样我们就可以在 inference 时把概率阈值设置的更小，上个例子修改后的 variance 如下：</p>
+<p> <img data-src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154446133.png?x-oss-process=style/resize_600" alt="image-20201026154446133"></p>
+<p>打印 roi_infos 可以得到所有目标的模板指纹、裁剪缩放等流水线以及类别名，需要根据具体业务再使用相应信息。</p>
+<h2 id="增加或修改某个ROI"><a href="#增加或修改某个ROI" class="headerlink" title="增加或修改某个ROI"></a>增加或修改某个ROI</h2><p>结合实际场景，我们可能会在终端上直接得到大量已裁剪好的目标区域样本，这时候就不需要 get_roi_rect_info_and_crops 动作了，直接统计计算得到指纹模板即可。</p>
+<p>为此，请准备好符合 roi_info 对应格式的对象， 把样本区分类别放置在一起各自文件夹内，文件夹名改为各类别名，然后调用 update_roi_hash 。</p>
+<p>相关用法的例子已在原脚本中有体现，多多尝试。</p>
+
+    </div>
+
+    
+    
+    
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Benjamin
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://benzblog.site/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/" title="使用Phash结合朴素贝叶斯进行目标图像匹配检测">https://benzblog.site/2020-10-26-使用Phash结合朴素贝叶斯进行目标图像匹配检测/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fab fa-fw fa-creative-commons"></i>BY-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/python/" rel="tag"><i class="fa fa-tag"></i> python</a>
+              <a href="/tags/CV/" rel="tag"><i class="fa fa-tag"></i> CV</a>
+              <a href="/tags/OCR/" rel="tag"><i class="fa fa-tag"></i> OCR</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020-04-25-docker_basic_skills/" rel="prev" title="Docker 基本使用技巧">
+      <i class="fa fa-chevron-left"></i> Docker 基本使用技巧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020-11-05-%E5%9C%A8Android%E5%B9%B3%E5%8F%B0%E4%B8%8A%E4%BD%BF%E7%94%A8%E5%86%B3%E7%AD%96%E6%A0%91%E6%96%B9%E6%B3%95%E8%BF%9B%E8%A1%8C%E7%AE%80%E5%8D%95%E7%9A%84%E5%9B%BE%E5%83%8F%E5%88%86%E7%B1%BB%E8%AF%86%E5%88%AB/" rel="next" title="在Android平台上使用决策树方法进行简单的图像分类识别">
+      在Android平台上使用决策树方法进行简单的图像分类识别 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+    
+  <div class="comments">
+    <div id="disqus_thread">
+      <noscript>Please enable JavaScript to view the comments powered by Disqus.</noscript>
+    </div>
+  </div>
+  
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#phash-原理"><span class="nav-number">1.</span> <span class="nav-text">phash 原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#朴素贝叶斯原理"><span class="nav-number">2.</span> <span class="nav-text">朴素贝叶斯原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对应工具的一般使用方法"><span class="nav-number">3.</span> <span class="nav-text">对应工具的一般使用方法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#准备视频文件和对应标注"><span class="nav-number">3.1.</span> <span class="nav-text">准备视频文件和对应标注</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#切分得到-iframe，并整理样本集"><span class="nav-number">3.2.</span> <span class="nav-text">切分得到 iframe，并整理样本集</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#手动裁剪得到关心区域的截图，并整理文件组织结构"><span class="nav-number">3.3.</span> <span class="nav-text">手动裁剪得到关心区域的截图，并整理文件组织结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-phash-helper-在样本集上自动切出目标区域"><span class="nav-number">3.4.</span> <span class="nav-text">使用 phash_helper 在样本集上自动切出目标区域</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用-phash-helper-生成目标样本的-phash-数据"><span class="nav-number">3.5.</span> <span class="nav-text">使用 phash_helper 生成目标样本的 phash 数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#清洗数据优化-ROI-参数"><span class="nav-number">3.6.</span> <span class="nav-text">清洗数据优化 ROI 参数</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#增加或修改某个ROI"><span class="nav-number">4.</span> <span class="nav-text">增加或修改某个ROI</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="BenZ"
+      src="https://benzgallery.oss-cn-shanghai.aliyuncs.com/sailing_cat 1200.png">
+  <p class="site-author-name" itemprop="name">BenZ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">15</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">32</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/BenZstory" title="GitHub → https://github.com/BenZstory" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:zhengbin0320@gmail.com" title="E-Mail → mailto:zhengbin0320@gmail.com" rel="noopener" target="_blank"><i class="fa fa-envelope fa-fw"></i>E-Mail</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="/atom.xml" title="RSS → /atom.xml"><i class="fa fa-rss fa-fw"></i>RSS</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://t.me/sailingcat" title="Telegram → https://t.me/sailingcat" rel="noopener" target="_blank"><i class="fa fa-paper-plane fa-fw"></i>Telegram</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+        <div class="back-to-top motion-element">
+          <i class="fa fa-arrow-up"></i>
+          <span>0%</span>
+        </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">BenZ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://pisces.theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+  <script src="//cdn.jsdelivr.net/gh/fancyapps/fancybox@3/dist/jquery.fancybox.min.js"></script>
+  <script src="//cdn.jsdelivr.net/npm/lozad@1/dist/lozad.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+          load: ['[tex]/mhchem'],
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+          packages: {'[+]': ['mhchem']},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+<script>
+  function loadCount() {
+    var d = document, s = d.createElement('script');
+    s.src = 'https://benzbloghexo.disqus.com/count.js';
+    s.id = 'dsq-count-scr';
+    (d.head || d.body).appendChild(s);
+  }
+  // defer loading until the whole page loading is completed
+  window.addEventListener('load', loadCount, false);
+</script>
+<script>
+  var disqus_config = function() {
+    this.page.url = "https://benzblog.site/2020-10-26-%E4%BD%BF%E7%94%A8Phash%E7%BB%93%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E8%BF%9B%E8%A1%8C%E7%9B%AE%E6%A0%87%E5%9B%BE%E5%83%8F%E5%8C%B9%E9%85%8D%E6%A3%80%E6%B5%8B/";
+    this.page.identifier = "2020-10-26-使用Phash结合朴素贝叶斯进行目标图像匹配检测/";
+    this.page.title = "使用Phash结合朴素贝叶斯进行目标图像匹配检测";
+    };
+  NexT.utils.loadComments(document.querySelector('#disqus_thread'), () => {
+    if (window.DISQUS) {
+      DISQUS.reset({
+        reload: true,
+        config: disqus_config
+      });
+    } else {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://benzbloghexo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', '' + +new Date());
+      (d.head || d.body).appendChild(s);
+    }
+  });
+</script>
+
+</body>
+</html>
