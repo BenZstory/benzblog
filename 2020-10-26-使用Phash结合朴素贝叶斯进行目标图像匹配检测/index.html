@@ -37,7 +37,7 @@
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154239654.png?x-oss-process=style/resize_600">
 <meta property="og:image" content="https://benzgallery.oss-cn-shanghai.aliyuncs.com/image-20201026154446133.png?x-oss-process=style/resize_600">
 <meta property="article:published_time" content="2020-10-25T16:00:00.000Z">
-<meta property="article:modified_time" content="2020-11-10T14:32:08.018Z">
+<meta property="article:modified_time" content="2020-11-12T14:37:27.738Z">
 <meta property="article:author" content="BenZ">
 <meta property="article:tag" content="python">
 <meta property="article:tag" content="CV">
@@ -223,7 +223,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-11-10 22:32:08" itemprop="dateModified" datetime="2020-11-10T22:32:08+08:00">2020-11-10</time>
+                <time title="修改时间：2020-11-12 22:37:27" itemprop="dateModified" datetime="2020-11-12T22:37:27+08:00">2020-11-12</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -285,8 +285,10 @@
 <p>为此，我们需要考虑一种方法，使得指纹模板能够覆盖更多样本的分布，于是想到了用朴素贝叶斯的方法。</p>
 <p>有关朴素贝叶斯算法的理解，建议参考<a href="https://juejin.im/post/6844904048009674760" target="_blank" rel="noopener">这篇文章</a>。</p>
 <p>简单来说，就是考虑每个特征在某一事件下出现概率的联合概率越大，则事件发生的概率越大。</p>
-<p>所以，给定同一目标$Y_j$的多个样本作为模板，我们将他们作同样的特征处理，特征共有$N$维，统计得到特征 $x_i=1$的概率$a_{ij})$ (则特征为$x_i=0$ 的概率为 $1-a_{ij}$) ，在对新样本$X=(x_1, x_2, … x_n)$判断是否与模板$Y_i$相同时，则用以下公式：</p>
-<p>$$<br>log(P(Y_j|X)) = logP(Y_j) + \sum_{i=0}^N(1-x_i)logP(x_1=0|Y_i) + \sum_{i=0}^NlogP(x_1=1|Y_i)<br>$$<br>将统计得到的概率值代入，即：<br>$$<br>log(P(Y_j|X)) = logP(Y_j) + \sum_{i=0}^N (1-x_i)log(1-a_{ij}) + \sum_{i=0}^Nlog(a_{ij})<br>$$<br>假定各个类别的先验概率都是一样的，最终问题变为计算等式右边后两项，形式上跟交叉熵很像，当值小于预设的阈值时，我们就认为属于对应分类。 </p>
+<p>所以，给定同一目标$Y_j$的多个样本作为模板，我们将他们作同样的特征处理，特征共有$N$维，记为$X=(x_1, x_2, … x_n)$，记 $x_i=1$ 的统计概率为 $a_ji$，则其伯努利形式概率质量函数为<br>$$<br>P(x_i|Y_j)=a_{ji}^{x_i}(1-a_{ji})^{1-x_i} , x_i=0或1<br>$$<br>根据朴素贝叶斯的概率公式<br>$$<br>P(Y_j|X) = \frac{P(Y_j)}{P(X)}\prod_{i=0}^NP(x_i|Y_j)<br>$$<br>，带入后有：<br>$$<br>P(Y_j|X) = \frac{logP(Y_j)\prod_{i=0}^Na_{ji}^{x_i}(1-a_{ji})^{1-x_i}}{P(X)}<br>$$</p>
+<p>其中P(X)为常数，可省去，再将两边取对数，得到如下：<br>$$<br>log(P(Y_j|X)) = logP(Y_j) + \sum_{i=0}^Nx_ilog(a_{ji}) + \sum_{i=0}^N (1-x_i)log(1-a_{ji})<br>$$<br>在训练时，统计${Y_j}$的先验概率$Y_j$以及上每个特征等于1的时候的概率 ${a_{ji}}$， 在验证时，把特征向量以${x_i}$带入上式，比较不同Y下的值，取argmax作为结果。</p>
+<p>对于图像匹配问题，同一分布内，$Y_j$包括属于或不属于某一类对照，共两个类别，由于负样本收集标注起来较麻烦，为简化问题，我这里只计算了正样本每个特征的概率，并假定正负类别概率一样，所以我在代码里干脆把先验概率 $logP(Y_j)$ 一项也给省掉了，换用一个经验阈值来判断是否属于正样本类别。(正常做法应该是正负类别分别统计，验证时分别计算概率估计，取大的一方作为结果。)</p>
+<p>另外，为避免被取log的值为0得到无穷小，我们还需要进行数值上的平滑。一般采用拉普拉斯平滑，需要在计算每个$a_{ji}$时，分子分母各加一定值，不过我的代码里是在最后 log 前加了一个极小值进行平滑，区别较大，但统计的代码简单了许多。具体算法流程可以参考这篇 sklearn 源码里引用的文章-<a href="https://nlp.stanford.edu/IR-book/html/htmledition/the-bernoulli-model-1.html" target="_blank" rel="noopener">IR-book-the-bernoulli-model</a>。</p>
 <p>代码参考如下：</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">def cmpHashDiff(template, target):</span><br><span class="line">    t &#x3D; template.copy()</span><br><span class="line">    </span><br><span class="line">    epsilon &#x3D; 0.0000001</span><br><span class="line">    t[t&#x3D;&#x3D;1] &#x3D; 1-epsilon</span><br><span class="line">    t[t&#x3D;&#x3D;0] &#x3D; epsilon</span><br><span class="line">    </span><br><span class="line">    t_log_positive &#x3D; np.log(t)</span><br><span class="line">    t_log_negative &#x3D; np.log(1-t)</span><br><span class="line">    ret_matrice &#x3D; (1-target)*t_log_negative + target*t_log_positive</span><br><span class="line">    ret &#x3D; np.sum(ret_matrice)</span><br><span class="line">    return ret</span><br></pre></td></tr></table></figure>
 
